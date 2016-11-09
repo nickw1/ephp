@@ -1,0 +1,5 @@
+Unless otherwise stated (in third party components), this software is 
+
+Copyright (c) Southampton Solent University, 2016
+
+This software is licenced under the GPL, v3.
