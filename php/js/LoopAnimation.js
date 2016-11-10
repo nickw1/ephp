@@ -40,8 +40,11 @@ LoopAnimation.prototype.loopAnimate = function(queryIndex,rowIndex, loopLine,
             loop.vars[i].lineNumber) {
             var cell = document.getElementById("row"+rowIndex+"_"+
                 sqlquery.loop.vars[i].value);
-            cell.classList.add("selected");
-            selectedCells.push(cell);
+			// 101116 possibility that a nonexistent column is in the loop code
+			if(cell!=null) {
+            	cell.classList.add("selected");
+            	selectedCells.push(cell);
+			}
         }
     }
 

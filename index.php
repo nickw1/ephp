@@ -19,8 +19,8 @@ class EPHPPage extends Page {
 		?>
 		<form method="post" action="ftp.php">
 		<label for="username">Username:</label>
-		<input name="username" id="username" />
-		<label for="password">Password:</label>
+		<input name="username" id="username" value="ephp001" />
+		<label for="password">Password (leave blank):</label>
 		<input name="password" id="password" type="password" />
 		<input type="button" id="ftpsubmit" value="Go!" />
 		</form>
