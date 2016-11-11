@@ -7,7 +7,7 @@ function init() {
     var mode=0;
     var savedLoginHTML="", originalLoginDivContents = "";
 
-	var mq = window.matchMedia("screen and (max-height: 799px)");
+	var mq = window.matchMedia("screen and (max-device-height: 799px)");
 	document.getElementById("network_canvas").setAttribute
 			("height", mq.matches? "336px": "536px");
 

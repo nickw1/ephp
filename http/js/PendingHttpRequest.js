@@ -67,7 +67,7 @@ PendingHttpRequest.prototype.send = function(immediateCallback) {
 			var json=null;
 			if(analysePHP) {
 				json = JSON.parse(xmlHTTP.responseText); 
-				if(xmlHTTP.status==200) {
+				if(xmlHTTP.status==200 && json.response) {
 					for(header in json.response.headers) {
 						if(header!="Server") {
 							this.editableResponse.headers[header] = 

@@ -195,85 +195,107 @@ class TokenReader {
             $this->tokens[$this->index+8]=="," &&
             is_array($this->tokens[$this->index+9]) &&
             $this->tokens[$this->index+9][0] == T_CONSTANT_ENCAPSED_STRING){
-                return array(
-                    array($this->tokens[$this->index][1],
+
+            // mysql:host=localhost;dbname=dftitutorials
+			$host = null;
+			$dbname = null;
+            $conninfo =  explode(":",$this->tokens[$this->index+5][1]);
+            if(count($conninfo)==2) {
+                $keyvals = explode(";", $conninfo[1]);
+                foreach ($keyvals as $keyval) {
+                    $kv_array = explode("=", $keyval);
+                    if(count($kv_array)==2) {
+                        switch($kv_array[0]) {
+                            case "host":
+                                $host = $kv_array[1];
+                                break;
+                            case "dbname":
+                                $dbname = $kv_array[1];
+                                break;
+                        }
+                    }
+                }    
+            }
+			return array(
+                        array($this->tokens[$this->index][1],
                             str_replace('"','',
                                 $this->tokens[$this->index+7][1]),
                             str_replace('"','',
-                                $this->tokens[$this->index+9][1])), 
+                                $this->tokens[$this->index+9][1]),
+                            $host, $dbname), 
                         10);
-            }
+        }
         return null;
     }
 
-	public function getSQLLoop($resultvars) {
-		$i = $this->index;
-		$result = $loop = $matched_resultvar = null;
-		if($this->index <= count($this->tokens)-11 &&
-			is_array($this->tokens[$this->index]) &&
-			$this->tokens[$this->index][0]==T_WHILE &&
-			$this->tokens[$this->index+1]=="(" &&
-			is_array($this->tokens[$this->index+2]) &&
-			$this->tokens[$this->index+2][0]==T_VARIABLE &&
-			$this->tokens[$this->index+3]=="=" &&
-			is_array($this->tokens[$this->index+4]) &&
-			$this->tokens[$this->index+4][0]==T_VARIABLE &&
-			in_array($this->tokens[$this->index+4][1], $resultvars) &&
-			is_array($this->tokens[$this->index+5]) &&
-			$this->tokens[$this->index+5][0]==T_OBJECT_OPERATOR &&
-			is_array($this->tokens[$this->index+6]) &&
-			$this->tokens[$this->index+6][0]==T_STRING &&
-			$this->tokens[$this->index+6][1] == "fetch" &&
-			$this->tokens[$this->index+7]=="(" &&
-			$this->tokens[$this->index+8]==")" &&
-			$this->tokens[$this->index+9]==")") {
+    public function getSQLLoop($resultvars) {
+        $i = $this->index;
+        $result = $loop = $matched_resultvar = null;
+        if($this->index <= count($this->tokens)-11 &&
+            is_array($this->tokens[$this->index]) &&
+            $this->tokens[$this->index][0]==T_WHILE &&
+            $this->tokens[$this->index+1]=="(" &&
+            is_array($this->tokens[$this->index+2]) &&
+            $this->tokens[$this->index+2][0]==T_VARIABLE &&
+            $this->tokens[$this->index+3]=="=" &&
+            is_array($this->tokens[$this->index+4]) &&
+            $this->tokens[$this->index+4][0]==T_VARIABLE &&
+            in_array($this->tokens[$this->index+4][1], $resultvars) &&
+            is_array($this->tokens[$this->index+5]) &&
+            $this->tokens[$this->index+5][0]==T_OBJECT_OPERATOR &&
+            is_array($this->tokens[$this->index+6]) &&
+            $this->tokens[$this->index+6][0]==T_STRING &&
+            $this->tokens[$this->index+6][1] == "fetch" &&
+            $this->tokens[$this->index+7]=="(" &&
+            $this->tokens[$this->index+8]==")" &&
+            $this->tokens[$this->index+9]==")") {
 
-			$i = $this->index+11;
-			$loop = array();
-			$loop["start"] = $this->tokens[$this->index][2];
-			$loop["vars"] = array();
-			$loop["rowvar"] = $this->tokens[$this->index+2][1];
-			$nesting=0;
-			$matched_resultvar = $this->tokens[$this->index+4][1];
-			$rowecho=array();
+            $i = $this->index+11;
+            $loop = array();
+            $loop["start"] = $this->tokens[$this->index][2];
+            $loop["vars"] = array();
+            $loop["rowvar"] = $this->tokens[$this->index+2][1];
+            $nesting=0;
+            $matched_resultvar = $this->tokens[$this->index+4][1];
+            $rowecho=array();
 
-			while($i<count($this->tokens)&&
-				($this->tokens[$i]!="}" || $nesting>0)) {
-//				echo "IN LOOP: $nesting ";
-//				print_token($this->tokens[$i], $i);
-				if(is_array($this->tokens[$i])) {
-					
-					$loop["end"] = $this->tokens[$i][2];
-					if($this->tokens[$i][0]==T_VARIABLE &&
-						$this->tokens[$i][1]==$loop["rowvar"] &&
-						$this->tokens[$i+1]=="[" &&
-						is_array($this->tokens[$i+2]) &&
-						($this->tokens[$i+2][0]==T_STRING ||
-						$this->tokens[$i+2][0]==T_CONSTANT_ENCAPSED_STRING) &&
-						$this->tokens[$i+3]="]") {
-						//echo "Found rowvar\n";
-						$loop["vars"][] = array ("lineNumber"=>
-							$this->tokens[$i][2], "value"=>
-							str_replace('"','',$this->tokens[$i+2][1]));
-						
-					}
-				} elseif ($this->tokens[$i]=="{") {
-					//echo "Found a {\n";
-					$nesting++;
-				} elseif($this->tokens[$i]=="}" && $nesting>0) {
-					//echo "Found a }\n";
-					$nesting--;
-				}
-				$i++;
-			}
-		}
+            while($i<count($this->tokens)&&
+                ($this->tokens[$i]!="}" || $nesting>0)) {
+//                echo "IN LOOP: $nesting ";
+//                print_token($this->tokens[$i], $i);
+                if(is_array($this->tokens[$i])) {
+                    
+                    $loop["end"] = $this->tokens[$i][2];
+                    if($this->tokens[$i][0]==T_VARIABLE &&
+                        $this->tokens[$i][1]==$loop["rowvar"] &&
+                        $this->tokens[$i+1]=="[" &&
+                        is_array($this->tokens[$i+2]) &&
+                        ($this->tokens[$i+2][0]==T_STRING ||
+                        $this->tokens[$i+2][0]==T_CONSTANT_ENCAPSED_STRING) &&
+                        $this->tokens[$i+3]="]") {
+                        //echo "Found rowvar\n";
+                        $loop["vars"][] = array ("lineNumber"=>
+                            $this->tokens[$i][2], "value"=>
+                            str_replace('"','',$this->tokens[$i+2][1]));
+                        
+                    }
+                } elseif ($this->tokens[$i]=="{") {
+                    //echo "Found a {\n";
+                    $nesting++;
+                } elseif($this->tokens[$i]=="}" && $nesting>0) {
+                    //echo "Found a }\n";
+                    $nesting--;
+                }
+                $i++;
+            }
+        }
 
-		return $loop!=null ? 
-			array(array("resultvar"=>$matched_resultvar,
-						"loop"=>$loop),
-						$i-$this->index) : null;
-	}
-			
+        return $loop!=null ? 
+            array(array("resultvar"=>$matched_resultvar,
+                        "loop"=>$loop),
+                        $i-$this->index) : null;
+    }
+            
     public function getSQLQuery($pdovar, $vars) {
         $i = $this->index;
         $query = null; 
@@ -382,8 +404,10 @@ elseif(($fileinfo=get_php_file($target,$config["ephproot"]))==null) {
             $errors[] = "HTTP request for file on server failed.";
 
         } elseif(preg_match("/<b>Parse error<\/b>:  syntax error, (.*) in .* on line <b>(\d+)<\/b>/", $script_result["content"], $matches)) { 
-            $errors[] = array ("syntaxError"=>$matches[1],
-                                "lineNumber"=>$matches[2]);
+            $errors[] = array ("syntaxError" => 
+							array ("reason"=>$matches[1],
+								"lineNumber"=>$matches[2])
+						);
             $httpCode = 200; // still made successful request
         } elseif($script_result["status"]["code"]==200) {
             if(($target_contents = @file_get_contents($targetfile))===false) {
@@ -399,7 +423,9 @@ elseif(($fileinfo=get_php_file($target,$config["ephproot"]))==null) {
                 $pdovar = null;
                 $queries = array();
 
-                $username==null;
+                $username=null;
+				$host=null;
+				$dbname=null;
 
                 while(! $tok->atEnd()) {
                     $result = $tok->findInputVars($_SERVER["REQUEST_METHOD"]);
@@ -413,18 +439,20 @@ elseif(($fileinfo=get_php_file($target,$config["ephproot"]))==null) {
                             $pdovar = $result[0][0];
                             $username = $result[0][1];
                             $password = $result[0][2];
+							$host = $result[0][3];
+							$dbname = $result[0][4];
                             $tok->forward($result[1]);
                         } elseif($pdovar!=null &&
                                 ($result = $tok->getSQLQuery($pdovar, $vars)) 
                                 != null) {
                             $queries[$result[0]["resultvar"]] = $result[0];
-							$resultvars[] = $result[0]["resultvar"];
+                            $resultvars[] = $result[0]["resultvar"];
                             $tok->forward($result[1]);
                         } elseif(($result=$tok->getSQLLoop($resultvars))!=null){
-							$queries[$result[0]["resultvar"]]["loop"] = 
-								$result[0]["loop"];
-							$tok->forward($result[1]);
-						} else { 
+                            $queries[$result[0]["resultvar"]]["loop"] = 
+                                $result[0]["loop"];
+                            $tok->forward($result[1]);
+                        } else { 
                             $tok->forward(1);
                         }
                     }
@@ -433,10 +461,10 @@ elseif(($fileinfo=get_php_file($target,$config["ephproot"]))==null) {
 
                     if($username != $expectedUsername) { 
                         $errors[]="Cannot connect to another user's database.";
-                    } else {
+                    } elseif($host && $dbname) {
                         try {
                             $conn= 
-                                new PDO("mysql:host=localhost;dbname=$username",
+                                new PDO("mysql:host=$host;dbname=$dbname",
                                 $username,$password);
 
                             foreach($queries as $query) { 
@@ -448,10 +476,12 @@ elseif(($fileinfo=get_php_file($target,$config["ephproot"]))==null) {
                                     $result = $query["query"]->execute($conn);
                                     if($result===false) {
                                         $sqlerr = $conn->errorInfo();
-                                        $errors[] = array
+                                        $errors[] = array 
+											("sqlError" => array
                                         ("query"=> $sql, "error"=>$sqlerr[2],
                                         "lineNumber"=>$query["query"]->
-                                            getLineNumber());
+                                            getLineNumber())
+										);
                                     } else {
                                         while($row=$result->fetch
                                         (PDO::FETCH_ASSOC)) {
@@ -460,7 +490,7 @@ elseif(($fileinfo=get_php_file($target,$config["ephproot"]))==null) {
                                         $sqlresults[]=array 
                                             ("sql" => $sqlWithVars, 
                                             "variable"=>$query["resultvar"],
-											"loop"=>$query["loop"],
+                                            "loop"=>$query["loop"],
                                             "lineNumber"=>$query["query"]->
                                                 getLineNumber(),
                                                 "results" => $curResults);
@@ -469,9 +499,13 @@ elseif(($fileinfo=get_php_file($target,$config["ephproot"]))==null) {
                             }
                         } catch (PDOException $e) {
                             $errors[] = "Cannot connect to database with ".
-                                "username and password in target PHP file."; 
+                                "username and password in target PHP file." .
+								$e->getMessage(); 
                         }
-                    }
+                    } else {
+						$errors[] = "Host and/or database name missing from ".
+									"PDO connection.";
+					}
                 } 
             } 
         } 

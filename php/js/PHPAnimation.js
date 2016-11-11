@@ -145,7 +145,7 @@ PHPAnimation.prototype.doAnimate = function(lineCount) {
             this.browserCallback (this.data.vars[this.varCount].httpVar,
                             this.colours[this.varCount%this.colours.length]);
             this.varCount+=(this.varCount+1<this.data.vars.length ? 1:0);
-        } else if(lineCount+1 == 
+        } else if(this.data.sqlqueries.length && lineCount+1 == 
             this.data.sqlqueries[this.sqlCount].lineNumber) {
 
             this.findVarsInLines(this.data.sqlqueries, this.sqlCount,
