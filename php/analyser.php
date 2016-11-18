@@ -499,8 +499,7 @@ elseif(($fileinfo=get_php_file($target,$config["ephproot"]))==null) {
                             }
                         } catch (PDOException $e) {
                             $errors[] = "Cannot connect to database with ".
-                                "username and password in target PHP file." .
-								$e->getMessage(); 
+                                "username and password in target PHP file."; 
                         }
                     } else {
 						$errors[] = "Host and/or database name missing from ".

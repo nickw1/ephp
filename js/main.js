@@ -7,9 +7,9 @@ function init() {
     var mode=0;
     var savedLoginHTML="", originalLoginDivContents = "";
 
-	var mq = window.matchMedia("screen and (max-device-height: 799px)");
-	document.getElementById("network_canvas").setAttribute
-			("height", mq.matches? "336px": "536px");
+    var mq = window.matchMedia("screen and (max-device-height: 799px)");
+    document.getElementById("network_canvas").setAttribute
+            ("height", mq.matches? "336px": "536px");
 
     var fileExplorer=new FileExplorer('serverContent', 
                             'fs/fs.php','client',
@@ -55,6 +55,9 @@ function init() {
                                     } )
                                 }});
 
+	window.addEventListener("resize", 
+			animation.calculateCanvasPos.bind(animation));
+
     var errors = { 
                     256: 'Unable to move temporary file on server',
                     257: 'File upload security violation detected',
@@ -86,12 +89,13 @@ function init() {
 
 
     var sendData = function(sendFile, additionalCallback, e) {
-            var formData = new FormData(), authenticating=false;
+            var formData = new FormData(), authenticating=false,
+                cancelPressed=false;
             savedLoginHTML = document.getElementById("login").innerHTML;
 
             if(document.getElementById("username") && 
                 document.getElementById("password")) { 
-			
+        
                 formData.append("username", 
                     document.getElementById("username").value);
                 formData.append("password", 
@@ -102,7 +106,7 @@ function init() {
             if(sendFile) {
                 if(fileInfo.file==null) {
                     filename = prompt("Unsaved file. Please enter a filename:");
-                    
+                       cancelPressed = filename==null; 
                     if(filename!=null && fileExplorer) {
                         filename=fileExplorer.dir+"/"+filename;
                     }
@@ -126,7 +130,7 @@ function init() {
                 document.getElementById("login").innerHTML = msg +
                     "<img src='assets/images/ajax-loader.gif' "+
                     "alt='ajax loader' />";
-				http.post('ftp/ftp.php', formData).then(function(xmlHTTP) {
+                http.post('ftp/ftp.php', formData).then(function(xmlHTTP) {
                     var json = JSON.parse(xmlHTTP.responseText);
                     if(json.status!=0 && (sendFile || json.status>=1024)) {
                         alert('Error: ' + errors[json.status]);
@@ -143,11 +147,14 @@ function init() {
                                 "<p>Logged in as " + loggedin +
                                 " <a href='ftp/logout.php'>Logout</a></p>";
                             doToolbar();
-							http.get('ftp/backup.php').then (
-                            	function(xmlHTTP) {
+                            http.get('ftp/backup.php').then (
+                                function(xmlHTTP) {
                                     var json=JSON.parse(xmlHTTP.responseText);
                                     browser.setCode(json.src);
                                     if(json.filename!="") {
+                                        // We want to mark reloaded backup code
+                                        // as unaltered if already saved
+                                        browser.markUnaltered();
                                         fileInfo.file=json.filename;
                                         showFilename();
                                     }
@@ -161,7 +168,8 @@ function init() {
                         // If we are saving an old file, go to the callback
                         // which defines what we do next (e.g. copy drag and
                         // drop data to the source editor)
-                        if(additionalCallback) { 
+
+                        if(additionalCallback) {
                             additionalCallback();
                         // only show the filename if we are NOT saving the
                         // old file
@@ -171,7 +179,9 @@ function init() {
                         }
                     }
                 });
-            } else if (additionalCallback) {
+            // If cancel was pressed for saving old file, do not
+            // run additional callback
+            } else if (additionalCallback && !cancelPressed) {
                 additionalCallback();
             }
         };
@@ -272,13 +282,13 @@ function init() {
                         showFilename();
                         a.setAttribute("download", fileInfo.file);
                         a.setAttribute("href", "data:text/plain;charset=utf-8,"+encodeURIComponent(browser.getCode()));
-					/*
-					var event = new Event('click'); // new way?
-					*/
-				
+                    /*
+                    var event = new Event('click'); // new way?
+                    */
+                
                      var event = document.createEvent('MouseEvents');
                       event.initEvent('click', true, true);
-				
+                
                         a.dispatchEvent(event);
                     }
                 }

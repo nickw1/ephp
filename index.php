@@ -19,8 +19,8 @@ class EPHPPage extends Page {
 		?>
 		<form method="post" action="ftp.php">
 		<label for="username">Username:</label>
-		<input name="username" id="username" />
-		<label for="password">Password:</label>
+		<input name="username" id="username" value="ephp001" />
+		<label for="password">Password (leave blank):</label>
 		<input name="password" id="password" type="password" />
 		<input type="button" id="ftpsubmit" value="Go!" />
 		</form>
@@ -104,7 +104,7 @@ $scripts = array
 			'http/js/ServerAnimation.js',
 			'php/js/PHPAnimation.js',
 			'php/js/LoopAnimation.js',
-			'http://www.free-map.org.uk/fm/js/lib/PromiseAjax.js',
+			'http://www.free-map.org.uk/javascript/PromiseAjax.js',
 			'ace-builds/src-noconflict/ace.js');
 
 $css = array ('css/ephp.css');

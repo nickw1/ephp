@@ -7,17 +7,10 @@ function Animation(options) {
     this.canvas = document.getElementById(options.canvasId);
     this.ctx = this.canvas.getContext('2d');
     this.animationState = this.messageTypes.NONE;
-    this.canvasX = 0; 
-    this.canvasY=0; 
     this.mouseX = this.mouseY = -1;
     this.lastMoveTime = -1;
     this.box = new HttpBox(this.http, { parent: 'network' });
-    var elem=this.canvas;
-    while(elem!=null) {
-        this.canvasX+=elem.offsetLeft;
-        this.canvasY+=elem.offsetTop;
-        elem=elem.offsetParent;
-    }    
+    this.calculateCanvasPos();
     this.canvas.addEventListener("mousemove", (function(e) {
                 if(this.animationState!=this.messageTypes.NONE) {
                     var localX=e.pageX-this.canvasX,
@@ -37,6 +30,16 @@ Animation.prototype.boxProps = { relativePos: 40, width:120, height:40,
                             fontSize:10};
 Animation.prototype.arrow = { outlineWidth: 2, size: 20 };
 
+Animation.prototype.calculateCanvasPos = function() {
+    this.canvasX = this.canvasY = 0; 
+    var elem=this.canvas;
+    while(elem!=null) {
+        this.canvasX+=elem.offsetLeft;
+        this.canvasY+=elem.offsetTop;
+        elem=elem.offsetParent;
+    }    
+}
+
 Animation.prototype.setHttp = function(http) {
     this.http=http;
     this.box.http=http;
@@ -44,7 +47,7 @@ Animation.prototype.setHttp = function(http) {
 
 Animation.prototype.animate = function() {
     this.x = 0; 
-	this.box.hide();
+    this.box.hide();
     if(this.fileExplorer) {
         this.fileExplorer.home ( (function() {
                     this.timer = setInterval
@@ -114,51 +117,51 @@ Animation.prototype.doAnimate = function(messageType) {
                     interval:500, 
                     callback: 
                         (function() {
-							// TODO go in own object - seems poor cohesion to
-							// put here, particularly error checking
+                            // TODO go in own object - seems poor cohesion to
+                            // put here, particularly error checking
                             this.http.send((function(analyserInfo) {
                                 var startResponseNow=true;
                                 if(analyserInfo) {
                                     if(analyserInfo.errors) {
-										var errMsg="";
-										for(var i=0; i<analyserInfo.errors.
-											length; i++) {
-											if(analyserInfo.errors[i].
-												syntaxError) {
-												errMsg += "There was a " +
-													"syntax error in your "+
-													"PHP code on line number "+
-													analyserInfo.errors[i].
-														syntaxError.lineNumber +
-													".\nThe reason is " +
-													analyserInfo.errors[i].
-														syntaxError.reason +
-													"\n. If you cannot see a "+
-													"problem with this line, "+
-													"look at the preceding "+
-													"two or three lines.\n";
-											} else if (analyserInfo.errors[i].
-												sqlError) {
-												errMsg += "There was an " +
-													"error in your "+
-													"SQL on line number "+
-													analyserInfo.errors[i].
-														sqlError.lineNumber +
-													".\n("+
-													analyserInfo.errors[i].
-														sqlError.query +
-													")\nThe reason is " +
-													analyserInfo.errors[i].
-														sqlError.error +
-													"\n.";
-											} else {
-												errMsg += 
-													analyserInfo.errors[i] +
-												"\n";
-											}
-										}
+                                        var errMsg="";
+                                        for(var i=0; i<analyserInfo.errors.
+                                            length; i++) {
+                                            if(analyserInfo.errors[i].
+                                                syntaxError) {
+                                                errMsg += "There was a " +
+                                                    "syntax error in your "+
+                                                    "PHP code on line number "+
+                                                    analyserInfo.errors[i].
+                                                        syntaxError.lineNumber +
+                                                    ".\nThe reason is " +
+                                                    analyserInfo.errors[i].
+                                                        syntaxError.reason +
+                                                    "\n. If you cannot see a "+
+                                                    "problem with this line, "+
+                                                    "look at the preceding "+
+                                                    "two or three lines.\n";
+                                            } else if (analyserInfo.errors[i].
+                                                sqlError) {
+                                                errMsg += "There was an " +
+                                                    "error in your "+
+                                                    "SQL on line number "+
+                                                    analyserInfo.errors[i].
+                                                        sqlError.lineNumber +
+                                                    ".\n("+
+                                                    analyserInfo.errors[i].
+                                                        sqlError.query +
+                                                    ")\nThe reason is " +
+                                                    analyserInfo.errors[i].
+                                                        sqlError.error +
+                                                    "\n.";
+                                            } else {
+                                                errMsg += 
+                                                    analyserInfo.errors[i] +
+                                                "\n";
+                                            }
+                                        }
                                         alert(errMsg);
-										startResponseNow = false;
+                                        startResponseNow = false;
                                     } else {
                                         startResponseNow=
                                             !this.phpAnimation.animate
