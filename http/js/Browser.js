@@ -119,11 +119,6 @@ Browser.prototype.loadResponse = function(o) {
     } 
 }
 
-Browser.prototype.loadContentToEditor = function(mimetype, responseText) {
-    this.editor.setValue(responseText);
-    this.altered = true;
-    this.showContent(mimetype, responseText);
-}
 
 Browser.prototype.showContent = function(mimetype, responseText) {
     if (mimetype=='text/plain') {
@@ -279,10 +274,9 @@ Browser.prototype.setCode = function(code) {
 Browser.prototype.setContent = function(mime,code) {
     this.editor.setValue(code);
     this.showContent(mime, code);
-    this.altered = true;
+    this.markUnaltered();
 }
     
-
 Browser.prototype.getCode = function() {
     return this.editor.getValue();
 }
@@ -307,8 +301,8 @@ Browser.prototype.loadDocumentOrImage = function(mimetype, url, responseText) {
 	if(mimetype=='image/jpeg' || mimetype=='image/png' ||
 				mimetype=='image/jpg') { 
 		this.showImage(url);
+		this.markUnaltered();
 	} else {
-		this.loadContentToEditor(mimetype, responseText);
+		this.setContent(mimetype, responseText);
 	}
-	this.markUnaltered();
 }

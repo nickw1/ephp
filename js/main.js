@@ -16,7 +16,6 @@ function init() {
                             { showContentCallback: function(mime,src) {
                                     saveOld(function() {
                                         browser.setContent(mime,src);
-                                        browser.markUnaltered();
                                         fileInfo = newFileInfo;
                                         browser.setWebDir
                                             ("/~"+loggedin+"/"+
@@ -55,8 +54,8 @@ function init() {
                                     } )
                                 }});
 
-	window.addEventListener("resize", 
-			animation.calculateCanvasPos.bind(animation));
+    window.addEventListener("resize", 
+            animation.calculateCanvasPos.bind(animation));
 
     var errors = { 
                     256: 'Unable to move temporary file on server',
@@ -87,69 +86,134 @@ function init() {
           'file_save' : ['none'] }
         ];
 
+    var dialog = new Dialog ("client",
+                            { 
+                                'Yes': function() {
+                                    dialog.hide();
+                                    uploadContent();
+                                    if(dialog.additionalCallback) {
+                                        dialog.additionalCallback();
+                                        dialog.additionalCallback = null;
+                                    }
+                                }, 
+                                'No': function() {
+                                    dialog.hide();
+                                    if(dialog.additionalCallback) {
+                                        dialog.additionalCallback();
+                                        dialog.additionalCallback = null;
+                                    }
+                                },
+                                'Cancel': function() {
+                                    dialog.hide();
+                                }
+                            },
+                            {
+                                top: '300px',
+                                left: '100px',
+                                width: '200px',
+                                height: '100px',
+                                position:'absolute',
+                                backgroundColor: '#ffffc0',
+                                border: '1px solid black'
+                            }
+                            );
 
-    var sendData = function(sendFile, additionalCallback, e) {
-            var formData = new FormData(), authenticating=false,
-                cancelPressed=false;
-            savedLoginHTML = document.getElementById("login").innerHTML;
 
-            if(document.getElementById("username") && 
-                document.getElementById("password")) { 
+    var askUploadFile = function(additionalCallback) {
+        dialog.additionalCallback = additionalCallback;
+        dialog.setContent("Unsaved file. Upload to server?");
+        dialog.show();
+    }
+
+    var uploadContent = function() {
+
+        var formData = new FormData();
+        savedLoginHTML = document.getElementById("login").innerHTML;
+
+        if(document.getElementById("username") && 
+            document.getElementById("password")) { 
         
-                formData.append("username", 
+            formData.append("username", 
                     document.getElementById("username").value);
-                formData.append("password", 
+            formData.append("password", 
                     document.getElementById("password").value);
-            }
-
-            var filename=null, msg="";
-            if(sendFile) {
-                if(fileInfo.file==null) {
-                    filename = prompt("Unsaved file. Please enter a filename:");
-                       cancelPressed = filename==null; 
-                    if(filename!=null && fileExplorer) {
-                        filename=fileExplorer.dir+"/"+filename;
-                    }
-                } else {
-                    filename = fileInfo.file;
-                }
-
-                if(filename!=null) {
-                    alert("Transferring: " + filename);
-                    formData.append("filename", filename);
-                    formData.append("src",browser.getCode());
-                    msg = "Transferring file...";
-                }
-            } else {
-                msg = "Logging in...";
+        }
+        var filename=null, msg="";
+        if(fileInfo.file==null) {
+            filename = prompt("Unsaved file. Please enter a filename:");
+            if(filename!=null && fileExplorer) {
+                filename=fileExplorer.dir+"/"+filename;
             } 
+        } else {
+            filename = fileInfo.file;
+        }
 
-            if(!sendFile || filename) {
-                originalLoginDivContents = document.getElementById("login").
+        if(filename!=null) {
+            alert("Transferring: " + filename);
+            formData.append("filename", filename);
+            formData.append("src",browser.getCode());
+            msg = "Transferring file...";
+
+            http.post('ftp/ftp.php', formData).then(function(xmlHTTP) {
+                var json = JSON.parse(xmlHTTP.responseText);
+                if(json.status!=0 && (json.status>=1024)) {
+                    alert('Error: ' + errors[json.status]);
+                } else {
+                    browser.markUnaltered();
+                    fileExplorer.sendAjax();
+
+                    if(fileInfo.file==null && filename!="") {
+                        fileInfo.file = filename;
+                        showFilename();
+                    } 
+                }
+            });
+        }
+    };
+
+    var login = function(e) {
+        var formData = new FormData();
+        savedLoginHTML = document.getElementById("login").innerHTML;
+
+        
+        if(document.getElementById("username") &&
+            document.getElementById("password")) {
+            formData.append("username", 
+                document.getElementById("username").value);
+            formData.append("password", 
+                document.getElementById("password").value);
+        }
+        var msg = "Logging in...";
+
+        originalLoginDivContents = document.getElementById("login").
                     innerHTML;
-                document.getElementById("login").innerHTML = msg +
+        document.getElementById("login").innerHTML = msg +
                     "<img src='assets/images/ajax-loader.gif' "+
                     "alt='ajax loader' />";
-                http.post('ftp/ftp.php', formData).then(function(xmlHTTP) {
+        http.post('ftp/ftp.php', formData).then(function(xmlHTTP) {
                     var json = JSON.parse(xmlHTTP.responseText);
-                    if(json.status!=0 && (sendFile || json.status>=1024)) {
+                    if(json.status!=0 && (json.status>=1024)) {
                         alert('Error: ' + errors[json.status]);
                         resetLogin();
                     } else {
-                        if(sendFile) {
-                            browser.markUnaltered();
-                        }
                         fileExplorer.sendAjax();
 
-                        if(loggedin==null && json.loggedin!=null) {
+                        if(json.loggedin!=null) {
                             loggedin = json.loggedin;
                             document.getElementById("login").innerHTML = 
                                 "<p>Logged in as " + loggedin +
                                 " <a href='ftp/logout.php'>Logout</a></p>";
                             doToolbar();
-                            http.get('ftp/backup.php').then (
-                                function(xmlHTTP) {
-                                    var json=JSON.parse(xmlHTTP.responseText);
+                            loadBackedUpFile();
+                        } 
+            }
+        });
+    };
+
+    var loadBackedUpFile = function() {
+            http.get('ftp/backup.php').then (
+                function(xmlHTTP) {
+                    var json=JSON.parse(xmlHTTP.responseText);
                                     browser.setCode(json.src);
                                     if(json.filename!="") {
                                         // We want to mark reloaded backup code
@@ -160,32 +224,7 @@ function init() {
                                     }
                                 });
                             setInterval(backup, 10000);
-                        } else {
-                            document.getElementById("login").innerHTML = 
-                                originalLoginDivContents;
-                        }
-
-                        // If we are saving an old file, go to the callback
-                        // which defines what we do next (e.g. copy drag and
-                        // drop data to the source editor)
-
-                        if(additionalCallback) {
-                            additionalCallback();
-                        // only show the filename if we are NOT saving the
-                        // old file
-                        } else if(fileInfo.file==null && filename!="") {
-                            fileInfo.file = filename;
-                            showFilename();
-                        }
-                    }
-                });
-            // If cancel was pressed for saving old file, do not
-            // run additional callback
-            } else if (additionalCallback && !cancelPressed) {
-                additionalCallback();
-            }
-        };
-
+    };
 
     var backup = function() {
         var data = new FormData();
@@ -232,12 +271,12 @@ function init() {
 
     var initFtpSubmitBtn = function() {
         document.getElementById("ftpsubmit").addEventListener
-                    ("click",sendData.bind(this,false,null));
+                    ("click",login);
     }
 
     var saveOld = function(cb) {
         if(browser.isAltered()) { 
-            sendData(true, cb);
+            askUploadFile(cb);
         } else {
             cb();
         }
@@ -246,7 +285,9 @@ function init() {
     if(document.getElementById("ftpsubmit")) {
         initFtpSubmitBtn();
     } else {
-        sendData();
+        // Page reload when logged in
+//        loadBackedUpFile();
+        login();
     }
 
     document.getElementById("file_upload").addEventListener
@@ -254,7 +295,7 @@ function init() {
                 if(loggedin==null) {
                     alert("Not logged in!");
                 } else {
-                    sendData(true);
+                    askUploadFile();
                 }
 
             });
