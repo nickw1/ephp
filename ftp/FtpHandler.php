@@ -43,8 +43,9 @@ abstract class FtpHandler {
 						strpos($filename,"../")!==false) {
 						return FtpHandler::INVALID_FILENAME;
 					} elseif (($error=$this->specifics()) == 0) {
+						// 21/11/16 public_html not necessarily at root
 						$uploadstatus = @ftp_put ($conn, 
-    						"/public_html/$filename", $tmpname, FTP_BINARY);
+    						"public_html/$filename", $tmpname, FTP_BINARY);
 						return $uploadstatus ? 0:FtpHandler::CANT_TRANSFER_FILE;
 					}
 				}	else {

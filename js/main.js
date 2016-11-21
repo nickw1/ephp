@@ -6,7 +6,6 @@ function init() {
     var filenameDiv = document.getElementById("filename");
     var mode=0;
     var savedLoginHTML="", originalLoginDivContents = "";
-
     var mq = window.matchMedia("screen and (max-device-height: 799px)");
     document.getElementById("network_canvas").setAttribute
             ("height", mq.matches? "336px": "536px");
@@ -126,7 +125,6 @@ function init() {
     }
 
     var uploadContent = function() {
-
         var formData = new FormData();
         savedLoginHTML = document.getElementById("login").innerHTML;
 
@@ -156,7 +154,7 @@ function init() {
 
             http.post('ftp/ftp.php', formData).then(function(xmlHTTP) {
                 var json = JSON.parse(xmlHTTP.responseText);
-                if(json.status!=0 && (json.status>=1024)) {
+                if(json.status!=0 && (json.status>=256)) {
                     alert('Error: ' + errors[json.status]);
                 } else {
                     browser.markUnaltered();
