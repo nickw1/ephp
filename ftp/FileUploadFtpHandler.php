@@ -2,10 +2,10 @@
 
 require_once('../defines.php');
 require_once(DOCUMENT_ROOT."/lib/FileUploader.php");
-require_once('FtpHandler.php');
+require_once('ReadWriteFtpHandler.php');
 
 
-class FileUploadFtpHandler extends FtpHandler {
+class FileUploadFtpHandler extends ReadWriteFtpHandler {
 
 	private $uploader;
 

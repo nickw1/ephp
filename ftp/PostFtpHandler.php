@@ -2,11 +2,11 @@
 
 require_once('../defines.php');
 require_once(DOCUMENT_ROOT."/lib/FileUploader.php");
-require_once('FtpHandler.php');
+require_once('ReadWriteFtpHandler.php');
 
 session_start();
 
-class PostFtpHandler extends FtpHandler {
+class PostFtpHandler extends ReadWriteFtpHandler {
 
 	const CANT_OPEN_TMP_FILE = 515;
 
