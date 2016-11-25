@@ -11,7 +11,8 @@ function init() {
             ("height", mq.matches? "336px": "536px");
 
     var fileExplorer=new FileExplorer('serverContent', 
-                            'fs/fs.php','client',
+                            {http: 'fs/fs.php',
+							ftp: 'ftp/ftp.php' } ,'client',
                             { showContentCallback: function(mime,src) {
                                     saveOld(function() {
                                         browser.setContent(mime,src);

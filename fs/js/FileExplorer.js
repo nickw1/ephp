@@ -1,10 +1,11 @@
 
-function FileExplorer(divId, serverUrl, dropId, callbacks)
+function FileExplorer(divId, urls, dropId, callbacks)
 {
     this.div = document.getElementById(divId);
     this.dir = ".";
     this.curFile = "";
-    this.serverUrl = serverUrl || 'fs.php';
+    this.serverUrl = urls.http || 'fs.php';
+    this.ftpUrl = urls.ftp || null; 
     this.callbacks = callbacks || {};
 
     this.urlType = "text/uri-list";
@@ -22,7 +23,7 @@ function FileExplorer(divId, serverUrl, dropId, callbacks)
                 if(data=="") {
                     data = e.dataTransfer.getData("text/plain");
                 } 
-				this.curFile = data;
+                this.curFile = data;
                 if(this.callbacks.fileInfoCallback) {
                     this.callbacks.fileInfoCallback(this.getFileInfo());
                 }
@@ -62,13 +63,17 @@ FileExplorer.prototype.getFileInfo = function() {
 FileExplorer.prototype.sendAjax = function(options)
 {
     options = options || {};
-    var url=this.serverUrl+"?dir="+this.dir, callback;
-    if(options.name)
-    {
-        url+="&file="+options.name;
-		callback = this.onAjaxFileResponse.bind(this);	
+    var url;
+    if(options.name) {
+        url = (this.ftpUrl ? this.ftpUrl:this.serverUrl) + 
+            "?dir="+this.dir+"&file="+options.name;
+        callback = this.ftpUrl ?
+             this.onAjaxFileResponseFtp.bind(this):
+             this.onAjaxFileResponse.bind(this);
+                
     }
     else {
+        url = this.serverUrl+"?dir="+this.dir;
         callback =  (function(xmlHTTP)
                 { 
                     this.onAjaxDirResponse(xmlHTTP);
@@ -77,9 +82,8 @@ FileExplorer.prototype.sendAjax = function(options)
                     }
                 }).bind(this);
     }
-	http.get(url).then(callback);
+    http.get(url).then(callback);
 }
-
 
 FileExplorer.prototype.images = 
     ['unknown.png', 'folder.png', 'html.png', 'script.png'];
@@ -167,6 +171,19 @@ FileExplorer.prototype.onAjaxFileResponse = function(xmlHTTP)
         this.callbacks.showContentCallback
             (xmlHTTP.getResponseHeader("Content-type"),
                         xmlHTTP.responseText);
+    }
+}
+
+FileExplorer.prototype.onAjaxFileResponseFtp = function(xmlHTTP)
+{
+    if(this.callbacks.showContentCallback) {
+        var data = JSON.parse(xmlHTTP.responseText);
+        if(data.status==0) {
+            this.callbacks.showContentCallback
+                (data.contentType, data.content);
+        } else {
+            alert("Error: " + data.status);
+        }
     }
 }
 
