@@ -21,11 +21,13 @@ body
 	flex-direction: row;
 }
 
+
 #ephp_container
 {
 	display: flex;
 	flex-direction: row; 
 }
+
 
 @media screen and (min-device-height: 800px)
 {
@@ -47,12 +49,12 @@ body
 		font-size: 80%;
 	}
 
-	#client_header, #network_header, #server_header 
+	.component_header
 	{
 		height: 50px;	
 	}
 	
-	#client_header img, #network_header img, #server_header img
+	.component_header img
 	{
 		height: 32px;
 	}
@@ -61,7 +63,7 @@ body
 
 
 
-#client_header, #network_header, #server_header
+.component_header
 {
 	text-align: center;
 	background-color: #ffffe0;
@@ -71,12 +73,10 @@ body
 {
 	display: flex;
 	flex-direction: column;
-	flex-grow: 1;
 	margin: 10px;
 	background-color: white;
-	justify-content: flex-start;
 	/* need this to prevent child elements resizing the content */
-	width:0px;
+	width: 33%;
 }
 
 
@@ -125,11 +125,17 @@ body
 
 #server
 {
-	flex-grow: 1;
 	margin: 10px;
 	background-color: white;
-	justify-content: flex-end;
-	width:0px;
+	width:33%;
+	overflow: auto;
+}
+
+#database
+{
+	margin: 10px;
+	background-color: white;
+	width: 0px;
 }
 
 /* putting a fixed width element in a flex layout is ok - other elements
@@ -138,10 +144,15 @@ body
 {
 	margin: 10px;
 	background-color: white;
-	justify-content: center;
 	width: 400px;
 }
 
+#dbconnect
+{
+	margin: 10px;
+	background-color: white;
+	width: 0px;
+}
 #network_canvas
 {
 	background-color: white;
@@ -176,10 +187,6 @@ tr,td,th
 
 
 
-#server
-{
-	overflow: auto;
-}
 
 #server .selected
 {
@@ -220,4 +227,76 @@ tr,td,th
 
 .serverCode {
 	line-height: 8px;
+}
+
+#client.animating {
+	animation-duration: 5s;
+	animation-name:  shrink_main_component;
+}
+
+#network.animating {
+	animation-duration: 5s;
+	animation-name: shrink_network_component;
+}
+
+#database.animating {
+	animation-duration: 5s;
+	animation-name: grow_main_component;
+}
+
+#dbconnect.animating {
+	animation-duration: 5s;
+	animation-name: grow_network_component;
+}
+
+@keyframes shrink_main_component {
+	from { width: 33%; } to { width: 0%; }
+}
+
+@keyframes shrink_network_component {
+	from { width: 400px; } to { width: 0px; }
+}
+
+@keyframes grow_main_component {
+	from { width: 0%; } to { width: 33%; }
+}
+
+@keyframes grow_network_component {
+	from { width: 0px; } to { width: 400px; }
+}
+
+#client.animating, #database.rev_animating {
+	animation-duration: 5s;
+	animation-name:  shrink_main_component;
+}
+
+#network.animating, #dbconnect.rev_animating {
+	animation-duration: 5s;
+	animation-name: shrink_network_component;
+}
+
+#database.animating, #client.rev_animating {
+	animation-duration: 5s;
+	animation-name: grow_main_component;
+}
+
+#dbconnect.animating, #network.rev_animating {
+	animation-duration: 5s;
+	animation-name: grow_network_component;
+}
+
+@keyframes shrink_main_component {
+	from { width: 33%; } to { width: 0%; }
+}
+
+@keyframes shrink_network_component {
+	from { width: 400px; } to { width: 0px; }
+}
+
+@keyframes grow_main_component {
+	from { width: 0%; } to { width: 33%; }
+}
+
+@keyframes grow_network_component {
+	from { width: 0px; } to { width: 400px; }
 }

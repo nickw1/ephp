@@ -27,13 +27,19 @@ class EPHPPage extends Page {
 		<?php
 		}
 		?>
+
+		<div style="display: none">
+		<input id="dbshow" value="dbshow" type="button"/>
+		<input id="dbhide" value="dbhide" type="button"/>
+		</div>
+
 		</div>
 
 		<div id="ephp_container">
 
 
 		<div id="client">
-			<div id='client_header'>client<br />
+			<div id='client_header' class='component_header'>client<br />
 				<img src='assets/images/computer-laptop.small.png'
 				alt='client' />
 			</div>
@@ -57,13 +63,13 @@ class EPHPPage extends Page {
 		</div>
 
 		<div id="network">
-		<div id='network_header'>
+		<div id='network_header' class='component_header'>
 		network<br />
 			<img src='assets/images/rgtaylor_csc_net_wan_cloud.med.png'
 				alt='network' />
 		</div>
 
-			<canvas id="network_canvas" width="400px">  </canvas>
+			<canvas id="network_canvas" width="100%">  </canvas>
 			<div id="network_controls">
 				<img id="play" src="assets/images/control_play_blue.png" />
 				<img id="pause" src="assets/images/control_pause_blue.png" />
@@ -75,14 +81,31 @@ class EPHPPage extends Page {
 		</div>
 
 		<div id="server">
-			<div id='server_header'>server<br />
+			<div id='server_header' class='component_header'>server<br />
 				<img src='assets/images/web_server.small.png'
 				alt='server' />
 			</div>
 			<div id="serverContent"> </div>
 		</div>
 
+		<div id='dbconnect'>
+			<div id='network_header' class='component_header'>
+			db connect<br />
+				<img src='assets/images/rgtaylor_csc_net_wan_cloud.med.png'
+					alt='network' />
+			</div>
 		</div>
+
+		<div id='database'>
+			<div id='database_header' class='component_header'>database<br />
+			<img src='assets/images/web_server.small.png'
+			alt='database' />
+			</div>
+			<div id='databaseContent'></div>
+		</div>
+
+		</div>
+
 
 		<div id="msg"></div>
 
@@ -102,6 +125,7 @@ $scripts = array
 			'http/js/PendingHttpRequest.js',
 			'http/js/HttpBox.js',
 			'http/js/ServerAnimation.js',
+			'http/js/db.js',
 			'php/js/PHPAnimation.js',
 			'php/js/LoopAnimation.js',
 			'http://www.free-map.org.uk/jslib/PromiseAjax.js',
