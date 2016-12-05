@@ -229,60 +229,29 @@ tr,td,th
 	line-height: 8px;
 }
 
-#client.animating {
-	animation-duration: 5s;
-	animation-name:  shrink_main_component;
-}
-
-#network.animating {
-	animation-duration: 5s;
-	animation-name: shrink_network_component;
-}
-
-#database.animating {
-	animation-duration: 5s;
-	animation-name: grow_main_component;
-}
-
-#dbconnect.animating {
-	animation-duration: 5s;
-	animation-name: grow_network_component;
-}
-
-@keyframes shrink_main_component {
-	from { width: 33%; } to { width: 0%; }
-}
-
-@keyframes shrink_network_component {
-	from { width: 400px; } to { width: 0px; }
-}
-
-@keyframes grow_main_component {
-	from { width: 0%; } to { width: 33%; }
-}
-
-@keyframes grow_network_component {
-	from { width: 0px; } to { width: 400px; }
-}
 
 #client.animating, #database.rev_animating {
 	animation-duration: 5s;
 	animation-name:  shrink_main_component;
+	animation-fill-mode: forwards;
 }
 
 #network.animating, #dbconnect.rev_animating {
 	animation-duration: 5s;
 	animation-name: shrink_network_component;
+	animation-fill-mode: forwards;
 }
 
 #database.animating, #client.rev_animating {
 	animation-duration: 5s;
 	animation-name: grow_main_component;
+	animation-fill-mode: forwards;
 }
 
 #dbconnect.animating, #network.rev_animating {
 	animation-duration: 5s;
 	animation-name: grow_network_component;
+	animation-fill-mode: forwards;
 }
 
 @keyframes shrink_main_component {
