@@ -352,8 +352,6 @@ function init() {
     showFilename();
     doTabs();
     doToolbar();
-
-	dbinit();
 }
 
 

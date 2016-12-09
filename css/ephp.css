@@ -136,6 +136,7 @@ body
 	margin: 10px;
 	background-color: white;
 	width: 0px;
+	display: none;
 }
 
 /* putting a fixed width element in a flex layout is ok - other elements
@@ -152,6 +153,7 @@ body
 	margin: 10px;
 	background-color: white;
 	width: 0px;
+	display: none;
 }
 #network_canvas
 {

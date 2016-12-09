@@ -69,7 +69,7 @@ class EPHPPage extends Page {
 				alt='network' />
 		</div>
 
-			<canvas id="network_canvas" width="100%">  </canvas>
+			<canvas id="network_canvas" width="400px">  </canvas>
 			<div id="network_controls">
 				<img id="play" src="assets/images/control_play_blue.png" />
 				<img id="pause" src="assets/images/control_pause_blue.png" />
@@ -125,9 +125,9 @@ $scripts = array
 			'http/js/PendingHttpRequest.js',
 			'http/js/HttpBox.js',
 			'http/js/ServerAnimation.js',
-			'http/js/db.js',
 			'php/js/PHPAnimation.js',
 			'php/js/LoopAnimation.js',
+			'php/js/DBAnimation.js',
 			'http://www.free-map.org.uk/jslib/PromiseAjax.js',
 			'http://www.free-map.org.uk/jslib/Dialog.js',
 			'ace-builds/src-noconflict/ace.js');

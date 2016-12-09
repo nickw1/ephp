@@ -7,13 +7,13 @@
 // can we obtain percentage widths in CSS from JavaScript? 
 // - animation-fill-mode: forwards will retain final width
 
-function DBShow (elements, otherInfo)  {
+function DBAnimation (elements, callback, otherOptions)  {
     this.client = document.getElementById(elements.client);
     this.network = document.getElementById(elements.network);
     this.dbconnect = document.getElementById(elements.dbconnect);
     this.database = document.getElementById(elements.database);
-    for(k in otherInfo) {
-        this[k] = otherInfo[k];
+    for(k in otherOptions) {
+        this[k] = otherOptions[k];
     }
         
     this.client.addEventListener
@@ -21,14 +21,21 @@ function DBShow (elements, otherInfo)  {
             if(e.animationName==this.forwardAnimName) {
                         this.client.style.display="none";
                         this.network.style.display="none";
+						this.showSQLRequest (this.sql, this.showResultSet);
                 } else if (e.animationName==this.reverseAnimName) {
                     this.database.style.display="none";
                     this.dbconnect.style.display="none";
+					callback();
                 }
             }).bind(this));
 }
 
-DBShow.prototype.startShowDB =  function(e) {
+DBAnimation.prototype.animate = function() {
+	this.startShowDB();
+}
+
+
+DBAnimation.prototype.startShowDB =  function(e) {
         this.displayAll();
         this.client.classList.remove(this.reverseAnimClass);
         this.network.classList.remove(this.reverseAnimClass);
@@ -40,7 +47,7 @@ DBShow.prototype.startShowDB =  function(e) {
         this.dbconnect.classList.add(this.forwardAnimClass);
     };
     
-DBShow.prototype.startHideDB = function(e) {
+DBAnimation.prototype.startHideDB = function(e) {
         this.displayAll();
         this.client.classList.remove(this.forwardAnimClass);
         this.network.classList.remove(this.forwardAnimClass);
@@ -52,27 +59,17 @@ DBShow.prototype.startHideDB = function(e) {
         this.dbconnect.classList.add(this.reverseAnimClass);
 }
 
-DBShow.prototype.displayAll = function() {
+DBAnimation.prototype.displayAll = function() {
     this.client.style.display = this.network.style.display =
     this.dbconnect.style.display = this.database.style.display = "block";
 }
 
-function dbinit() {
-    
-/*
-    var dbs = new DBShow({ client: "client", 
-                            network: "network", 
-                            dbconnect:"dbconnect", 
-                            database: "database" },
-                        {
-                             forwardAnimName:"shrink_main_component", 
-                            reverseAnimName:"grow_main_component", 
-                            forwardAnimClass:"animating", 
-                            reverseAnimClass:"rev_animating" }
-                        );
-    document.getElementById("dbshow").addEventListener
-        ("click", dbs.startShowDB.bind(dbs));
-    document.getElementById("dbhide").addEventListener
-        ("click", dbs.startHideDB.bind(dbs));
-*/    
+DBAnimation.prototype.showSQLRequest = function(sql, resultFunc) {
+	// TODO animation similar to HTTP to show sql query sent to DB
+}
+
+DBAnimation.prototype.showResultSet = function() {
+	// TODO show the result set on the database div
+
+	// button which when clicked sends the result set back
 }

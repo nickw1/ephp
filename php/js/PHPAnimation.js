@@ -25,6 +25,7 @@ function PHPAnimation(options) {
     this.tooltip.style.left = this.tooltip.style.top = '0px';
 
 	this.loopAnimation = new LoopAnimation(this);
+	this.dbAnimation = options.dbAnimation || null;
 }
 
 PHPAnimation.prototype.colours = 
@@ -148,6 +149,11 @@ PHPAnimation.prototype.doAnimate = function(lineCount) {
         } else if(this.data.sqlqueries.length && lineCount+1 == 
             this.data.sqlqueries[this.sqlCount].lineNumber) {
 
+			if(this.dbAnimation) {
+				this.dbAnimation.animate
+					(this.data.sqlqueries[this.sqlCount].sql,
+					this.doAnimate.bind(this));
+			}
             this.findVarsInLines(this.data.sqlqueries, this.sqlCount,
                      (function(i, e) {
 							return this.loopAnimation.
