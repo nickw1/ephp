@@ -14,7 +14,6 @@ function FileExplorer(divId, urls, dropId, callbacks)
 
     this.dropDiv.addEventListener("drop",
         (function(e) {
-                console.log("DROP EVENT");
                 e.preventDefault();
                 var data = e.dataTransfer.getData(this.urlType);
                 console.log("data returned: " + data);
@@ -27,7 +26,6 @@ function FileExplorer(divId, urls, dropId, callbacks)
                 if(this.callbacks.fileInfoCallback) {
                     this.callbacks.fileInfoCallback(this.getFileInfo());
                 }
-                console.log("sending ajax: name=" + data);
                 this.sendAjax({name:data});
                 
             }).bind(this));    

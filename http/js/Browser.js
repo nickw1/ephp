@@ -1,3 +1,5 @@
+// window.location.hostname
+// window.location.protocol http:
 
 function Browser(options) {
     this.div = document.getElementById(options.divId);
@@ -64,7 +66,8 @@ Browser.prototype.sendRequest = function(method,url,formData) {
                 method: method,
                 formData: formData,
                 callback: this.loadResponse.bind(this),
-                server: parts[1]?parts[1].replace("http://",""):"",
+                server: parts[1]?parts[1].replace("http://",""):
+						window.location.hostname,
                 analyser: 'php/analyser.php'
               }
             );
@@ -295,6 +298,10 @@ Browser.prototype.isAltered = function() {
 
 Browser.prototype.setWebDir = function(dir){
     this.webDir = dir; 
+}
+
+Browser.prototype.setFile = function(file) {
+	this.addressBox.value = this.webDir + "/" +file;
 }
 
 Browser.prototype.loadDocumentOrImage = function(mimetype, url, responseText) {
