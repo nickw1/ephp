@@ -26,6 +26,9 @@ function PHPAnimation(options) {
 
 	this.loopAnimation = new LoopAnimation(this);
 	this.dbAnimation = options.dbAnimation || null;
+
+	this.interval = options.interval || 1000;
+
 }
 
 PHPAnimation.prototype.colours = 
@@ -56,6 +59,18 @@ PHPAnimation.prototype.setCallback = function(callback) {
 		this.div.classList.remove("serverCode");
         this.callback(); 
         }).bind(this)); 
+
+	var slider = new Slider(2000, 10, {
+		onchange: (function(value) {
+			this.interval = value;
+			this.loopAnimation.interval = value;
+		}).bind(this) ,
+
+		parent: this.btndiv
+		} );
+	slider.setValue(this.interval);
+
+	this.btndiv.appendChild(document.createElement("br"));
     this.btndiv.appendChild(btn);    
 }
 
@@ -110,7 +125,7 @@ PHPAnimation.prototype.animate = function(data) {
             this.varCount=0;
             this.sqlCount=0;
             this.sqlLoopCount=0;
-            setTimeout(this.doAnimate.bind(this), 500);
+            setTimeout(this.doAnimate.bind(this), this.interval);
         }
         this.div.appendChild(this.btndiv);
         this.div.appendChild(this.tooltip);
@@ -122,13 +137,13 @@ PHPAnimation.prototype.doAnimate = function(lineCount) {
 	lineCount = lineCount || 0;
 	var end = this.lines.length;
     if(lineCount != end) {
-        var nextInterval = 500;
+        var nextInterval = this.interval;
         if(lineCount>0) {
             this.lines[lineCount-1].classList.remove("lineHighlight");
         }
         this.lines[lineCount].classList.add("lineHighlight");
         if(lineCount+1 == this.data.vars[this.varCount].lineNumber) {
-            nextInterval = 200;
+            nextInterval = 0.4 * this.interval;
             this.varComments[this.varCount].style.display = "inline";
             var matches = null;
 
@@ -169,7 +184,6 @@ PHPAnimation.prototype.doAnimate = function(lineCount) {
 		if(this.sqlLoopCount < this.data.sqlqueries.length &&
 			lineCount+1==this.data.sqlqueries[this.sqlLoopCount].
 			loop.start) {
-			this.loopAnimation.contLoopAnimate=true;
 			var tooltipInfo = this.loopAnimation.createResultsDiv
 				(this.sqlLoopCount,1024,200,this.tooltip);
 			this.tooltip.style.left = tooltipInfo.x; 

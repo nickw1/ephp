@@ -1,54 +1,76 @@
-
-function LoopAnimation(phpAnim) {
+function LoopAnimation(phpAnim, interval) {
 	this.phpAnim = phpAnim;
 	this.contLoopAnimate=false;
+	this.interval = interval || 1000;
 }
 
-
+// resets this.rowIndex to 0 and this.loopLine to first line of loop
+// and selectedCells to []
 // loopLine is numbered from 1
-LoopAnimation.prototype.loopAnimate = function(queryIndex,rowIndex, loopLine, 	
-					selectedCells, mainAnimationCallback) {
-	var lines = this.phpAnim.getLines();
-	var sqlquery = this.phpAnim.getSQLQuery(queryIndex);
-    rowIndex = rowIndex || 0;
-   	loopLine = loopLine || sqlquery.loop.start;
-    selectedCells = selectedCells || [];
+LoopAnimation.prototype.loopAnimate=function(queryIndex, mainAnimationCallback){
+	this.mainAnimationCallback = mainAnimationCallback || null;
+	this.sqlquery = this.phpAnim.getSQLQuery(queryIndex);
+	this.resetLoop();
+	this.resumeLoopAnimate();
+}
 
-	if (rowIndex>0 && loopLine==sqlquery.loop.start) {
-       	lines[sqlquery.loop.end-1].classList.
-			remove("lineHighlight");
-	} else if (loopLine > 1) {
-       	lines[loopLine-2].classList.remove("lineHighlight");
+LoopAnimation.prototype.resetLoop = function() {
+	this.rowIndex = 0;
+	this.loopLine = this.sqlquery.loop.start;
+	this.selectedCells = [];
+}
+
+LoopAnimation.prototype.pauseLoopAnimate = function() {
+	if(this.timeout) {
+		clearTimeout(this.timeout);
+		this.timeout=null;
 	}
-    lines[loopLine-1].classList.add("lineHighlight");
+	this.contLoopAnimate = false;
+}
 
-    var lastRowIndex = rowIndex==0 ? 
-        sqlquery.results.length-1 :
-        rowIndex-1;
+LoopAnimation.prototype.resumeLoopAnimate = function() {
+	if(this.contLoopAnimate==false) {
+		this.contLoopAnimate = true;
+		this.iterateLoopAnimate();
+	}
+}
+
+// resumes without resetting rowIndex, loopLine, selectedCells
+LoopAnimation.prototype.iterateLoopAnimate = function() {
+	var lines = this.phpAnim.getLines();
+
+	if (this.rowIndex>0 && this.loopLine==this.sqlquery.loop.start) {
+       	lines[this.sqlquery.loop.end-1].classList.
+			remove("lineHighlight");
+	} else if (this.loopLine > 1) {
+       	lines[this.loopLine-2].classList.remove("lineHighlight");
+	}
+    lines[this.loopLine-1].classList.add("lineHighlight");
+
+    var lastRowIndex = this.rowIndex==0 ? 
+        this.sqlquery.results.length-1 :
+        this.rowIndex-1;
+
     document.getElementById("row"+lastRowIndex).classList.remove("selected");
+	this.unselectSelectedCells();
+    document.getElementById("row"+this.rowIndex).classList.add("selected");
 
-    for(var cell=0; cell<selectedCells.length; cell++) {
-        selectedCells[cell].classList.remove("selected");
-    }
+    this.selectedCells = [];
 
-    document.getElementById("row"+rowIndex).classList.add("selected");
-
-    selectedCells = [];
-
-    for(var i=0; i<sqlquery.loop.vars.length; i++) {
-        if(loopLine==sqlquery.
+    for(var i=0; i<this.sqlquery.loop.vars.length; i++) {
+        if(this.loopLine==this.sqlquery.
             loop.vars[i].lineNumber) {
-            var cell = document.getElementById("row"+rowIndex+"_"+
-                sqlquery.loop.vars[i].value);
+            var cell = document.getElementById("row"+this.rowIndex+"_"+
+                this.sqlquery.loop.vars[i].value);
 			// 101116 possibility that a nonexistent column is in the loop code
 			if(cell!=null) {
             	cell.classList.add("selected");
-            	selectedCells.push(cell);
+            	this.selectedCells.push(cell);
 			}
         }
     }
 
-    var curLine = lines[loopLine-1].innerHTML;
+    var curLine = lines[this.loopLine-1].innerHTML;
 
     if(curLine.indexOf("echo") != -1) {
         var inQuotes=false;
@@ -69,16 +91,16 @@ LoopAnimation.prototype.loopAnimate = function(queryIndex,rowIndex, loopLine,
         
 
         var re = new RegExp("\\"+
-            sqlquery.loop.rowvar+
+            this.sqlquery.loop.rowvar+
             "\\[\"?(\\w+)\\\"?]", "g");
         var output = curLine.replace(re, (function(match,p1,offset,string) {
-                for(var i=0; i<sqlquery.loop.vars.
+                for(var i=0; i<this.sqlquery.loop.vars.
                     length; i++) {
-                    if(p1==sqlquery.loop.vars[i].
+                    if(p1==this.sqlquery.loop.vars[i].
                         value) {
                         var s=    
-                            sqlquery.results[rowIndex]
-                          [sqlquery.loop.vars[i].value];
+                            this.sqlquery.results[this.rowIndex]
+                          [this.sqlquery.loop.vars[i].value];
                         return s;
                     }
                 }    
@@ -89,23 +111,30 @@ LoopAnimation.prototype.loopAnimate = function(queryIndex,rowIndex, loopLine,
         document.getElementById("databaseResultsConsole").appendChild(p);
     }
 
-    if(++loopLine > sqlquery.loop.end) {
-        rowIndex++;
-       	loopLine=sqlquery.loop.start;
+    if(++this.loopLine > this.sqlquery.loop.end) {
+        this.rowIndex++;
+       	this.loopLine=this.sqlquery.loop.start;
     }
 
-    if(rowIndex < sqlquery.results.length &&
+    if(this.rowIndex < this.sqlquery.results.length &&
 			this.contLoopAnimate) {
-        setTimeout(this.loopAnimate.bind(this,queryIndex,rowIndex,loopLine,
-            selectedCells,mainAnimationCallback),1000);
+        this.timeout=
+			setTimeout(this.iterateLoopAnimate.bind(this),this.interval);
     } else {
-		lines[sqlquery.loop.end-1].
+		lines[this.sqlquery.loop.end-1].
 			classList.remove("lineHighlight");
-		lineCount = sqlquery.loop.end+1;
-		if(mainAnimationCallback) {
-			mainAnimationCallback(sqlquery.loop.end+1);
+		lineCount = this.sqlquery.loop.end+1;
+		this.resetLoop();
+		if(this.mainAnimationCallback) {
+			this.mainAnimationCallback(this.sqlquery.loop.end+1);
 		}
 	}
+}
+
+LoopAnimation.prototype.unselectSelectedCells = function() {
+    for(var cell=0; cell<this.selectedCells.length; cell++) {
+        this.selectedCells[cell].classList.remove("selected");
+    }
 }
 
 // hostDiv = this.tooltoip
@@ -140,27 +169,81 @@ LoopAnimation.prototype.createResultsDiv = function(i, x, y, hostDiv) {
 		}
 		table.appendChild(tr);
 	}
-	div.appendChild(table);
-	var btn = document.createElement("input");
-	btn.setAttribute("type", "button");    
-	btn.setAttribute("value", "Show Loop Running");    
-	var closeBtn = document.createElement("input");
-	closeBtn.setAttribute("type", "button");    
-	closeBtn.setAttribute("value", "Close");
-                            
-	btn.addEventListener("click", (function(e) {
-								 this.contLoopAnimate=true;
-                                    this.loopAnimate(i);
-                                }).bind(this));
-                        
-	closeBtn.addEventListener("click",
+
+	var close = document.createElement("img");
+	close.setAttribute("alt", "Close");
+	close.setAttribute("src", "assets/images/cross.png");
+
+	close.addEventListener("click",
 		(function(e) {
-			this.contLoopAnimate=false;
+			this.pauseLoopAnimate();
+			this.resetLoop();
 			hostDiv.style.display='none';
 		}).bind(this));
 
-	div.appendChild(btn);
-	div.appendChild(closeBtn);
+	var titlebar = document.createElement("div");
+	titlebar.style.textAlign = 'right';
+	titlebar.style.backgroundColor = '#c0c0c0';
+	titlebar.appendChild(close);
+
+	div.appendChild(titlebar);
+	div.appendChild(table);
+	/*
+	var play = document.createElement("input");
+	play.setAttribute("type", "button");    
+	play.setAttribute("value", "Show Loop Running");    
+	*/
+	var play = document.createElement("img");
+	play.setAttribute("alt", "Play/Resume Loop");
+	play.setAttribute("src", "assets/images/control_play_blue.2.png");
+
+
+	var pause = document.createElement("img");
+	pause.setAttribute("alt", "Pause Loop");
+	pause.setAttribute("src", "assets/images/control_pause_blue.2.png");                            
+	var rewind = document.createElement("img");
+	rewind.setAttribute("alt", "Rewind Loop");
+	rewind.setAttribute("src", "assets/images/control_rewind_blue.2.png");                            
+
+
+	var range = document.createElement("input");
+	range.setAttribute("type", "range");
+	range.setAttribute("min", 1);
+	range.setAttribute("max", 10);
+	range.setAttribute("step", 1);
+	range.setAttribute("value", 2000.0 / this.interval);
+	range.addEventListener("change", (function(e) {
+		 this.interval = 2000.0 / e.target.value;
+		}).bind(this));
+
+	play.addEventListener("click", this.resumeLoopAnimate.bind(this));
+	pause.addEventListener("click",this.pauseLoopAnimate.bind(this)); 
+
+	rewind.addEventListener("click", 
+		(function(e) {
+			if(this.contLoopAnimate) {
+				this.pauseLoopAnimate();
+    			document.getElementById("row"+this.rowIndex).classList.
+					remove("selected");
+				this.unselectSelectedCells();
+				this.resetLoop();
+				this.resumeLoopAnimate();
+			}
+		}).bind(this));
+
+	div.appendChild(play);
+	div.appendChild(rewind);
+	div.appendChild(pause);
+
+	var slider = new Slider(2000, 10, {
+		onchange: (function(value) {
+			this.interval = value;
+		}).bind(this) ,
+
+		parent: div
+		} );
+	slider.setValue(this.interval);
+
 	var console = document.createElement("div");
 	console.setAttribute("id", "databaseResultsConsole");
 	console.style.height="200px";
