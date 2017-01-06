@@ -44,6 +44,7 @@ function Browser(options) {
     this.altered=false;
     this.webDir="";
     this.editor = ace.edit(options.sourceElement);
+	this.editor.setOptions({fontSize:"12pt"});
     this.editor.getSession().setMode("ace/mode/php");
     this.editor.on("change", (function(e) {
         this.showContent('text/html', this.editor.getValue());

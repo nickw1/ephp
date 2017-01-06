@@ -43,7 +43,8 @@ function init() {
                                     interval: 10,
                                     step : 1,
                                     fileExplorer: fileExplorer,
-                                    phpAnimation: phpAnimation });
+                                    phpAnimation: phpAnimation,
+									controlsDiv: network_controls });
 
 	/*
     var animation = new GenericAnimation({canvasId: 'network_canvas',

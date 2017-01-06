@@ -23,6 +23,17 @@ function Animation(options) {
         this.phpAnimation = options.phpAnimation;
         this.phpAnimation.setCallback(this.startResponse.bind(this));
     }
+
+	if(options.controlsDiv) {
+		var slider = new Slider(50, 10, {
+		onchange: (function(value) {
+			// TODO
+		}).bind(this) ,
+
+		parent: options.controlsDiv 
+		} );
+		slider.setValue(this.interval);
+	}
 }
 
 Animation.prototype.messageTypes =  { NONE: 0, REQUEST: 1, RESPONSE: -1};

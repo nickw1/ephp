@@ -20,5 +20,8 @@ function Slider(maxInterval, nValues, options) {
 }
 
 Slider.prototype.setValue = function(interval) {
+	console.log("Slider.setValue(): interval=" + interval);
+	console.log("setting attribute of range to " +
+		this.maxInterval/interval);
 	this.range.setAttribute("value", this.maxInterval / interval);
 }
