@@ -44,11 +44,11 @@ class EPHPPage extends Page {
 				alt='client' />
 			</div>
 			<div id='client_toolbar'>
-				<img id='file_new' src='assets/images/page_add.png' 
+				<img id='file_new' src='assets/images/page_add.2.png' 
 					alt='New file' title='New file' />
-				<img id='file_save' src='assets/images/script_save.png'
+				<img id='file_save' src='assets/images/script_save.2.png'
 					alt='Save current file' title='Save current file' />
-				<img id='file_upload' src='assets/images/arrow_right.png'
+				<img id='file_upload' src='assets/images/arrow_right.2.png'
 					alt='Upload current file' title='Upload current file' />
 			</div>
 			<div id='filename'></div>
@@ -71,12 +71,16 @@ class EPHPPage extends Page {
 
 			<canvas id="network_canvas" width="400px">  </canvas>
 			<div id="network_controls">
-				<img id="play" src="assets/images/control_play_blue.png" />
-				<img id="pause" src="assets/images/control_pause_blue.png" />
+				<img id="play" src="assets/images/control_play_blue.2.png" 
+					alt='Resume animation' />
+				<img id="pause" src="assets/images/control_pause_blue.2.png" 
+					alt='Pause animation'/>
 				<img id="rewind" 
-					src="assets/images/control_rewind_blue.png" />
+					src="assets/images/control_rewind_blue.2.png" 
+					alt='Rewind animation' />
 				<img id="fastforward" 
-					src="assets/images/control_fastforward_blue.png" />
+					src="assets/images/control_fastforward_blue.2.png" 
+					alt='Fast-forward animation'/>
 			</div>
 		</div>
 

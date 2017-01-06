@@ -8,7 +8,7 @@ function init() {
     var savedLoginHTML="", originalLoginDivContents = "";
     var mq = window.matchMedia("screen and (max-device-height: 799px)");
     document.getElementById("network_canvas").setAttribute
-            ("height", mq.matches? "336px": "536px");
+            ("height", mq.matches? "312px": "512px");
 
     var fileExplorer=new FileExplorer('serverContent', 
                             {http: 'fs/fs.php',

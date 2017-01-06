@@ -33,7 +33,7 @@ body
 {
 	#ephp_container 
 	{
-		height: 675px;
+		height: 675px; 
 	}
 }
 
@@ -41,7 +41,7 @@ body
 {
 	#ephp_container 
 	{
-		height: 475px;
+		height: 475px; 
 	}
 
 	body
@@ -82,7 +82,7 @@ body
 
 #client_toolbar
 {
-	height: 16px;
+	height: 32px;
 }
 #client_footer
 {
