@@ -27,14 +27,6 @@ function Browser(options) {
     this.content = document.createElement("div");
     this.div.appendChild(this.content);
     if(this.animation!=null) {
-        document.getElementById("pause").addEventListener
-                ("click", this.animation.pause.bind(this.animation));
-        document.getElementById("play").addEventListener
-                ("click", this.animation.play.bind(this.animation));
-        document.getElementById("fastforward").addEventListener
-                ("click", this.animation.fastForward.bind(this.animation));
-        document.getElementById("rewind").addEventListener
-                ("click", this.animation.rewind.bind(this.animation));
         if(this.animation.phpAnimation != null) {
             this.animation.phpAnimation.browserCallback =
                 this.highlightFormField.bind(this);

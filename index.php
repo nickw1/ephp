@@ -70,18 +70,7 @@ class EPHPPage extends Page {
 		</div>
 
 			<canvas id="network_canvas" width="320px">  </canvas>
-			<div id="network_controls">
-				<img id="play" src="assets/images/control_play_blue.2.png" 
-					alt='Resume animation' />
-				<img id="pause" src="assets/images/control_pause_blue.2.png" 
-					alt='Pause animation'/>
-				<img id="rewind" 
-					src="assets/images/control_rewind_blue.2.png" 
-					alt='Rewind animation' />
-				<img id="fastforward" 
-					src="assets/images/control_fastforward_blue.2.png" 
-					alt='Fast-forward animation'/>
-			</div>
+			<div id="network_controls"> </div>
 		</div>
 
 		<div id="server">

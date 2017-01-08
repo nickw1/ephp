@@ -25,6 +25,25 @@ function Animation(options) {
     }
 
     if(options.controlsDiv) {
+
+        var controls = { 'Pause' : [ 'assets/images/control_pause_blue.2.png' , 
+                            this.pause.bind(this)],
+                        'Play' : [ 'assets/images/control_play_blue.2.png' , 
+                            this.play.bind(this)],
+                        'Fast forward' : 
+                            ['assets/images/control_fastforward_blue.2.png' , 
+                                this.fastForward.bind(this) ],
+                        'Rewind' : 
+                            [ 'assets/images/control_rewind_blue.2.png', 
+                                this.rewind.bind(this) ] };
+        for(control in controls) {
+            var img = document.createElement("img");
+            img.setAttribute("alt", control);
+            img.setAttribute("src", controls[control][0]);
+            img.addEventListener("click", controls[control][1]);
+            options.controlsDiv.appendChild(img);
+        }
+
         var slider = new Slider(50, 10, {
         onchange: (function(value) {
             this.interval = value;
