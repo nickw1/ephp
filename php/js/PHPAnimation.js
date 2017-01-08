@@ -24,10 +24,10 @@ function PHPAnimation(options) {
     this.tooltip.style.position='absolute';
     this.tooltip.style.left = this.tooltip.style.top = '0px';
 
-	this.loopAnimation = new LoopAnimation(this);
-	this.dbAnimation = options.dbAnimation || null;
+    this.loopAnimation = new LoopAnimation(this);
+    this.dbAnimation = options.dbAnimation || null;
 
-	this.interval = options.interval || 1000;
+    this.interval = options.interval || 1000;
 
 }
 
@@ -35,11 +35,11 @@ PHPAnimation.prototype.colours =
     ['yellow', '#00ff00', 'cyan', '#ff80ff', '#ff8080', 'orange'];
 
 PHPAnimation.prototype.getLines = function() {
-	return this.lines;
+    return this.lines;
 }
 
 PHPAnimation.prototype.getSQLQuery = function(queryIndex) {
-	return this.data.sqlqueries[queryIndex];
+    return this.data.sqlqueries[queryIndex];
 }
 
 PHPAnimation.prototype.setCallback = function(callback) {
@@ -56,21 +56,21 @@ PHPAnimation.prototype.setCallback = function(callback) {
         for(var i=0; i<this.originalDivContents.length; i++) {
             this.div.appendChild(this.originalDivContents[i]); 
         }
-		this.div.classList.remove("serverCode");
+        this.div.classList.remove("serverCode");
         this.callback(); 
         }).bind(this)); 
 
-	var slider = new Slider(2000, 10, {
-		onchange: (function(value) {
-			this.interval = value;
-			this.loopAnimation.interval = value;
-		}).bind(this) ,
+    var slider = new Slider(2000, 10, {
+        onchange: (function(value) {
+            this.interval = value;
+            this.loopAnimation.interval = value;
+        }).bind(this) ,
 
-		parent: this.btndiv
-		} );
-	slider.setValue(this.interval);
+        parent: this.btndiv
+        } );
+    slider.setValue(this.interval);
 
-	this.btndiv.appendChild(document.createElement("br"));
+    this.btndiv.appendChild(document.createElement("br"));
     this.btndiv.appendChild(btn);    
 }
 
@@ -84,27 +84,27 @@ PHPAnimation.prototype.animate = function(data) {
             this.originalDivContents.push(this.div.firstChild);
             this.div.removeChild(this.div.firstChild);
         }
-		this.div.classList.add("serverCode");
+        this.div.classList.add("serverCode");
         this.data = data;
         var lines = this.data.php.split("\n");
         this.lines = [];
         this.varComments = [];
         var curVar=0, curLoopVar=0, line;
         if(this.data.vars.length > 0) {
-			var lineNoText, lineNoSpan;
+            var lineNoText, lineNoSpan;
             for(var i=0; i<lines.length; i++) {
-			  lineNoText = ""+(i+1);
-			 
-			  while(lineNoText.length<3) {
-				lineNoText="0"+lineNoText;
-			  }
-			  lineNoSpan = document.createElement("span");
-			  lineNoSpan.setAttribute("class", "lineNumber");
+              lineNoText = ""+(i+1);
+             
+              while(lineNoText.length<3) {
+                lineNoText="0"+lineNoText;
+              }
+              lineNoSpan = document.createElement("span");
+              lineNoSpan.setAttribute("class", "lineNumber");
               lineNoSpan.appendChild(document.createTextNode(lineNoText));
-			  line = document.createElement("span");
-			  line.setAttribute("class", "code");
-			  this.div.appendChild(lineNoSpan);
-			  line.appendChild(document.createTextNode(lines[i]));
+              line = document.createElement("span");
+              line.setAttribute("class", "code");
+              this.div.appendChild(lineNoSpan);
+              line.appendChild(document.createTextNode(lines[i]));
               if(i+1 == this.data.vars[curVar].lineNumber) {
                     var value = document.createElement("code");
                     value.appendChild(document.createTextNode
@@ -117,7 +117,7 @@ PHPAnimation.prototype.animate = function(data) {
                     curVar += (curVar<this.data.vars.length-1 ? 1:0);
                 } 
                 this.div.appendChild(line);
-				this.div.appendChild(document.createElement("br"));
+                this.div.appendChild(document.createElement("br"));
                 this.lines.push(line);
             }
         
@@ -134,8 +134,8 @@ PHPAnimation.prototype.animate = function(data) {
 }
 
 PHPAnimation.prototype.doAnimate = function(lineCount) {
-	lineCount = lineCount || 0;
-	var end = this.lines.length;
+    lineCount = lineCount || 0;
+    var end = this.lines.length;
     if(lineCount != end) {
         var nextInterval = this.interval;
         if(lineCount>0) {
@@ -154,7 +154,7 @@ PHPAnimation.prototype.doAnimate = function(lineCount) {
                                 y: e.pageY+"px",
                                 node: document.createTextNode
                                     (this.data.vars[i].value),
-								hideOnMouseOut:true
+                                hideOnMouseOut:true
                                 }
                     }).bind(this));
             this.audio.play();
@@ -164,16 +164,16 @@ PHPAnimation.prototype.doAnimate = function(lineCount) {
         } else if(this.data.sqlqueries.length && lineCount+1 == 
             this.data.sqlqueries[this.sqlCount].lineNumber) {
 
-			if(this.dbAnimation) {
-				this.dbAnimation.animate
-					(this.data.sqlqueries[this.sqlCount].sql,
-					this.doAnimate.bind(this));
-			}
+            if(this.dbAnimation) {
+                this.dbAnimation.animate
+                    (this.data.sqlqueries[this.sqlCount].sql,
+                    this.doAnimate.bind(this));
+            }
             this.findVarsInLines(this.data.sqlqueries, this.sqlCount,
                      (function(i, e) {
-							return this.loopAnimation.
-								createResultsDiv(i,e.pageX,e.pageY,
-									this.tooltip);
+                            return this.loopAnimation.
+                                createResultsDiv(i,e.pageX,e.pageY,
+                                    this.tooltip);
                         }).bind(this));
 
             
@@ -181,25 +181,25 @@ PHPAnimation.prototype.doAnimate = function(lineCount) {
         }
         lineCount++;    
 
-		if(this.sqlLoopCount < this.data.sqlqueries.length &&
-			lineCount+1==this.data.sqlqueries[this.sqlLoopCount].
-			loop.start) {
-			var tooltipInfo = this.loopAnimation.createResultsDiv
-				(this.sqlLoopCount,1024,200,this.tooltip);
-			this.tooltip.style.left = tooltipInfo.x; 
-			this.tooltip.style.top = tooltipInfo.y; 
-			this.tooltip.innerHTML = "";
-			this.tooltip.appendChild(tooltipInfo.node); 
-			this.tooltip.style.display='block';
-			this.tooltip.hideOnMouseOut = tooltipInfo.hideOnMouseOut;
+        if(this.sqlLoopCount < this.data.sqlqueries.length &&
+            lineCount+1==this.data.sqlqueries[this.sqlLoopCount].
+            loop.start) {
+            var tooltipInfo = this.loopAnimation.createResultsDiv
+                (this.sqlLoopCount,1024,200,this.tooltip);
+            this.tooltip.style.left = tooltipInfo.x; 
+            this.tooltip.style.top = tooltipInfo.y; 
+            this.tooltip.innerHTML = "";
+            this.tooltip.appendChild(tooltipInfo.node); 
+            this.tooltip.style.display='block';
+            this.tooltip.hideOnMouseOut = tooltipInfo.hideOnMouseOut;
             this.lines[lineCount-1].classList.remove("lineHighlight");
-        	setTimeout(this.loopAnimation.loopAnimate.bind(this.loopAnimation,
-						this.sqlLoopCount++,0,lineCount+1,[],
-						this.doAnimate.bind(this)),
-				nextInterval);
-		} else {
-        	setTimeout(this.doAnimate.bind(this,lineCount), nextInterval);
-		}
+            setTimeout(this.loopAnimation.loopAnimate.bind(this.loopAnimation,
+                        this.sqlLoopCount++,0,lineCount+1,[],
+                        this.doAnimate.bind(this)),
+                nextInterval);
+        } else {
+            setTimeout(this.doAnimate.bind(this,lineCount), nextInterval);
+        }
     } else { // if there is another line to do
         this.lines[this.lines.length-1].classList.remove("lineHighlight");
     }
@@ -235,13 +235,13 @@ PHPAnimation.prototype.findVarsInLines = function(arr, varCount,
                             this.tooltip.innerHTML = "";
                             this.tooltip.appendChild(tooltipInfo.node); 
                             this.tooltip.style.display='block';
-							this.tooltip.hideOnMouseOut = 
-								tooltipInfo.hideOnMouseOut;
+                            this.tooltip.hideOnMouseOut = 
+                                tooltipInfo.hideOnMouseOut;
                         }).bind(this,this.varCount));
                     span.addEventListener("mouseout",
                                     (function(e) {
-									if(this.tooltip.hideOnMouseOut) {
-                                    	this.tooltip.style.display='none';
+                                    if(this.tooltip.hideOnMouseOut) {
+                                        this.tooltip.style.display='none';
                                     }}).bind(this));
                     span.style.color = 'blue';
                     span.style.textDecoration='underline';

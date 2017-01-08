@@ -1,5 +1,5 @@
 function Animation(options) {
-    this.interval = options.interval || 500;
+    this.interval = options.interval || 50;
     this.step = options.step || 1;
     this.fileExplorer = options.fileExplorer || null;
     this.timer = null;
@@ -24,16 +24,16 @@ function Animation(options) {
         this.phpAnimation.setCallback(this.startResponse.bind(this));
     }
 
-	if(options.controlsDiv) {
-		var slider = new Slider(50, 10, {
-		onchange: (function(value) {
-			// TODO
-		}).bind(this) ,
+    if(options.controlsDiv) {
+        var slider = new Slider(50, 10, {
+        onchange: (function(value) {
+            this.interval = value;
+        }).bind(this) ,
 
-		parent: options.controlsDiv 
-		} );
-		slider.setValue(this.interval);
-	}
+        parent: options.controlsDiv 
+        } );
+        slider.setValue(this.interval);
+    }
 }
 
 Animation.prototype.messageTypes =  { NONE: 0, REQUEST: 1, RESPONSE: -1};
@@ -61,12 +61,12 @@ Animation.prototype.animate = function() {
     this.box.hide();
     if(this.fileExplorer) {
         this.fileExplorer.home ( (function() {
-                    this.timer = setInterval
+                    this.timer = setTimeout
                         (this.doAnimate.bind(this,this.messageTypes.REQUEST), 
                         this.interval);
                     }.bind(this))); 
     } else {
-        this.timer = setInterval
+        this.timer = setTimeout
                 (this.doAnimate.bind(this,this.messageTypes.REQUEST), 
                 this.interval);
     }
@@ -112,8 +112,15 @@ Animation.prototype.doAnimate = function(messageType) {
                             this.boxProps.width+2,
                             this.boxProps.height+2);
         this.x += this.step*direction;
+
+        // use same animation state for next timeout, hence no parameter to
+        // this.doAnimate()
+
+        if(!this.paused) {
+            this.timer = setTimeout
+                (this.doAnimate.bind(this), this.interval);
+        }
     } else {
-        clearInterval(this.timer);
         this.timer=null;
         
         if(this.animationState==this.messageTypes.REQUEST) {
@@ -197,21 +204,23 @@ Animation.prototype.doAnimate = function(messageType) {
 
 Animation.prototype.startResponse = function() {
 
-    this.timer = setInterval (this.doAnimate.bind
+    this.timer = setTimeout (this.doAnimate.bind
                                     (this,this.messageTypes.RESPONSE),     
                                     this.interval);
 }
 
 Animation.prototype.pause = function() {
+    this.paused = true;
     if(this.timer!=null) {
-        clearInterval(this.timer);
+        clearTimeout(this.timer);
         this.timer = null;
     }
 }
 
 Animation.prototype.play = function() {    
     if(this.timer==null) {
-        this.timer = setInterval(this.doAnimate.bind(this), this.interval);
+        this.paused = false;
+        this.timer = setTimeout(this.doAnimate.bind(this), this.interval);
     }
 }
 

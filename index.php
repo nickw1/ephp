@@ -69,7 +69,7 @@ class EPHPPage extends Page {
 				alt='network' />
 		</div>
 
-			<canvas id="network_canvas" width="400px">  </canvas>
+			<canvas id="network_canvas" width="320px">  </canvas>
 			<div id="network_controls">
 				<img id="play" src="assets/images/control_play_blue.2.png" 
 					alt='Resume animation' />

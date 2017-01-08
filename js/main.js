@@ -40,8 +40,8 @@ function init() {
     var phpAnimation = new PHPAnimation({divId:"serverContent"});
 
     var animation = new Animation({canvasId: 'network_canvas',
-                                    interval: 10,
-                                    step : 1,
+                                    interval: 20,
+                                    step : 2,
                                     fileExplorer: fileExplorer,
                                     phpAnimation: phpAnimation,
 									controlsDiv: network_controls });
