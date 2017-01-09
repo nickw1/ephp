@@ -3,9 +3,7 @@
 
 function PHPAnimation(options) {
     this.div = document.getElementById(options.divId);
-    if(options.callback) {
-        this.setCallback(options.callback);
-    }
+    this.callback = options.callback || null; 
     this.browserCallback = options.browserCallback || null;
     this.audio = new Audio('assets/sound/Game-Spawn.ogg');
 
@@ -28,7 +26,11 @@ function PHPAnimation(options) {
     this.dbAnimation = options.dbAnimation || null;
 
     this.interval = options.interval || 1000;
+    this.timer=null;
+	this.showing=false;
+	this.isRunning=false;
 
+    this.setupGUI();
 }
 
 PHPAnimation.prototype.colours = 
@@ -44,12 +46,15 @@ PHPAnimation.prototype.getSQLQuery = function(queryIndex) {
 
 PHPAnimation.prototype.setCallback = function(callback) {
     this.callback = callback;
+}
+
+PHPAnimation.prototype.setupGUI = function() {
     this.btndiv = document.createElement("div");
     var btn = document.createElement("input");
     btn.setAttribute("type","button");
     btn.setAttribute("value","Run PHP and send back output");
-    this.callback = callback;
     btn.addEventListener("click", (function() {
+		this.showing=false;
         while(this.div.childNodes.length > 0) {
             this.div.removeChild(this.div.firstChild);
         }
@@ -57,7 +62,10 @@ PHPAnimation.prototype.setCallback = function(callback) {
             this.div.appendChild(this.originalDivContents[i]); 
         }
         this.div.classList.remove("serverCode");
-        this.callback(); 
+        if(this.callback) {
+            this.callback();
+        }
+
         }).bind(this)); 
 
     var slider = new Slider(2000, 10, {
@@ -75,16 +83,26 @@ PHPAnimation.prototype.setCallback = function(callback) {
 }
 
 PHPAnimation.prototype.animate = function(data) {
+	this.isRunning = true;
     if(data.vars.length==0 && data.sqlqueries.length==0) {
         return false;
     } else {
-        this.originalDivContents = [];
-        
-        while(this.div.childNodes.length > 0) {    
-            this.originalDivContents.push(this.div.firstChild);
-            this.div.removeChild(this.div.firstChild);
-        }
-        this.div.classList.add("serverCode");
+		this.clearTimer();
+
+		// If showing some other code from a previous request, blank out the
+		// div, otherwise save the original contents
+		if(this.showing) {
+			this.div.innerHTML = "";
+		} else {
+			this.showing=true;
+        	this.originalDivContents = [];
+        	while(this.div.childNodes.length > 0) {    
+            	this.originalDivContents.push(this.div.firstChild);
+            	this.div.removeChild(this.div.firstChild);
+        	}
+        	this.div.classList.add("serverCode");
+		}
+
         this.data = data;
         var lines = this.data.php.split("\n");
         this.lines = [];
@@ -125,7 +143,7 @@ PHPAnimation.prototype.animate = function(data) {
             this.varCount=0;
             this.sqlCount=0;
             this.sqlLoopCount=0;
-            setTimeout(this.doAnimate.bind(this), this.interval);
+            this.timer=setTimeout(this.doAnimate.bind(this), this.interval);
         }
         this.div.appendChild(this.btndiv);
         this.div.appendChild(this.tooltip);
@@ -193,15 +211,17 @@ PHPAnimation.prototype.doAnimate = function(lineCount) {
             this.tooltip.style.display='block';
             this.tooltip.hideOnMouseOut = tooltipInfo.hideOnMouseOut;
             this.lines[lineCount-1].classList.remove("lineHighlight");
-            setTimeout(this.loopAnimation.loopAnimate.bind(this.loopAnimation,
-                        this.sqlLoopCount++,0,lineCount+1,[],
-                        this.doAnimate.bind(this)),
+            this.timer=setTimeout
+                (this.loopAnimation.loopAnimate.bind(this.loopAnimation,
+                        this.sqlLoopCount++, this.doAnimate.bind(this)),
                 nextInterval);
         } else {
-            setTimeout(this.doAnimate.bind(this,lineCount), nextInterval);
+            this.timer=setTimeout
+                (this.doAnimate.bind(this,lineCount), nextInterval);
         }
-    } else { // if there is another line to do
+    } else { // if there is NOT another line to do
         this.lines[this.lines.length-1].classList.remove("lineHighlight");
+		this.isRunning = false;
     }
 }
 
@@ -269,4 +289,21 @@ PHPAnimation.prototype.findVarsInLines = function(arr, varCount,
             this.lines[i].appendChild(newNodes[node]);
         }
     } //  loop through lines 
+}
+
+PHPAnimation.prototype.stop = function() {
+	this.clearTimer();
+	if(this.isRunning) {
+		this.tooltip.style.display='none';
+		this.div.removeChild(this.tooltip);
+		this.isRunning = false;
+	}
+	this.loopAnimation.stop();
+}
+
+PHPAnimation.prototype.clearTimer = function() {
+    if(this.timer!=null) {
+        clearTimeout(this.timer);
+        this.timer=null;
+    }
 }

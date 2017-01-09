@@ -21,10 +21,7 @@ LoopAnimation.prototype.resetLoop = function() {
 }
 
 LoopAnimation.prototype.pauseLoopAnimate = function() {
-    if(this.timeout) {
-        clearTimeout(this.timeout);
-        this.timeout=null;
-    }
+	this.clearTimer();
     this.contLoopAnimate = false;
 }
 
@@ -32,6 +29,18 @@ LoopAnimation.prototype.resumeLoopAnimate = function() {
     if(this.contLoopAnimate==false) {
         this.contLoopAnimate = true;
         this.iterateLoopAnimate();
+    }
+}
+
+LoopAnimation.prototype.stop = function() {
+	this.clearTimer();
+	this.contLoopAnimate = false;
+}
+
+LoopAnimation.prototype.clearTimer = function() {
+    if(this.timeout) {
+        clearTimeout(this.timeout);
+        this.timeout=null;
     }
 }
 
@@ -256,3 +265,4 @@ LoopAnimation.prototype.createResultsDiv = function(i, x, y, hostDiv) {
     div.appendChild(console);
     return { x: x+"px", hideOnMouseOut:false, y: (y+200)+"px", node: div };
 }
+

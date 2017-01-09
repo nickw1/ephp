@@ -121,7 +121,7 @@ $scripts = array
 			'php/js/PHPAnimation.js',
 			'php/js/LoopAnimation.js',
 			'php/js/DBAnimation.js',
-			'php/js/Slider.js',
+			'lib/js/Slider.js',
 			'http://www.free-map.org.uk/jslib/PromiseAjax.js',
 			'http://www.free-map.org.uk/jslib/Dialog.js',
 			'ace-builds/src-noconflict/ace.js');

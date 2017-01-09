@@ -30,12 +30,13 @@ function Animation(options) {
                             this.pause.bind(this)],
                         'Play' : [ 'assets/images/control_play_blue.2.png' , 
                             this.play.bind(this)],
-                        'Fast forward' : 
-                            ['assets/images/control_fastforward_blue.2.png' , 
-                                this.fastForward.bind(this) ],
                         'Rewind' : 
                             [ 'assets/images/control_rewind_blue.2.png', 
-                                this.rewind.bind(this) ] };
+                                this.rewind.bind(this) ] ,
+                        'Fast forward' : 
+                            ['assets/images/control_fastforward_blue.2.png' , 
+                                this.fastForward.bind(this) ]
+                        };
         for(control in controls) {
             var img = document.createElement("img");
             img.setAttribute("alt", control);
@@ -75,18 +76,28 @@ Animation.prototype.setHttp = function(http) {
     this.box.http=http;
 }
 
-Animation.prototype.animate = function() {
+// Now can pass an onrequestend event handler - e.g. if we want to tell the
+// parent, typically the browser, that the animation has finished
+Animation.prototype.animate = function(options) {
+    options = options || {};
+    this.onrequestend = options.onrequestend || null;
+    this.onrequeststart = options.onrequeststart || null;
+    this.onrequeststart();
     this.x = 0; 
     this.box.hide();
+    if(this.phpAnimation.isRunning) {
+        this.phpAnimation.stop();
+    }
+
     if(this.fileExplorer) {
         this.fileExplorer.home ( (function() {
                     this.timer = setTimeout
-                        (this.doAnimate.bind(this,this.messageTypes.REQUEST), 
+                        (this.doAnimate.bind(this,this.messageTypes.REQUEST),
                         this.interval);
                     }.bind(this))); 
     } else {
         this.timer = setTimeout
-                (this.doAnimate.bind(this,this.messageTypes.REQUEST), 
+                (this.doAnimate.bind(this,this.messageTypes.REQUEST),
                 this.interval);
     }
 }
@@ -141,6 +152,10 @@ Animation.prototype.doAnimate = function(messageType) {
         }
     } else {
         this.timer=null;
+
+        if(this.onrequestend) {
+            this.onrequestend();
+        }
         
         if(this.animationState==this.messageTypes.REQUEST) {
             if(this.fileExplorer!=null) {
@@ -223,6 +238,7 @@ Animation.prototype.doAnimate = function(messageType) {
 
 Animation.prototype.startResponse = function() {
 
+    this.onrequeststart();
     this.timer = setTimeout (this.doAnimate.bind
                                     (this,this.messageTypes.RESPONSE),     
                                     this.interval);
@@ -230,6 +246,10 @@ Animation.prototype.startResponse = function() {
 
 Animation.prototype.pause = function() {
     this.paused = true;
+    this.clearTimer();
+}
+
+Animation.prototype.clearTimer = function() {
     if(this.timer!=null) {
         clearTimeout(this.timer);
         this.timer = null;
@@ -244,12 +264,14 @@ Animation.prototype.play = function() {
 }
 
 Animation.prototype.fastForward = function() {
+    this.clearTimer();
     this.x=(this.animationState==this.messageTypes.RESPONSE ? 20: 
             this.canvas.width-20);
     this.doAnimate();
 }
 
 Animation.prototype.rewind = function() {
+    this.clearTimer();
     this.x=(this.animationState==this.messageTypes.RESPONSE ? 
             this.canvas.width: 0);
     this.doAnimate();

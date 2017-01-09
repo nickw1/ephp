@@ -19,9 +19,10 @@ function Browser(options) {
     this.addressButton.style.flexGrow = 1;
     this.addressButton.setAttribute("type", "button");
     this.addressButton.setAttribute("value","Go!");
-    this.addressButton.addEventListener("click", (function() {
-                this.sendRequest("GET", this.addressBox.value);
-            } ).bind(this));
+    this.addressButton.addEventListener("click", 
+                    (function()  {
+                        this.sendRequest("GET", this.addressBox.value);
+                    }).bind(this));
     this.addressDiv.appendChild(this.addressButton);
     this.div.appendChild(this.addressDiv);
     this.content = document.createElement("div");
@@ -36,22 +37,28 @@ function Browser(options) {
     this.altered=false;
     this.webDir="";
     this.editor = ace.edit(options.sourceElement);
-	this.editor.setOptions({fontSize:"12pt"});
+    this.editor.setOptions({fontSize:"12pt"});
     this.editor.getSession().setMode("ace/mode/php");
     this.editor.on("change", (function(e) {
         this.showContent('text/html', this.editor.getValue());
         this.altered=true;
             }).bind(this));
     this.addedCssRules = [];
+    this.setRequestingState(false);
 }
 
 Browser.prototype.sendRequest = function(method,url,formData) {
+    this.setRequestingState(true);
     var regexp=/^(http:\/\/[^\/]+)?(\/.*)$/;    
     var parts = url.match(regexp);
     if(parts==null) {
         alert("Invalid URL");
     } else if(this.animation==null) {
-		http.send(method, url, formData).then(this.loadResponse.bind(this));
+        http.send(method, url, formData).then(
+                (function() {
+                    this.setRequestingState(false);
+                    this.loadResponse();
+                    } ).bind(this));
     } else {
         var pXHR = new PendingHttpRequest
             ( {
@@ -60,18 +67,31 @@ Browser.prototype.sendRequest = function(method,url,formData) {
                 formData: formData,
                 callback: this.loadResponse.bind(this),
                 server: parts[1]?parts[1].replace("http://",""):
-						window.location.hostname,
+                        window.location.hostname,
                 analyser: 'php/analyser.php'
               }
             );
 
         this.animation.setHttp(pXHR);
-        this.animation.animate();
+        this.animation.animate({onrequeststart:
+                                    this.setRequestingState.bind(this,true),
+                                onrequestend:
+                                    this.setRequestingState.bind(this,false)});
     }
+}
+
+Browser.prototype.setRequestingState = function(state) {
+    if(state) {
+        this.addressButton.setAttribute("disabled", "disabled");
+    } else {
+        this.addressButton.removeAttribute("disabled");
+    }
+    this.requesting = state;
 }
 
 // Handles editableResponse from animation or ordinary XMLHttpRequest 
 Browser.prototype.loadResponse = function(o) {
+    this.setRequestingState(false);
     var status=200, url="/", responseText="", mimetype="text/html",
         statusText="OK";
     if(o.headers) {
@@ -79,7 +99,7 @@ Browser.prototype.loadResponse = function(o) {
         url = o.url;
         responseText = o.content;
         mimetype = o.headers["Content-Type"];
-		console.log("mimetype="+mimetype)
+        console.log("mimetype="+mimetype)
         statusText = o.statusText;
     } else if (o.responseText) {
         status = o.status;
@@ -104,9 +124,9 @@ Browser.prototype.loadResponse = function(o) {
         this.addressBox.value =  url;
         if(this.saveOldCallback) {
             this.saveOldCallback 
-			    (this.loadDocumentOrImage.bind(this,mimetype,url,responseText));
+                (this.loadDocumentOrImage.bind(this,mimetype,url,responseText));
         } else {
-			this.loadDocumentOrImage(mimetype, url, responseText);
+            this.loadDocumentOrImage(mimetype, url, responseText);
         }
             
     } else {
@@ -242,12 +262,12 @@ Browser.prototype.showContent = function(mimetype, responseText) {
 }
 
 Browser.prototype.showImage = function(url) {
-	var img = new Image();
-	img.src = url; 
-	img.onload = (function() {
-		this.content.innerHTML = "";
-		this.content.appendChild(img);
-	}).bind(this);
+    var img = new Image();
+    img.src = url; 
+    img.onload = (function() {
+        this.content.innerHTML = "";
+        this.content.appendChild(img);
+    }).bind(this);
 }
 
 Browser.prototype.highlightFormField = function(fieldName, colour) {
@@ -294,15 +314,15 @@ Browser.prototype.setWebDir = function(dir){
 }
 
 Browser.prototype.setFile = function(file) {
-	this.addressBox.value = this.webDir + "/" +file;
+    this.addressBox.value = this.webDir + "/" +file;
 }
 
 Browser.prototype.loadDocumentOrImage = function(mimetype, url, responseText) {
-	if(mimetype=='image/jpeg' || mimetype=='image/png' ||
-				mimetype=='image/jpg') { 
-		this.showImage(url);
-		this.markUnaltered();
-	} else {
-		this.setContent(mimetype, responseText);
-	}
+    if(mimetype=='image/jpeg' || mimetype=='image/png' ||
+                mimetype=='image/jpg') { 
+        this.showImage(url);
+        this.markUnaltered();
+    } else {
+        this.setContent(mimetype, responseText);
+    }
 }
