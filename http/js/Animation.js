@@ -82,7 +82,9 @@ Animation.prototype.animate = function(options) {
     options = options || {};
     this.onrequestend = options.onrequestend || null;
     this.onrequeststart = options.onrequeststart || null;
-    this.onrequeststart();
+    if(this.onrequeststart) {
+        this.onrequeststart();
+    }
     this.x = 0; 
     this.box.hide();
     if(this.phpAnimation.isRunning) {
@@ -238,7 +240,9 @@ Animation.prototype.doAnimate = function(messageType) {
 
 Animation.prototype.startResponse = function() {
 
-    this.onrequeststart();
+    if(this.onrequeststart) {
+        this.onrequeststart();
+    }
     this.timer = setTimeout (this.doAnimate.bind
                                     (this,this.messageTypes.RESPONSE),     
                                     this.interval);
