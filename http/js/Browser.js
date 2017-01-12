@@ -73,9 +73,9 @@ Browser.prototype.sendRequest = function(method,url,formData) {
             );
 
         this.animation.setHttp(pXHR);
-        this.animation.animate({onrequeststart:
+        this.animation.animate({onmessagestart:
                                     this.setRequestingState.bind(this,true),
-                                onrequestend:
+                                onmessageend:
                                     this.setRequestingState.bind(this,false)});
     }
 }

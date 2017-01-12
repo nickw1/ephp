@@ -76,14 +76,14 @@ Animation.prototype.setHttp = function(http) {
     this.box.http=http;
 }
 
-// Now can pass an onrequestend event handler - e.g. if we want to tell the
+// Now can pass an onmessageend event handler - e.g. if we want to tell the
 // parent, typically the browser, that the animation has finished
 Animation.prototype.animate = function(options) {
     options = options || {};
-    this.onrequestend = options.onrequestend || null;
-    this.onrequeststart = options.onrequeststart || null;
-    if(this.onrequeststart) {
-        this.onrequeststart();
+    this.onmessageend = options.onmessageend || null;
+    this.onmessagestart = options.onmessagestart || null;
+    if(this.onmessagestart) {
+        this.onmessagestart();
     }
     this.x = 0; 
     this.box.hide();
@@ -155,8 +155,8 @@ Animation.prototype.doAnimate = function(messageType) {
     } else {
         this.timer=null;
 
-        if(this.onrequestend) {
-            this.onrequestend();
+        if(this.onmessageend) {
+            this.onmessageend();
         }
         
         if(this.animationState==this.messageTypes.REQUEST) {
@@ -240,8 +240,8 @@ Animation.prototype.doAnimate = function(messageType) {
 
 Animation.prototype.startResponse = function() {
 
-    if(this.onrequeststart) {
-        this.onrequeststart();
+    if(this.onmessagestart) {
+        this.onmessagestart();
     }
     this.timer = setTimeout (this.doAnimate.bind
                                     (this,this.messageTypes.RESPONSE),     
