@@ -98,7 +98,8 @@ Browser.prototype.loadResponse = function(o) {
         status = o.status;
         url = o.url;
         responseText = o.content;
-        mimetype = o.headers["Content-Type"];
+        // deal with Content-types with charset stuff after
+        mimetype = (o.headers["Content-Type"].split(";"))[0];
         console.log("mimetype="+mimetype)
         statusText = o.statusText;
     } else if (o.responseText) {
@@ -111,7 +112,7 @@ Browser.prototype.loadResponse = function(o) {
         for(var i=0; i<responseHeaders.length-1; i++) {
             var curHeader = responseHeaders[i].split(": ");
             if(curHeader[0]=="Content-Type") {
-                mimetype = curHeader[1];
+                mimetype = (curHeader[1].split(";"))[0];
             }
         }    
     }
@@ -322,7 +323,6 @@ Browser.prototype.setFile = function(file) {
 }
 
 Browser.prototype.loadDocumentOrImage = function(mimetype, url, responseText) {
-    alert(mimetype);
     if(mimetype=='image/jpeg' || mimetype=='image/png' ||
                 mimetype=='image/jpg') { 
         this.showImage(url);
