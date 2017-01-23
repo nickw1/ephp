@@ -263,6 +263,10 @@ Browser.prototype.showContent = function(mimetype, responseText) {
 
 Browser.prototype.showImage = function(url) {
     var img = new Image();
+    img.onerror = (function() {
+        this.content.innerHTML = url + 
+            " could not be loaded as it is an invalid image.";
+        }).bind(this);
     img.src = url; 
     img.onload = (function() {
         this.content.innerHTML = "";
@@ -318,11 +322,16 @@ Browser.prototype.setFile = function(file) {
 }
 
 Browser.prototype.loadDocumentOrImage = function(mimetype, url, responseText) {
+    alert(mimetype);
     if(mimetype=='image/jpeg' || mimetype=='image/png' ||
                 mimetype=='image/jpg') { 
         this.showImage(url);
         this.markUnaltered();
-    } else {
+    } else if (mimetype=='text/html' || mimetype=='text/plain') {
         this.setContent(mimetype, responseText);
+    } else {
+        this.setContent('text/html', 
+            'This browser does not recognise the content type '+ mimetype);
     }
 }
+
