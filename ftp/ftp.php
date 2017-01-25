@@ -6,9 +6,9 @@ require_once('PostFtpHandler.php');
 session_start();
 
 
-$u = isset($_POST["username"]) ? $_POST["username"] :
+$u = isset($_POST["ephp_username"]) ? $_POST["ephp_username"] :
         (isset($_SESSION["ephpuser"]) ? $_SESSION["ephpuser"]: null);
-$p = isset($_POST["password"]) ? $_POST["password"] :
+$p = isset($_POST["ephp_password"]) ? $_POST["ephp_password"] :
         (isset($_SESSION["ephppass"]) ? $_SESSION["ephppass"]: null);
 if($_SERVER["REQUEST_METHOD"]=="POST") {
 	if(isset($_FILES["file"])) {

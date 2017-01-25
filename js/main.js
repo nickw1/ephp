@@ -213,13 +213,13 @@ function init() {
         var formData = new FormData();
         savedLoginHTML = document.getElementById("login").innerHTML;
 
-        if(document.getElementById("username") && 
-            document.getElementById("password")) { 
+        if(document.getElementById("ephp_username") && 
+            document.getElementById("ephp_password")) { 
         
-            formData.append("username", 
-                    document.getElementById("username").value);
-            formData.append("password", 
-                    document.getElementById("password").value);
+            formData.append("ephp_username", 
+                    document.getElementById("ephp_username").value);
+            formData.append("ephp_password", 
+                    document.getElementById("ephp_password").value);
         }
         var filename=null, msg="";
         if(fileInfo.file==null) {
@@ -259,12 +259,12 @@ function init() {
         savedLoginHTML = document.getElementById("login").innerHTML;
 
         
-        if(document.getElementById("username") &&
-            document.getElementById("password")) {
-            formData.append("username", 
-                document.getElementById("username").value);
-            formData.append("password", 
-                document.getElementById("password").value);
+        if(document.getElementById("ephp_username") &&
+            document.getElementById("ephp_password")) {
+            formData.append("ephp_username", 
+                document.getElementById("ephp_username").value);
+            formData.append("ephp_password", 
+                document.getElementById("ephp_password").value);
         }
         var msg = "Logging in...";
 
