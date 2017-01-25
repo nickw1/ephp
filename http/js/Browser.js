@@ -72,6 +72,7 @@ Browser.prototype.sendRequest = function(method,url,formData) {
               }
             );
 
+		this.animation.stop(); // stop any previous animations
         this.animation.setHttp(pXHR);
         this.animation.animate({onmessagestart:
                                     this.setRequestingState.bind(this,true),
@@ -81,11 +82,13 @@ Browser.prototype.sendRequest = function(method,url,formData) {
 }
 
 Browser.prototype.setRequestingState = function(state) {
+	/*
     if(state) {
         this.addressButton.setAttribute("disabled", "disabled");
     } else {
         this.addressButton.removeAttribute("disabled");
     }
+	*/
     this.requesting = state;
 }
 

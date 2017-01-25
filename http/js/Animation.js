@@ -253,6 +253,13 @@ Animation.prototype.pause = function() {
     this.clearTimer();
 }
 
+Animation.prototype.stop = function() {
+	this.clearTimer();
+    if(this.phpAnimation.isRunning) {
+        this.phpAnimation.stop();
+    }
+}
+
 Animation.prototype.clearTimer = function() {
     if(this.timer!=null) {
         clearTimeout(this.timer);
