@@ -295,7 +295,9 @@ PHPAnimation.prototype.stop = function() {
 	this.clearTimer();
 	if(this.isRunning) {
 		this.tooltip.style.display='none';
-		this.div.removeChild(this.tooltip);
+		if(this.showing) {
+			this.div.removeChild(this.tooltip);
+		}
 		this.isRunning = false;
 	}
 	this.loopAnimation.stop();
