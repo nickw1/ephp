@@ -3,13 +3,14 @@
 // INPUT: php script which can have query string or post data
 
 class InputVars {
-    private $varlist, $get, $post;
+    private $varlist, $get, $post, $srcGets, $srcPosts;
 
     public function __construct($get, $post) {
         //$this->varlist = [];
         $this->varlist = array();
         $this->get = $get;
         $this->post = $post;
+		$this->srcGets= $this->srcPosts=0;
     }
 
     public function addVar($phpvar, $reqtype, $httpvar, $linenum) {
@@ -17,6 +18,9 @@ class InputVars {
         $this->varlist[$phpvar] = array( "reqtype" => $reqtype,
                                     "httpvar" => $httpvar,
                                     "lineNumber" => $linenum );
+
+		if($reqtype=="GET") $this->srcGets++;
+		if($reqtype=="POST") $this->srcPosts++;
     }
 
     public function getValue($phpvar) {
@@ -37,6 +41,14 @@ class InputVars {
         }
         return $arr;
     }
+
+	public function nPosts() {
+		return $this->srcPosts; 
+	}
+
+	public function  nGets() {
+		return $this->srcGets; 
+	}
 }
 
 class DBQuery {
@@ -145,13 +157,15 @@ class TokenReader {
             $this->isVarAssignment() &&
             is_array($this->tokens[$this->index+2]) &&
             $this->tokens[$this->index+2][0] == T_VARIABLE &&
-            $this->tokens[$this->index+2][1] == '$_'.$reqtype &&
+    //        $this->tokens[$this->index+2][1] == '$_'.$reqtype &&
+            ($this->tokens[$this->index+2][1] == '$_GET' ||	
+			$this->tokens[$this->index+2][1] == '$_POST') &&
             $this->tokens[$this->index+3] == "[" &&
             $this->tokens[$this->index+5] == "]" &&
             is_array($this->tokens[$this->index+4]) &&
             $this->tokens[$this->index+4][0] == T_CONSTANT_ENCAPSED_STRING) {
             $arr = array ($this->tokens[$this->index][1] , 
-                            $reqtype,
+                            substr($this->tokens[$this->index+2][1], 2),
                             str_replace('"','',
                             $this->tokens[$this->index+4][1]),
                                 $this->tokens[$this->index][2]);
@@ -381,6 +395,7 @@ foreach($_POST as $k=>$v) {
 $httpCode = 500;
 $sqlresults = array();
 $resultvars = array();
+$warnings = array();
 
 $loop=null;
 
@@ -390,8 +405,8 @@ if(!isset($_SESSION["ephpuser"])) {
 elseif(($fileinfo=get_php_file($target,$config["ephproot"]))==null) {
     $errors[] = "Can only read from ephp-designated directories.";
 } else {
-    list($expectedUsername, $targetfile) = $fileinfo;
     $vars =new InputVars($get, $post);
+    list($expectedUsername, $targetfile) = $fileinfo;
     if($expectedUsername != $_SESSION["ephpuser"]) {
         $errors[] = "Cannot read another user's files.";
         $httpCode = 400;
@@ -457,6 +472,11 @@ elseif(($fileinfo=get_php_file($target,$config["ephproot"]))==null) {
                         }
                     }
                 }
+				if(($_SERVER["REQUEST_METHOD"]=="POST" && $vars->nPosts()==0) ||
+					($_SERVER["REQUEST_METHOD"]=="GET" && $vars->nGets()==0)) {
+					$warnings[] = "Method was $_SERVER[REQUEST_METHOD] but no ".
+							'$_'.$_SERVER["REQUEST_METHOD"]." variables found.";
+				}
                 if($username != null) {
 
                     if($username != $expectedUsername) { 
@@ -518,6 +538,7 @@ if(empty($errors)) {
         "response" => $script_result,
         "vars" => $vars ? $vars->getVarsAndValues(): array(),
         "sqlqueries" => $sqlresults,
+		"warnings"=> $warnings,
                 ); 
         $httpCode = $script_result["status"]["code"];
 } else { 

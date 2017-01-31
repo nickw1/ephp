@@ -338,3 +338,6 @@ Browser.prototype.loadDocumentOrImage = function(mimetype, url, responseText) {
     }
 }
 
+Browser.prototype.refresh = function() {
+	this.editor.resize();
+}

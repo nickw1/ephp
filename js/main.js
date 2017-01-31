@@ -335,6 +335,8 @@ function init() {
         }
         
         tabs[mode].classList.add("active");
+		browser.refresh();
+		
     }
 
     var doToolbar = function() {
