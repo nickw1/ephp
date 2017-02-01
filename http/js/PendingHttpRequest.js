@@ -36,8 +36,10 @@ PendingHttpRequest.prototype.send = function(immediateCallback) {
 
 	if(analysePHP) {
 		var analyserUrl = this.analyser;
+		// Kill the cache - this caused no reload at times
 		if(this.method=='GET') {
-			analyserUrl+="?target=";
+			analyserUrl+="?killcache="+new Date().getTime()+
+				"&target=";
 			var parts = this.url.split("?");
 			analyserUrl+=(parts.length==2 ? parts[0]+"&"+parts[1] : this.url);
 		} else if (this.method=='POST') {
