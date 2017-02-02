@@ -91,6 +91,8 @@ Animation.prototype.animate = function(options) {
         this.phpAnimation.stop();
     }
 
+    this.paused=false;
+
     if(this.fileExplorer) {
         this.fileExplorer.home ( (function() {
                     this.timer = setTimeout
@@ -174,7 +176,7 @@ Animation.prototype.doAnimate = function(messageType) {
                             // TODO go in own object - seems poor cohesion to
                             // put here, particularly error checking
                             this.http.send((function(analyserInfo) {
-								console.log("analyserInfo="+JSON.stringify(analyserInfo));
+                                console.log("analyserInfo="+JSON.stringify(analyserInfo));
                                 var startResponseNow=true;
                                 if(analyserInfo) {
                                     if(analyserInfo.errors) {
@@ -218,16 +220,16 @@ Animation.prototype.doAnimate = function(messageType) {
                                         alert(errMsg);
                                         startResponseNow = false;
                                     } else {
-										if(analyserInfo.warnings.length) {
-											var warn="";
-											for(var i=0; 
-											i<analyserInfo.warnings.length;
-											i++) {
-												warn+=analyserInfo.warnings[i]+
-												"\n";
-											}
-											alert("WARNING(s):\n"+warn);
-										}
+                                        if(analyserInfo.warnings.length) {
+                                            var warn="";
+                                            for(var i=0; 
+                                            i<analyserInfo.warnings.length;
+                                            i++) {
+                                                warn+=analyserInfo.warnings[i]+
+                                                "\n";
+                                            }
+                                            alert("WARNING(s):\n"+warn);
+                                        }
                                         startResponseNow=
                                             !this.phpAnimation.animate
                                                 (analyserInfo);
@@ -265,7 +267,7 @@ Animation.prototype.pause = function() {
 }
 
 Animation.prototype.stop = function() {
-	this.clearTimer();
+    this.clearTimer();
     if(this.phpAnimation.isRunning) {
         this.phpAnimation.stop();
     }
