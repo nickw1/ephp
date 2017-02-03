@@ -91,10 +91,10 @@ class DBQuery {
         foreach($this->dbq as $part) {
             if(is_array($part)) {
                 if(isset($part[$type])) {
-                    $sql .= strtolower(trim($part[$type]));
+                    $sql .= strtolower($part[$type]);
                 }
             } else { 
-                $sql .= (strtolower(trim($part)));
+                $sql .= strtolower($part);
             }
         }
         return $sql;
