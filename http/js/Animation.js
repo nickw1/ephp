@@ -176,7 +176,6 @@ Animation.prototype.doAnimate = function(messageType) {
                             // TODO go in own object - seems poor cohesion to
                             // put here, particularly error checking
                             this.http.send((function(analyserInfo) {
-                                console.log("analyserInfo="+JSON.stringify(analyserInfo));
                                 var startResponseNow=true;
                                 if(analyserInfo) {
                                     if(analyserInfo.errors) {

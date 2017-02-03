@@ -225,12 +225,12 @@ PHPAnimation.prototype.doAnimate = function(lineCount) {
     }
 }
 
-PHPAnimation.prototype.findVarsInLines = function(arr, varCount, 
+PHPAnimation.prototype.findVarsInLines = function(arr, curVarCount, 
         getTooltipCallback) {
-    for(var i=arr[varCount].lineNumber; i<this.lines.length; i++) {
+    for(var i=arr[curVarCount].lineNumber; i<this.lines.length; i++) {
         var regex = new RegExp(
                             "^(.*?)(\\"+
-                            arr[this.varCount].variable+
+                            arr[curVarCount].variable+
                             ")(\\W.*)$");
         var newNodes = [];
         for(var node=0; node<this.lines[i].childNodes.length; node++) {
@@ -257,7 +257,7 @@ PHPAnimation.prototype.findVarsInLines = function(arr, varCount,
                             this.tooltip.style.display='block';
                             this.tooltip.hideOnMouseOut = 
                                 tooltipInfo.hideOnMouseOut;
-                        }).bind(this,this.varCount));
+                        }).bind(this,curVarCount));
                     span.addEventListener("mouseout",
                                     (function(e) {
                                     if(this.tooltip.hideOnMouseOut) {

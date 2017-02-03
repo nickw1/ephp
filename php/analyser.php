@@ -94,7 +94,7 @@ class DBQuery {
                     $sql .= strtolower(trim($part[$type]));
                 }
             } else { 
-                $sql .= strtolower(trim($part));
+                $sql .= (strtolower(trim($part)));
             }
         }
         return $sql;
@@ -336,9 +336,8 @@ class TokenReader {
                 if(is_array($this->tokens[$i])) {
                     switch($this->tokens[$i][0]) {
                         case T_ENCAPSED_AND_WHITESPACE:
-                            $query->addPart($this->tokens[$i][1]);
-                            break;
-
+                            $query->addPart($this->tokens[$i][1]); 
+								break; 
                         case T_CONSTANT_ENCAPSED_STRING:
                             $query->addPart(str_replace('"','',
                                 $this->tokens[$i][1]));
