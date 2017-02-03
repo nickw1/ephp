@@ -10,7 +10,7 @@ class InputVars {
         $this->varlist = array();
         $this->get = $get;
         $this->post = $post;
-		$this->srcGets= $this->srcPosts=0;
+        $this->srcGets= $this->srcPosts=0;
     }
 
     public function addVar($phpvar, $reqtype, $httpvar, $linenum) {
@@ -19,8 +19,8 @@ class InputVars {
                                     "httpvar" => $httpvar,
                                     "lineNumber" => $linenum );
 
-		if($reqtype=="GET") $this->srcGets++;
-		if($reqtype=="POST") $this->srcPosts++;
+        if($reqtype=="GET") $this->srcGets++;
+        if($reqtype=="POST") $this->srcPosts++;
     }
 
     public function getValue($phpvar) {
@@ -42,13 +42,13 @@ class InputVars {
         return $arr;
     }
 
-	public function nPosts() {
-		return $this->srcPosts; 
-	}
+    public function nPosts() {
+        return $this->srcPosts; 
+    }
 
-	public function  nGets() {
-		return $this->srcGets; 
-	}
+    public function  nGets() {
+        return $this->srcGets; 
+    }
 }
 
 class DBQuery {
@@ -105,6 +105,18 @@ class DBQuery {
         return $conn->query($this->sql);
     }
 
+	// Hacky way of trying out inserts and updates without running them
+	// Prepare the statement without executing and then test whether
+	// it worked
+	// the setAttribute() is necessary to get error info after doing
+	// the prepare
+	
+    public function test($conn) {
+	$conn->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+        $this->makeSQL();
+         $conn->prepare($this->sql);
+    }
+
     public function isSelect() {
         $this->makeSQL();
         return strncmp($this->sql, "select", 6) == 0;
@@ -158,8 +170,8 @@ class TokenReader {
             is_array($this->tokens[$this->index+2]) &&
             $this->tokens[$this->index+2][0] == T_VARIABLE &&
     //        $this->tokens[$this->index+2][1] == '$_'.$reqtype &&
-            ($this->tokens[$this->index+2][1] == '$_GET' ||	
-			$this->tokens[$this->index+2][1] == '$_POST') &&
+            ($this->tokens[$this->index+2][1] == '$_GET' ||    
+            $this->tokens[$this->index+2][1] == '$_POST') &&
             $this->tokens[$this->index+3] == "[" &&
             $this->tokens[$this->index+5] == "]" &&
             is_array($this->tokens[$this->index+4]) &&
@@ -211,8 +223,8 @@ class TokenReader {
             $this->tokens[$this->index+9][0] == T_CONSTANT_ENCAPSED_STRING){
 
             // mysql:host=localhost;dbname=dftitutorials
-			$host = null;
-			$dbname = null;
+            $host = null;
+            $dbname = null;
             $conninfo =  explode(":",$this->tokens[$this->index+5][1]);
             if(count($conninfo)==2) {
                 $keyvals = explode(";", $conninfo[1]);
@@ -230,7 +242,7 @@ class TokenReader {
                     }
                 }    
             }
-			return array(
+            return array(
                         array($this->tokens[$this->index][1],
                             str_replace('"','',
                                 $this->tokens[$this->index+7][1]),
@@ -311,33 +323,41 @@ class TokenReader {
     }
             
     public function getSQLQuery($pdovar, $vars) {
+	$resultvar = null;
         $i = $this->index;
         $query = null; 
         if(
+//            is_array($this->tokens[$this->index]) &&
+ //           $this->tokens[$this->index][0] == T_VARIABLE &&
+  //          $this->tokens[$this->index+1] == "=" &&
             is_array($this->tokens[$this->index]) &&
             $this->tokens[$this->index][0] == T_VARIABLE &&
-            $this->tokens[$this->index+1] == "=" &&
+            $this->tokens[$this->index][1] == $pdovar &&
+            is_array($this->tokens[$this->index+1]) &&
+            $this->tokens[$this->index+1][0] == T_OBJECT_OPERATOR &&
             is_array($this->tokens[$this->index+2]) &&
-            $this->tokens[$this->index+2][0] == T_VARIABLE &&
-            $this->tokens[$this->index+2][1] == $pdovar &&
-            is_array($this->tokens[$this->index+3]) &&
-            $this->tokens[$this->index+3][0] == T_OBJECT_OPERATOR &&
-            is_array($this->tokens[$this->index+4]) &&
-            $this->tokens[$this->index+4][0] == T_STRING &&
-            $this->tokens[$this->index+4][1] == "query" &&
-            $this->tokens[$this->index+5] == "(" ) {
-           
+            $this->tokens[$this->index+2][0] == T_STRING &&
+            $this->tokens[$this->index+2][1] == "query" &&
+            $this->tokens[$this->index+3] == "(" ) {
+
             $resultvar = $this->tokens[$this->index][1]; 
-            $i += 6;
+            $i += 4;
             $query = new DBQuery();
-            $query->setLineNumber($this->tokens[$this->index+2][2]);
-            $resultvar = $this->tokens[$this->index][1];
+            $query->setLineNumber($this->tokens[$this->index][2]);
+
+	    if( $this->index >= 2 &&
+            	is_array($this->tokens[$this->index-2]) &&
+           	$this->tokens[$this->index-2][0] == T_VARIABLE &&
+           	$this->tokens[$this->index-1] == "=") 	{
+            	$resultvar = $this->tokens[$this->index][1];
+	    }
+
             while($this->tokens[$i] != ")" && $i<count($this->tokens)) {
                 if(is_array($this->tokens[$i])) {
                     switch($this->tokens[$i][0]) {
                         case T_ENCAPSED_AND_WHITESPACE:
                             $query->addPart($this->tokens[$i][1]); 
-								break; 
+                                break; 
                         case T_CONSTANT_ENCAPSED_STRING:
                             $query->addPart(str_replace('"','',
                                 $this->tokens[$i][1]));
@@ -361,8 +381,10 @@ class TokenReader {
             }
             $i++; // move beyond the closing ) of the query call 
             // return [$query, $i-$this->index];
-            return array (array("query"=>$query,
+	
+           $a = array (array("query"=>$query,
                     "resultvar"=>$resultvar), $i - $this->index);
+	return $a;
         }    
         return null;
     }
@@ -419,9 +441,9 @@ elseif(($fileinfo=get_php_file($target,$config["ephproot"]))==null) {
 
         } elseif(preg_match("/<b>Parse error<\/b>:  syntax error, (.*) in .* on line <b>(\d+)<\/b>/", $script_result["content"], $matches)) { 
             $errors[] = array ("syntaxError" => 
-							array ("reason"=>$matches[1],
-								"lineNumber"=>$matches[2])
-						);
+                            array ("reason"=>$matches[1],
+                                "lineNumber"=>$matches[2])
+                        );
             $httpCode = 200; // still made successful request
         } elseif($script_result["status"]["code"]==200) {
             if(($target_contents = @file_get_contents($targetfile))===false) {
@@ -438,8 +460,8 @@ elseif(($fileinfo=get_php_file($target,$config["ephproot"]))==null) {
                 $queries = array();
 
                 $username=null;
-				$host=null;
-				$dbname=null;
+                $host=null;
+                $dbname=null;
 
                 while(! $tok->atEnd()) {
                     $result = $tok->findInputVars($_SERVER["REQUEST_METHOD"]);
@@ -453,14 +475,18 @@ elseif(($fileinfo=get_php_file($target,$config["ephproot"]))==null) {
                             $pdovar = $result[0][0];
                             $username = $result[0][1];
                             $password = $result[0][2];
-							$host = $result[0][3];
-							$dbname = $result[0][4];
+                            $host = $result[0][3];
+                            $dbname = $result[0][4];
                             $tok->forward($result[1]);
                         } elseif($pdovar!=null &&
                                 ($result = $tok->getSQLQuery($pdovar, $vars)) 
                                 != null) {
-                            $queries[$result[0]["resultvar"]] = $result[0];
-                            $resultvars[] = $result[0]["resultvar"];
+		    	    if($result[0]["resultvar"]!=null) {
+                            	$resultvars[] = $result[0]["resultvar"];
+                            	$queries[$result[0]["resultvar"]] = $result[0];
+			    } else {
+				$queries[] = $result[0];
+			    }
                             $tok->forward($result[1]);
                         } elseif(($result=$tok->getSQLLoop($resultvars))!=null){
                             $queries[$result[0]["resultvar"]]["loop"] = 
@@ -471,11 +497,11 @@ elseif(($fileinfo=get_php_file($target,$config["ephproot"]))==null) {
                         }
                     }
                 }
-				if(($_SERVER["REQUEST_METHOD"]=="POST" && $vars->nPosts()==0) ||
-					($_SERVER["REQUEST_METHOD"]=="GET" && $vars->nGets()==0)) {
-					$warnings[] = "Method was $_SERVER[REQUEST_METHOD] but no ".
-							'$_'.$_SERVER["REQUEST_METHOD"]." variables found.";
-				}
+                if(($_SERVER["REQUEST_METHOD"]=="POST" && $vars->nPosts()==0) ||
+                    ($_SERVER["REQUEST_METHOD"]=="GET" && $vars->nGets()==0)) {
+                    $warnings[] = "Method was $_SERVER[REQUEST_METHOD] but no ".
+                            '$_'.$_SERVER["REQUEST_METHOD"]." variables found.";
+                }
                 if($username != null) {
 
                     if($username != $expectedUsername) { 
@@ -496,11 +522,11 @@ elseif(($fileinfo=get_php_file($target,$config["ephproot"]))==null) {
                                     if($result===false) {
                                         $sqlerr = $conn->errorInfo();
                                         $errors[] = array 
-											("sqlError" => array
+                                            ("sqlError" => array
                                         ("query"=> $sql, "error"=>$sqlerr[2],
                                         "lineNumber"=>$query["query"]->
                                             getLineNumber())
-										);
+                                        );
                                     } else {
                                         while($row=$result->fetch
                                         (PDO::FETCH_ASSOC)) {
@@ -514,16 +540,29 @@ elseif(($fileinfo=get_php_file($target,$config["ephproot"]))==null) {
                                                 getLineNumber(),
                                                 "results" => $curResults);
                                     }
-                                }
+                                } else {
+				    $sql = $query["query"]->getSQL();
+				    $query["query"]->test($conn);
+			            $sqlerr = $conn->errorInfo();
+				    if($sqlerr[0] != 0 ) {
+                                        $errors[] = array 
+                                            ("sqlError" => array
+                                        ("query"=> $sql, "error"=>$sqlerr[2],
+                                        "lineNumber"=>$query["query"]->
+                                            getLineNumber())
+                                        );
+				    }
+				}
+				
                             }
                         } catch (PDOException $e) {
                             $errors[] = "Cannot connect to database with ".
                                 "username and password in target PHP file."; 
                         }
                     } else {
-						$errors[] = "Host and/or database name missing from ".
-									"PDO connection.";
-					}
+                        $errors[] = "Host and/or database name missing from ".
+                                    "PDO connection.";
+                    }
                 } 
             } 
         } 
@@ -537,7 +576,7 @@ if(empty($errors)) {
         "response" => $script_result,
         "vars" => $vars ? $vars->getVarsAndValues(): array(),
         "sqlqueries" => $sqlresults,
-		"warnings"=> $warnings,
+        "warnings"=> $warnings,
                 ); 
         $httpCode = $script_result["status"]["code"];
 } else { 
