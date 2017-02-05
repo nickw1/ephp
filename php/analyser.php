@@ -112,9 +112,9 @@ class DBQuery {
     // the prepare
     
     public function test($conn) {
-    $conn->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+        $conn->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
         $this->makeSQL();
-         $conn->prepare($this->sql);
+        $conn->prepare($this->sql);
     }
 
     public function isSelect() {
@@ -254,19 +254,49 @@ class TokenReader {
         return null;
     }
 
+    // Match: $row = $result->fetch(); etc
+    public function getSQLFetchWithNoLoop($resultvars, $idx=null) {
+        $idx = $idx==null ?   $this->index : $idx;
+        return ($idx <= count($this->tokens)-8 &&
+            is_array($this->tokens[$idx]) &&
+            $this->tokens[$idx][0]==T_VARIABLE &&
+            $this->tokens[$idx+1]=="=" &&
+            is_array($this->tokens[$idx+2]) &&
+            $this->tokens[$idx+2][0]==T_VARIABLE &&
+            in_array($this->tokens[$idx+2][1], $resultvars) 
+            && is_array($this->tokens[$idx+3]) &&
+            $this->tokens[$idx+3][0]==T_OBJECT_OPERATOR &&
+            is_array($this->tokens[$idx+4]) &&
+            $this->tokens[$idx+4][0]==T_STRING &&
+            $this->tokens[$idx+4][1] == "fetch" &&
+            $this->tokens[$idx+5]=="(" &&
+            $this->tokens[$idx+6]==")" &&
+            $this->tokens[$idx+7]==";") ? 
+            array(
+                (array("rowvar"=>$this->tokens[$idx][1],
+                "resultvar"=>$this->tokens[$idx+2][1])), 8) : null;
+    }
+
     public function getSQLLoop($resultvars) {
+            // Allow while loops with resultvars and no fetch()
         $i = $this->index;
         $result = $loop = $matched_resultvar = null;
-        if($this->index <= count($this->tokens)-11 &&
+
+        // while($resultvar...
+        if($this->index <= count($this->tokens)-5 &&
             is_array($this->tokens[$this->index]) &&
             $this->tokens[$this->index][0]==T_WHILE &&
             $this->tokens[$this->index+1]=="(" &&
             is_array($this->tokens[$this->index+2]) &&
-            $this->tokens[$this->index+2][0]==T_VARIABLE &&
+            $this->tokens[$this->index+2][0]==T_VARIABLE) {
+
+            // ... = $row->fetch())
+            if($this->index <= count($this->tokens)-11 &&
+            is_array($this->tokens[$this->index]) &&
             $this->tokens[$this->index+3]=="=" &&
             is_array($this->tokens[$this->index+4]) &&
             $this->tokens[$this->index+4][0]==T_VARIABLE &&
-            in_array($this->tokens[$this->index+4][1], $resultvars) &&
+            in_array($this->tokens[$this->index+4][1], $resultvars) && 
             is_array($this->tokens[$this->index+5]) &&
             $this->tokens[$this->index+5][0]==T_OBJECT_OPERATOR &&
             is_array($this->tokens[$this->index+6]) &&
@@ -274,9 +304,16 @@ class TokenReader {
             $this->tokens[$this->index+6][1] == "fetch" &&
             $this->tokens[$this->index+7]=="(" &&
             $this->tokens[$this->index+8]==")" &&
-            $this->tokens[$this->index+9]==")") {
+            $this->tokens[$this->index+9]==")")  {
+                $inc=11;
+				$initfetch=true;
+            // ...)
+            } elseif($this->tokens[$this->index+3]==")") {
+                $inc=5;
+				$initfetch=false;
+            }
 
-            $i = $this->index+11;
+            $i = $this->index+$inc;
             $loop = array();
             $loop["start"] = $this->tokens[$this->index][2];
             $loop["vars"] = array();
@@ -311,6 +348,10 @@ class TokenReader {
                 } elseif($this->tokens[$i]=="}" && $nesting>0) {
                     //echo "Found a }\n";
                     $nesting--;
+                } 
+                if(($fetchtest=$this->getSQLFetchWithNoLoop($resultvars,$i))!=null && $fetchtest[0]["rowvar"]==$loop["rowvar"]) {
+                    $matched_resultvar = $fetchtest[0]["resultvar"];
+                    $i+=$fetchtest[1]-1;
                 }
                 $i++;
             }
@@ -318,7 +359,8 @@ class TokenReader {
 
         return $loop!=null ? 
             array(array("resultvar"=>$matched_resultvar,
-                        "loop"=>$loop),
+                        "loop"=>$loop,
+						"initfetch"=>$initfetch),
                         $i-$this->index) : null;
     }
             
@@ -418,6 +460,7 @@ $httpCode = 500;
 $sqlresults = array();
 $resultvars = array();
 $warnings = array();
+$prefetches=array();
 
 $loop=null;
 
@@ -489,9 +532,17 @@ elseif(($fileinfo=get_php_file($target,$config["ephproot"]))==null) {
                                 $queries[] = $result[0];
                             }
                             $tok->forward($result[1]);
+                        } elseif(($result=
+                            $tok->getSQLFetchWithNoLoop($resultvars))!=null) {
+                            $prefetches[$result[0]["rowvar"]]++;            
+                            $tok->forward($result[1]);
                         } elseif(($result=$tok->getSQLLoop($resultvars))!=null){
                             $queries[$result[0]["resultvar"]]["loop"] = 
                                 $result[0]["loop"];
+							if($prefetches[$result[0]["loop"]["rowvar"]]) {
+								$prefetches[$result[0]["loop"]["rowvar"]] -=
+									$result[0]["initfetch"] ? 0:1;
+							}
                             $tok->forward($result[1]);
                         } else { 
                             $tok->forward(1);
@@ -529,9 +580,13 @@ elseif(($fileinfo=get_php_file($target,$config["ephproot"]))==null) {
                                             getLineNumber())
                                         );
                                     } else {
-                                        while($row=$result->fetch
-                                        (PDO::FETCH_ASSOC)) {
-                                        $curResults[] = $row;
+                                        $curResults = $result->fetchAll
+                                            (PDO::FETCH_ASSOC);
+                                        $pf=$prefetches
+                                            [$query["loop"]["rowvar"]];
+                                        if($pf) {
+                                            $curResults=array_slice
+                                                ($curResults,$pf);
                                         }
                                         $sqlresults[]=array 
                                             ("sql" => $sqlWithVars, 
