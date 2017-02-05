@@ -105,14 +105,14 @@ class DBQuery {
         return $conn->query($this->sql);
     }
 
-	// Hacky way of trying out inserts and updates without running them
-	// Prepare the statement without executing and then test whether
-	// it worked
-	// the setAttribute() is necessary to get error info after doing
-	// the prepare
-	
+    // Hacky way of trying out inserts and updates without running them
+    // Prepare the statement without executing and then test whether
+    // it worked
+    // the setAttribute() is necessary to get error info after doing
+    // the prepare
+    
     public function test($conn) {
-	$conn->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+    $conn->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
         $this->makeSQL();
          $conn->prepare($this->sql);
     }
@@ -323,10 +323,11 @@ class TokenReader {
     }
             
     public function getSQLQuery($pdovar, $vars) {
-	$resultvar = null;
+    $resultvar = null;
         $i = $this->index;
         $query = null; 
         if(
+// Dealing with queries with no result variable i.e INSERT, UPDATE
 //            is_array($this->tokens[$this->index]) &&
  //           $this->tokens[$this->index][0] == T_VARIABLE &&
   //          $this->tokens[$this->index+1] == "=" &&
@@ -345,12 +346,12 @@ class TokenReader {
             $query = new DBQuery();
             $query->setLineNumber($this->tokens[$this->index][2]);
 
-	    if( $this->index >= 2 &&
-            	is_array($this->tokens[$this->index-2]) &&
-           	$this->tokens[$this->index-2][0] == T_VARIABLE &&
-           	$this->tokens[$this->index-1] == "=") 	{
-            	$resultvar = $this->tokens[$this->index][1];
-	    }
+        if( $this->index >= 2 &&
+                is_array($this->tokens[$this->index-2]) &&
+               $this->tokens[$this->index-2][0] == T_VARIABLE &&
+               $this->tokens[$this->index-1] == "=")     {
+                $resultvar = $this->tokens[$this->index-2][1];
+        }
 
             while($this->tokens[$i] != ")" && $i<count($this->tokens)) {
                 if(is_array($this->tokens[$i])) {
@@ -381,10 +382,10 @@ class TokenReader {
             }
             $i++; // move beyond the closing ) of the query call 
             // return [$query, $i-$this->index];
-	
+    
            $a = array (array("query"=>$query,
                     "resultvar"=>$resultvar), $i - $this->index);
-	return $a;
+    return $a;
         }    
         return null;
     }
@@ -481,12 +482,12 @@ elseif(($fileinfo=get_php_file($target,$config["ephproot"]))==null) {
                         } elseif($pdovar!=null &&
                                 ($result = $tok->getSQLQuery($pdovar, $vars)) 
                                 != null) {
-		    	    if($result[0]["resultvar"]!=null) {
-                            	$resultvars[] = $result[0]["resultvar"];
-                            	$queries[$result[0]["resultvar"]] = $result[0];
-			    } else {
-				$queries[] = $result[0];
-			    }
+                                if($result[0]["resultvar"]!=null) {
+                                $resultvars[] = $result[0]["resultvar"];
+                                $queries[$result[0]["resultvar"]] = $result[0];
+                            } else {
+                                $queries[] = $result[0];
+                            }
                             $tok->forward($result[1]);
                         } elseif(($result=$tok->getSQLLoop($resultvars))!=null){
                             $queries[$result[0]["resultvar"]]["loop"] = 
@@ -541,19 +542,18 @@ elseif(($fileinfo=get_php_file($target,$config["ephproot"]))==null) {
                                                 "results" => $curResults);
                                     }
                                 } else {
-				    $sql = $query["query"]->getSQL();
-				    $query["query"]->test($conn);
-			            $sqlerr = $conn->errorInfo();
-				    if($sqlerr[0] != 0 ) {
+                                    $sql = $query["query"]->getSQL();
+                                    $query["query"]->test($conn);
+                                    $sqlerr = $conn->errorInfo();
+                                    if($sqlerr[0] != 0 ) {
                                         $errors[] = array 
                                             ("sqlError" => array
                                         ("query"=> $sql, "error"=>$sqlerr[2],
                                         "lineNumber"=>$query["query"]->
                                             getLineNumber())
                                         );
-				    }
-				}
-				
+                                    }
+                                }
                             }
                         } catch (PDOException $e) {
                             $errors[] = "Cannot connect to database with ".
