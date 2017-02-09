@@ -203,7 +203,7 @@ PHPAnimation.prototype.doAnimate = function(lineCount) {
             lineCount+1==this.data.sqlqueries[this.sqlLoopCount].
             loop.start) {
             var tooltipInfo = this.loopAnimation.createResultsDiv
-                (this.sqlLoopCount,1024,200,this.tooltip);
+                (this.sqlLoopCount,"75%","75%",this.tooltip);
             this.tooltip.style.left = tooltipInfo.x; 
             this.tooltip.style.top = tooltipInfo.y; 
             this.tooltip.innerHTML = "";

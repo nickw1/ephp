@@ -47,7 +47,8 @@ PendingHttpRequest.prototype.send = function(immediateCallback) {
 		} 
 		actualUrl = analyserUrl;
 	} else {
-		actualUrl = this.url;
+		// ALSO do it for HTML urls
+		actualUrl = noQsUrl + "?killcache="+new Date().getTime();
 	}
 
 	http.send (this.method, actualUrl, this.formData).then( (function(xmlHTTP)

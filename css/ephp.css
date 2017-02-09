@@ -216,7 +216,7 @@ tr,td,th
 }
 
 .lineHighlight {
-	background-color: #c0ffc0;
+	background-color: red; color:white 
 }
 
 .lineNumber {
