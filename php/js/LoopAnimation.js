@@ -241,15 +241,18 @@ LoopAnimation.prototype.createResultsDiv = function(i, x, y, hostDiv) {
 
     rewind.addEventListener("click", 
         (function(e) {
+    		document.getElementById("row"+this.rowIndex).
+				classList.remove("selected");
             if(this.contLoopAnimate) {
                 this.pauseLoopAnimate();
-                document.getElementById("row"+this.rowIndex).classList.
+	    }
+	    document.getElementById("row"+this.rowIndex).classList.
                     remove("selected");
-                this.unselectSelectedCells();
-                this.resetLoop();
-        this.clearConsole();
+            this.unselectSelectedCells();
+            this.resetLoop();
+            this.clearConsole();
     //            this.resumeLoopAnimate();
-            }
+            
         }).bind(this));
 
     div.appendChild(play);
