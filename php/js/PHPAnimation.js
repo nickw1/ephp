@@ -27,8 +27,8 @@ function PHPAnimation(options) {
 
     this.interval = options.interval || 1000;
     this.timer=null;
-	this.showing=false;
-	this.isRunning=false;
+    this.showing=false;
+    this.isRunning=false;
 
     this.setupGUI();
 }
@@ -54,7 +54,7 @@ PHPAnimation.prototype.setupGUI = function() {
     btn.setAttribute("type","button");
     btn.setAttribute("value","Run PHP and send back output");
     btn.addEventListener("click", (function() {
-		this.showing=false;
+        this.showing=false;
         while(this.div.childNodes.length > 0) {
             this.div.removeChild(this.div.firstChild);
         }
@@ -83,25 +83,25 @@ PHPAnimation.prototype.setupGUI = function() {
 }
 
 PHPAnimation.prototype.animate = function(data) {
-	this.isRunning = true;
+    this.isRunning = true;
     if(data.vars.length==0 && data.sqlqueries.length==0) {
         return false;
     } else {
-		this.clearTimer();
+        this.clearTimer();
 
-		// If showing some other code from a previous request, blank out the
-		// div, otherwise save the original contents
-		if(this.showing) {
-			this.div.innerHTML = "";
-		} else {
-			this.showing=true;
-        	this.originalDivContents = [];
-        	while(this.div.childNodes.length > 0) {    
-            	this.originalDivContents.push(this.div.firstChild);
-            	this.div.removeChild(this.div.firstChild);
-        	}
-        	this.div.classList.add("serverCode");
-		}
+        // If showing some other code from a previous request, blank out the
+        // div, otherwise save the original contents
+        if(this.showing) {
+            this.div.innerHTML = "";
+        } else {
+            this.showing=true;
+            this.originalDivContents = [];
+            while(this.div.childNodes.length > 0) {    
+                this.originalDivContents.push(this.div.firstChild);
+                this.div.removeChild(this.div.firstChild);
+            }
+            this.div.classList.add("serverCode");
+        }
 
         this.data = data;
         var lines = this.data.php.split("\n");
@@ -187,12 +187,15 @@ PHPAnimation.prototype.doAnimate = function(lineCount) {
                     (this.data.sqlqueries[this.sqlCount].sql,
                     this.doAnimate.bind(this));
             }
+        /*
             this.findVarsInLines(this.data.sqlqueries, this.sqlCount,
                      (function(i, e) {
                             return this.loopAnimation.
-                                createResultsDiv(i,e.pageX,e.pageY,
+                                createResultsDiv(i,
+                e.pageX,e.pageY,
                                     this.tooltip);
                         }).bind(this));
+        */
 
             
             this.sqlCount+=(this.sqlCount+1<this.data.sqlqueries.length?1:0);
@@ -200,10 +203,11 @@ PHPAnimation.prototype.doAnimate = function(lineCount) {
         lineCount++;    
 
         if(this.sqlLoopCount < this.data.sqlqueries.length &&
+        this.data.sqlqueries[this.sqlLoopCount].loop !=null && 
             lineCount+1==this.data.sqlqueries[this.sqlLoopCount].
             loop.start) {
             var tooltipInfo = this.loopAnimation.createResultsDiv
-                (this.sqlLoopCount,"75%","75%",this.tooltip);
+                (this.sqlLoopCount,0,0,this.tooltip);
             this.tooltip.style.left = tooltipInfo.x; 
             this.tooltip.style.top = tooltipInfo.y; 
             this.tooltip.innerHTML = "";
@@ -221,7 +225,7 @@ PHPAnimation.prototype.doAnimate = function(lineCount) {
         }
     } else { // if there is NOT another line to do
         this.lines[this.lines.length-1].classList.remove("lineHighlight");
-		this.isRunning = false;
+        this.isRunning = false;
     }
 }
 
@@ -292,15 +296,15 @@ PHPAnimation.prototype.findVarsInLines = function(arr, curVarCount,
 }
 
 PHPAnimation.prototype.stop = function() {
-	this.clearTimer();
-	if(this.isRunning) {
-		this.tooltip.style.display='none';
-		if(this.showing) {
-			this.div.removeChild(this.tooltip);
-		}
-		this.isRunning = false;
-	}
-	this.loopAnimation.stop();
+    this.clearTimer();
+    if(this.isRunning) {
+        this.tooltip.style.display='none';
+        if(this.showing) {
+            this.div.removeChild(this.tooltip);
+        }
+        this.isRunning = false;
+    }
+    this.loopAnimation.stop();
 }
 
 PHPAnimation.prototype.clearTimer = function() {

@@ -21,7 +21,7 @@ LoopAnimation.prototype.resetLoop = function() {
 }
 
 LoopAnimation.prototype.pauseLoopAnimate = function() {
-	this.clearTimer();
+    this.clearTimer();
     this.contLoopAnimate = false;
 }
 
@@ -33,8 +33,8 @@ LoopAnimation.prototype.resumeLoopAnimate = function() {
 }
 
 LoopAnimation.prototype.stop = function() {
-	this.clearTimer();
-	this.contLoopAnimate = false;
+    this.clearTimer();
+    this.contLoopAnimate = false;
 }
 
 LoopAnimation.prototype.clearTimer = function() {
@@ -77,6 +77,9 @@ LoopAnimation.prototype.iterateLoopAnimate = function() {
                 this.selectedCells.push(cell);
             }
         }
+    var varcell = document.getElementById("row"+this.rowIndex+"_var");
+    varcell.classList.add("selected");
+    this.selectedCells.push(varcell);
     }
 
     var curLine = lines[this.loopLine-1].innerHTML;
@@ -115,9 +118,11 @@ LoopAnimation.prototype.iterateLoopAnimate = function() {
                 }    
                 return match;
             }).bind(this));
-        var p = document.createElement(p);
-        p.innerHTML = output;
-        document.getElementById("databaseResultsConsole").appendChild(p);
+        var span = document.createElement("span");
+        span.innerHTML = output.replace(/</g,"&lt;").replace(/>/g, "&gt;");
+        document.getElementById("databaseResultsConsole").appendChild(span);
+        document.getElementById("databaseResultsConsole").appendChild
+        (document.createElement("br"));
     }
 
     if(++this.loopLine > this.sqlquery.loop.end) {
@@ -176,6 +181,12 @@ LoopAnimation.prototype.createResultsDiv = function(i, x, y, hostDiv) {
                     (sqlquery.results[row][col]));
             tr.appendChild(td);
         }
+    var td = document.createElement("td");
+    td.setAttribute("id","row"+row+"_var");
+    td.appendChild(document.createTextNode("< $row"));
+//    td.style.display = "none";
+    td.setAttribute("class","varcell");
+    tr.appendChild(td);
         table.appendChild(tr);
     }
 
@@ -236,7 +247,8 @@ LoopAnimation.prototype.createResultsDiv = function(i, x, y, hostDiv) {
                     remove("selected");
                 this.unselectSelectedCells();
                 this.resetLoop();
-                this.resumeLoopAnimate();
+        this.clearConsole();
+    //            this.resumeLoopAnimate();
             }
         }).bind(this));
 
@@ -266,3 +278,6 @@ LoopAnimation.prototype.createResultsDiv = function(i, x, y, hostDiv) {
     return { x: x+"px", hideOnMouseOut:false, y: (y+200)+"px", node: div };
 }
 
+LoopAnimation.prototype.clearConsole = function() {
+    document.getElementById("databaseResultsConsole").innerHTML = "";
+}
