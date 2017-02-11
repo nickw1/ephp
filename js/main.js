@@ -39,11 +39,11 @@ function init() {
 
     var phpAnimation = new PHPAnimation({divId:"serverContent"});
 
-    var animation = new Animation({canvasId: 'network_canvas',
+    var animation = new HTTPAnimation({canvasId: 'network_canvas',
                                     interval: 20,
                                     step : 2,
                                     fileExplorer: fileExplorer,
-                                    phpAnimation: phpAnimation,
+                                    serverAnimation: phpAnimation,
 									controlsDiv: network_controls });
 
 	/*

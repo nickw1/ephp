@@ -28,8 +28,8 @@ function Browser(options) {
     this.content = document.createElement("div");
     this.div.appendChild(this.content);
     if(this.animation!=null) {
-        if(this.animation.phpAnimation != null) {
-            this.animation.phpAnimation.browserCallback =
+        if(this.animation.serverAnimation != null) {
+            this.animation.serverAnimation.browserCallback =
                 this.highlightFormField.bind(this);
         }
     }
@@ -73,7 +73,7 @@ Browser.prototype.sendRequest = function(method,url,formData) {
             );
 
 		this.animation.stop(); // stop any previous animations
-        this.animation.setHttp(pXHR);
+        this.animation.setMessage(pXHR);
         this.animation.animate({onmessagestart:
                                     this.setRequestingState.bind(this,true),
                                 onmessageend:
@@ -103,7 +103,6 @@ Browser.prototype.loadResponse = function(o) {
         responseText = o.content;
         // deal with Content-types with charset stuff after
         mimetype = (o.headers["Content-Type"].split(";"))[0];
-        console.log("mimetype="+mimetype)
         statusText = o.statusText;
     } else if (o.responseText) {
         status = o.status;
@@ -192,13 +191,13 @@ Browser.prototype.showContent = function(mimetype, responseText) {
         // It works on Firefox and IE
         for(var i=0; i<tmpDoc.styleSheets.length; i++) {
             for(var j=0; j<tmpDoc.styleSheets[i].cssRules.length; j++) {
-                console.log(tmpDoc.styleSheets[i].cssRules[j].selectorText);
+                //console.log(tmpDoc.styleSheets[i].cssRules[j].selectorText);
                 var newRule = "#" + this.div.id+" #virtualBody "+
                     (tmpDoc.styleSheets[i].cssRules[j].selectorText=="body"?
                     "":tmpDoc.styleSheets[i].cssRules[j].selectorText) + "{"+
                     tmpDoc.styleSheets[i].cssRules[j].style.cssText + 
                     "}";
-                console.log(i+","+j+": new rule="+newRule);
+                //console.log(i+","+j+": new rule="+newRule);
                 document.styleSheets[0].insertRule(newRule, 0);
                 this.addedCssRules.push(newRule);
             }

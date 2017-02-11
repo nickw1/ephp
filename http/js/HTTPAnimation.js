@@ -1,11 +1,11 @@
 
 function HTTPAnimation(options) {
 
-	// Specific HTTPAnimation stuff
+	GenericAnimation.prototype.constructor.apply(this,[options]);
 	this.fileExplorer = options.fileExplorer;
-
-	options.onrequestend = function() {
 }
+
+HTTPAnimation.prototype = Object.create(GenericAnimation.prototype);
 
 // Overridden
 
@@ -17,9 +17,7 @@ HTTPAnimation.prototype.fireAnimation = function() {
                         this.interval);
                     }.bind(this))); 
     } else {
-        this.timer = setTimeout
-                (this.doAnimate.bind(this,this.messageTypes.REQUEST),
-                this.interval);
+		GenericAnimation.prototype.fireAnimation.apply(this);
     }
 }
 

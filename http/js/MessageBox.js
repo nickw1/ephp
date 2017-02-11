@@ -1,6 +1,6 @@
 
-function HttpBox(http, options) {
-	this.http = http;
+function MessageBox(msg, options) {
+	this.message = msg;
 	this.div = document.createElement("div");
 	this.div.style.position="absolute";
 	/* percentages seem to be wrt the container not the network div. no
@@ -27,23 +27,23 @@ function HttpBox(http, options) {
 				if(this.messageType == this.messageTypes.REQUEST) {
 					var lines = this.textarea.value.split("\n");
 					var components = lines[0].split(" ");
-					this.http.setMethod(components[0]);
-					this.http.setUrl(components[1]);
+					this.message.setMethod(components[0]);
+					this.message.setUrl(components[1]);
 					if(components[0].toUpperCase()=="POST") {
-						this.http.setPostData(lines[lines.length-1]);
+						this.message.setPostData(lines[lines.length-1]);
 					}
 				} else if (this.messageType == this.messageTypes.RESPONSE) {
 					var lines = this.textarea.value.split("\n");
 					if(lines.length>=1) {
 						var status = lines[0].split(/^HTTP\/1\.1 (\d+) (.*)$/);
 						if(status.length>=3) {
-							this.http.setAlteredStatus(status[1], status[2]);
+							this.message.setAlteredStatus(status[1], status[2]);
 						}
 					}
 					var i = 1;
 					while(i<lines.length && lines[i].length>0) {
 						var curHeader = lines[i].split(": ");
-						this.http.setAlteredResponseHeader
+						this.message.setAlteredResponseHeader
 							(curHeader[0], curHeader[1]);
 						i++;
 					}
@@ -52,7 +52,7 @@ function HttpBox(http, options) {
 					while(i<lines.length) {
 						responseText += lines[i++]+"\n";
 					}
-					this.http.setContent(responseText);
+					this.message.setContent(responseText);
 				}
 				this.hide();
 			}).bind(this));
@@ -60,21 +60,21 @@ function HttpBox(http, options) {
 	this.messageType = this.messageTypes.NONE;
 }
 
-HttpBox.prototype.messageTypes = { REQUEST: 1, RESPONSE: -1, NONE: 0 };
+MessageBox.prototype.messageTypes = { REQUEST: 1, RESPONSE: -1, NONE: 0 };
 
-HttpBox.prototype.showRequest = function() {
-	this.textarea.value = this.http.getRequest();
+MessageBox.prototype.showRequest = function() {
+	this.textarea.value = this.message.getRequest();
 	this.div.style.display="block";
 	this.messageType = this.messageTypes.REQUEST;
 }
 
-HttpBox.prototype.showResponse = function() {
-	this.textarea.value = this.http.getResponse();
+MessageBox.prototype.showResponse = function() {
+	this.textarea.value = this.message.getResponse();
 	this.div.style.display="block";
 	this.messageType = this.messageTypes.RESPONSE;
 }
 
-HttpBox.prototype.hide = function() {
+MessageBox.prototype.hide = function() {
 	this.div.style.display="none";
 	this.messageType = this.messageTypes.NONE;
 }
