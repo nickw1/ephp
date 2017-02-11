@@ -10,6 +10,7 @@ function GenericAnimation(options) {
     this.interval = options.interval || 50;
     this.step = options.step || 1;
     this.timer = null;
+	this.message = options.message;
     this.canvas = document.getElementById(options.canvasId);
     this.ctx = this.canvas.getContext('2d');
     this.animationState = this.messageTypes.NONE;
@@ -25,7 +26,12 @@ function GenericAnimation(options) {
                 }    
             }).bind(this));
 
-	// REMOVED reference to PHPAnimation
+	// Replaced PHPAnimation with a generic ServerAnimation (something which
+	// animates server side then returns to the response on finish)
+	if(options.serverAnimation) {
+		this.serverAnimation = options.serverAnimation;
+		this.serverAnimation.setCallback(this.startResponse.bind(this));
+	}
 
     if(options.controlsDiv) {
 
@@ -92,14 +98,18 @@ GenericAnimation.prototype.animate = function(options) {
     this.box.hide();
 
 	// REMOVED reference to phpanimation.
+	// replaced with serverAnimation
+	if(this.serverAnimation && this.serverAnimation.isRunning) {
+		this.serverAnimation.stop();
+	}
 
-	if(false) { 
-		// REMOVED reference to fileexplorer	
-    } else {
-        this.timer = setTimeout
-                (this.doAnimate.bind(this,this.messageTypes.REQUEST),
-                this.interval);
-    }
+	// can be overridden with FileExplorer stuff
+	this.fireAnimation();
+}
+
+GenericAnimation.prototype.fireAnimation = function(){
+	this.timer = setTimeout
+		(this.doAnimate.bind(this,this.messageTypes.REQUEST), this.interval);
 }
 
 GenericAnimation.prototype.doAnimate = function(messageType) {
@@ -171,6 +181,17 @@ GenericAnimation.prototype.doAnimate = function(messageType) {
     }
 }
 
+// Default onrequestend - start the server animation if it exists 
+// otherwise start the response
+// Can be overridden e.g. to parse the PHP analyser info
+GenericAnimation.prototype.onrequestend = function() {
+	if(this.serverAnimation) { 
+		this.serverAnimation.animate();
+	} else {
+		this.startResponse();
+	}
+}
+
 GenericAnimation.prototype.startResponse = function() {
 
     if(this.onmessagestart) {
@@ -184,6 +205,14 @@ GenericAnimation.prototype.startResponse = function() {
 GenericAnimation.prototype.pause = function() {
     this.paused = true;
     this.clearTimer();
+}
+
+GenericAnimation.prototype.stop = function() {
+	this.clearTimer();
+	// phpAnimation stuff replaced by serverAnimation
+	if(this.serverAnimation && this.serverAnimation.isRunning) {
+		this.serverAnimation.stop();
+	}
 }
 
 GenericAnimation.prototype.clearTimer = function() {

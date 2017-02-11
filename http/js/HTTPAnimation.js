@@ -3,12 +3,32 @@ function HTTPAnimation(options) {
 
 	// Specific HTTPAnimation stuff
 	this.fileExplorer = options.fileExplorer;
-	this.phpAnimation = options.phpAnimation;
 
 	options.onrequestend = function() {
+}
+
+// Overridden
+
+HTTPAnimation.prototype.fireAnimation = function() {
+    if(this.fileExplorer) {
+        this.fileExplorer.home ( (function() {
+                    this.timer = setTimeout
+                        (this.doAnimate.bind(this,this.messageTypes.REQUEST),
+                        this.interval);
+                    }.bind(this))); 
+    } else {
+        this.timer = setTimeout
+                (this.doAnimate.bind(this,this.messageTypes.REQUEST),
+                this.interval);
+    }
+}
+
+// Overridden to do the ServerFilesystemAnimation and analyser stuff
+HTTPAnimation.prototype.onrequestend = function() {
+
 		var urlParts = this.message.url.split("/");    
 
-		var sa = new ServerAnimation(
+		var sa = new ServerFilesystemAnimation(
 			{fileExplorer: this.fileExplorer,
 			urlParts: urlParts,
 			repeat:2, 
@@ -59,8 +79,16 @@ function HTTPAnimation(options) {
 								alert(errMsg);
 								startResponseNow = false;
 							} else {
+								if(analyserInfo.warnings.length) {
+									var warn="";
+									for(var i=0; 
+									i<analyserInfo.warnings.length; i++) {
+										warn += analyserInfo.warnings[i]+"\n";
+									}
+									alert("WARNING(s):\n"+warn);
+								}
 								startResponseNow=
-									!this.phpAnimation.animate
+									!this.serverAnimation.animate
 										(analyserInfo);
 							}
 						}
@@ -72,7 +100,4 @@ function HTTPAnimation(options) {
 				}).bind(this)
 			});
 		sa.animate();
-	}
-
-	GenericAnimation.prototype.constructor.apply(this,options);
 }

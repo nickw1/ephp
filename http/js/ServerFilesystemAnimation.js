@@ -1,4 +1,4 @@
-function ServerAnimation(options) {
+function ServerFilesystemAnimation(options) {
 	this.repeat = options.repeat || 5;
 	this.interval = options.interval || 1000;
 	this.callback = options.callback;
@@ -6,7 +6,7 @@ function ServerAnimation(options) {
 	this.urlParts = options.urlParts;
 }
 
-ServerAnimation.prototype.animate = function() {
+ServerFilesystemAnimation.prototype.animate = function() {
 	if(this.urlParts.length >= 2) {
 		this.urlPartCounter = this.urlParts[1][0] == "~"  ? 2:1;
 		this.counter=0;
@@ -23,7 +23,7 @@ ServerAnimation.prototype.animate = function() {
 	}
 }
 
-ServerAnimation.prototype.doAnimate = function() {
+ServerFilesystemAnimation.prototype.doAnimate = function() {
 	if(this.counter++ == this.repeat) {
 		clearInterval(this.timer);
 		this.timer=null;
@@ -37,7 +37,7 @@ ServerAnimation.prototype.doAnimate = function() {
 	}
 }
 
-ServerAnimation.prototype.nextLevel = function() {
+ServerFilesystemAnimation.prototype.nextLevel = function() {
 	if(this.urlPartCounter == this.urlParts.length-1) {
 		this.callback();
 	} else {

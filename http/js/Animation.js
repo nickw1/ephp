@@ -166,7 +166,7 @@ Animation.prototype.doAnimate = function(messageType) {
             
                 var urlParts = this.http.url.split("/");    
 
-                var sa = new ServerAnimation(
+                var sa = new ServerFilesystemAnimation(
                     {fileExplorer: this.fileExplorer,
                     urlParts: urlParts,
                     repeat:2, 
