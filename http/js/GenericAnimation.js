@@ -10,13 +10,19 @@ function GenericAnimation(options) {
     this.interval = options.interval || 50;
     this.step = options.step || 1;
     this.timer = null;
-	this.message = options.message;
-    this.canvas = document.getElementById(options.canvasId);
+    this.message = options.message;
+   // this.canvas = document.getElementById(options.canvasId);
+    this.canvas = document.createElement("canvas");
+    var parentElement = document.getElementById(options.parentId);
+    this.canvas.setAttribute("height", options.height);
+    this.canvas.setAttribute("width", parentElement.style.width); 
+    parentElement.appendChild(this.canvas);
+    
     this.ctx = this.canvas.getContext('2d');
     this.animationState = this.messageTypes.NONE;
     this.mouseX = this.mouseY = -1;
     this.lastMoveTime = -1;
-    this.box = new MessageBox(this.message, { parent: 'network' });
+    this.box = new MessageBox(this.message, { parent: options.parentId });
     this.calculateCanvasPos();
     this.canvas.addEventListener("mousemove", (function(e) {
                 if(this.animationState!=this.messageTypes.NONE) {
@@ -26,14 +32,19 @@ function GenericAnimation(options) {
                 }    
             }).bind(this));
 
-	// Replaced PHPAnimation with a generic ServerAnimation (something which
-	// animates server side then returns to the response on finish)
-	if(options.serverAnimation) {
-		this.serverAnimation = options.serverAnimation;
-		this.serverAnimation.setCallback(this.startResponse.bind(this));
-	}
+    this.onmessagestart = options.onmessagestart || [];
+    this.onmessageend = options.onmessageend || [];
 
-    if(options.controlsDiv) {
+    // Replaced PHPAnimation with a generic ServerAnimation (something which
+    // animates server side then returns to the response on finish)
+    if(options.serverAnimation) {
+        this.serverAnimation = options.serverAnimation;
+        this.serverAnimation.setCallback(this.startResponse.bind(this));
+    }
+
+    var controlsDiv = document.createElement("div");
+    parentElement.appendChild(controlsDiv);
+    if(controlsDiv) {
 
         var controls = { 'Pause' : [ 'assets/images/control_pause_blue.2.png' , 
                             this.pause.bind(this)],
@@ -51,7 +62,7 @@ function GenericAnimation(options) {
             img.setAttribute("alt", control);
             img.setAttribute("src", controls[control][0]);
             img.addEventListener("click", controls[control][1]);
-            options.controlsDiv.appendChild(img);
+            controlsDiv.appendChild(img);
         }
 
         var slider = new Slider(50, 10, {
@@ -59,7 +70,7 @@ function GenericAnimation(options) {
             this.interval = value;
         }).bind(this) ,
 
-        parent: options.controlsDiv 
+        parent: controlsDiv 
         } );
         slider.setValue(this.interval);
     }
@@ -87,29 +98,26 @@ GenericAnimation.prototype.setMessage = function(message) {
 
 // Now can pass an onmessageend event handler - e.g. if we want to tell the
 // parent, typically the browser, that the animation has finished
-GenericAnimation.prototype.animate = function(options) {
-    options = options || {};
-    this.onmessageend = options.onmessageend || null;
-    this.onmessagestart = options.onmessagestart || null;
-    if(this.onmessagestart) {
-        this.onmessagestart();
+GenericAnimation.prototype.animate = function() {
+    for(var i=0; i<this.onmessagestart.length; i++) {
+        this.onmessagestart[i](this.messageTypes.REQUEST);
     }
     this.x = 0; 
     this.box.hide();
 
-	// REMOVED reference to phpanimation.
-	// replaced with serverAnimation
-	if(this.serverAnimation && this.serverAnimation.isRunning) {
-		this.serverAnimation.stop();
-	}
+    // REMOVED reference to phpanimation.
+    // replaced with serverAnimation
+    if(this.serverAnimation && this.serverAnimation.isRunning) {
+        this.serverAnimation.stop();
+    }
 
-	// can be overridden with FileExplorer stuff
-	this.fireAnimation();
+    // can be overridden with FileExplorer stuff
+    this.fireAnimation();
 }
 
 GenericAnimation.prototype.fireAnimation = function(){
-	this.timer = setTimeout
-		(this.doAnimate.bind(this,this.messageTypes.REQUEST), this.interval);
+    this.timer = setTimeout
+        (this.doAnimate.bind(this,this.messageTypes.REQUEST), this.interval);
 }
 
 GenericAnimation.prototype.doAnimate = function(messageType) {
@@ -163,17 +171,18 @@ GenericAnimation.prototype.doAnimate = function(messageType) {
     } else {
         this.timer=null;
 
-		// onmessageend e.g. re-enable the send button from browser for
-		// http animation
-        if(this.onmessageend) {
-            this.onmessageend();
+        // onmessageend e.g. re-enable the send button from browser for
+        // http animation
+           for(var i=0; i<this.onmessageend.length; i++)  {
+            this.onmessageend[i](this.animationState);
         }
         
         if(this.animationState==this.messageTypes.REQUEST) {
-			// NEW onrequestend is an event handler which runs when the
-			// request has reached its destination. This would for example
-			// run the PHPAnimation (or whatever)
-			this.onrequestend();
+            // NEW onrequestend is an event handler which runs when the
+            // request has reached its destination. This would for example
+            // run the PHPAnimation (or whatever)
+            this.finishRequest();
+            
         } else if (this.animationState==this.messageTypes.RESPONSE) {
             //  REMOVED this.fileExplorer.clearSelected();
             this.message.finish();
@@ -181,21 +190,21 @@ GenericAnimation.prototype.doAnimate = function(messageType) {
     }
 }
 
-// Default onrequestend - start the server animation if it exists 
+// Default finishRequest - start the server animation if it exists 
 // otherwise start the response
 // Can be overridden e.g. to parse the PHP analyser info
-GenericAnimation.prototype.onrequestend = function() {
-	if(this.serverAnimation) { 
-		this.serverAnimation.animate();
-	} else {
-		this.startResponse();
-	}
+GenericAnimation.prototype.finishRequest = function() {
+    if(this.serverAnimation) { 
+        this.serverAnimation.animate();
+    } else {
+        this.startResponse();
+    }
 }
 
 GenericAnimation.prototype.startResponse = function() {
 
-    if(this.onmessagestart) {
-        this.onmessagestart();
+    for(var i=0; i<this.onmessagestart.length; i++) {
+        this.onmessagestart[i](this.messageTypes.RESPONSE);
     }
     this.timer = setTimeout (this.doAnimate.bind
                                     (this,this.messageTypes.RESPONSE),     
@@ -208,11 +217,11 @@ GenericAnimation.prototype.pause = function() {
 }
 
 GenericAnimation.prototype.stop = function() {
-	this.clearTimer();
-	// phpAnimation stuff replaced by serverAnimation
-	if(this.serverAnimation && this.serverAnimation.isRunning) {
-		this.serverAnimation.stop();
-	}
+    this.clearTimer();
+    // phpAnimation stuff replaced by serverAnimation
+    if(this.serverAnimation && this.serverAnimation.isRunning) {
+        this.serverAnimation.stop();
+    }
 }
 
 GenericAnimation.prototype.clearTimer = function() {
@@ -259,4 +268,12 @@ GenericAnimation.prototype.showMessageBox = function(localX, localY) {
             this.box.showRequest();
         }
     }
-}    
+}
+
+GenericAnimation.prototype.addOnMessageStartListener = function(cb) {
+    this.onmessagestart.push(cb);
+}
+
+GenericAnimation.prototype.addOnMessageEndListener = function(cb) {
+    this.onmessageend.push(cb);
+}

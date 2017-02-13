@@ -7,22 +7,21 @@ function init() {
     var mode=0;
     var savedLoginHTML="", originalLoginDivContents = "";
     var mq = window.matchMedia("screen and (max-device-height: 799px)");
-    document.getElementById("network_canvas").setAttribute
-            ("height", mq.matches? "312px": "512px");
+    var canvasHeight =  mq.matches? "312px": "512px";
 
     var fileExplorer=new FileExplorer('serverContent', 
                             {http: 'fs/fs.php',
-							ftp: 'ftp/ftp.php' } ,'client',
+                            ftp: 'ftp/ftp.php' } ,'client',
                             { showContentCallback: function(mime,src) {
                                     saveOld(function() {
                                         browser.setContent(mime,src);
                                         fileInfo = newFileInfo;
-										// remove the . from the current dir 
-										var localPath = 
-											"/~" + loggedin +
-												fileInfo.dir.substr(1);
+                                        // remove the . from the current dir 
+                                        var localPath = 
+                                            "/~" + loggedin +
+                                                fileInfo.dir.substr(1);
                                         browser.setWebDir(localPath);
-										browser.setFile(fileInfo.file);
+                                        browser.setFile(fileInfo.file);
                                         newFileInfo = null;
                                         if(mode==0) {
                                             showFilename();
@@ -39,94 +38,27 @@ function init() {
 
     var phpAnimation = new PHPAnimation({divId:"serverContent"});
 
-    var animation = new HTTPAnimation({canvasId: 'network_canvas',
+    var animation = new HTTPAnimation({parentId: 'network',
+                                        height:canvasHeight,
                                     interval: 20,
                                     step : 2,
                                     fileExplorer: fileExplorer,
-                                    serverAnimation: phpAnimation,
-									controlsDiv: network_controls });
+                                    serverAnimation: phpAnimation });
 
-	/*
-    var animation = new GenericAnimation({canvasId: 'network_canvas',
-                                    interval: 10,
-                                    step : 1,
-									onrequestend: 
-										
-										function(anim) {
-            if(fileExplorer!=null) {
-            
-                var urlParts = anim.http.url.split("/");    
+    animation.addOnMessageEndListener(function(msgtype) {
+        if(msgtype==GenericAnimation.prototype.messageTypes.REQUEST) { 
+            document.getElementById("network").style.display="none";
+            document.getElementById("client").style.width="50%";
+            document.getElementById("server").style.width="50%";
+        } });
 
-                var sa = new ServerAnimation(
-                    {fileExplorer: fileExplorer,
-                    urlParts: urlParts,
-                    repeat:2, 
-                    interval:500, 
-                    callback: 
-                        (function() {
-                            // TODO go in own object - seems poor cohesion to
-                            // put here, particularly error checking
-                            anim.http.send((function(analyserInfo) {
-                                var startResponseNow=true;
-                                if(analyserInfo) {
-                                    if(analyserInfo.errors) {
-                                        var errMsg="";
-                                        for(var i=0; i<analyserInfo.errors.
-                                            length; i++) {
-                                            if(analyserInfo.errors[i].
-                                                syntaxError) {
-                                                errMsg += "There was a " +
-                                                    "syntax error in your "+
-                                                    "PHP code on line number "+
-                                                    analyserInfo.errors[i].
-                                                        syntaxError.lineNumber +
-                                                    ".\nThe reason is " +
-                                                    analyserInfo.errors[i].
-                                                        syntaxError.reason +
-                                                    "\n. If you cannot see a "+
-                                                    "problem with anim line, "+
-                                                    "look at the preceding "+
-                                                    "two or three lines.\n";
-                                            } else if (analyserInfo.errors[i].
-                                                sqlError) {
-                                                errMsg += "There was an " +
-                                                    "error in your "+
-                                                    "SQL on line number "+
-                                                    analyserInfo.errors[i].
-                                                        sqlError.lineNumber +
-                                                    ".\n("+
-                                                    analyserInfo.errors[i].
-                                                        sqlError.query +
-                                                    ")\nThe reason is " +
-                                                    analyserInfo.errors[i].
-                                                        sqlError.error +
-                                                    "\n.";
-                                            } else {
-                                                errMsg += 
-                                                    analyserInfo.errors[i] +
-                                                "\n";
-                                            }
-                                        }
-                                        alert(errMsg);
-                                        startResponseNow = false;
-                                    } else {
-                                        startResponseNow=
-                                            !anim.phpAnimation.animate
-                                                (analyserInfo);
-                                    }
-                                }
+    animation.addOnMessageStartListener(function(msgtype) {
+        if(msgtype==GenericAnimation.prototype.messageTypes.RESPONSE) { 
+            document.getElementById("network").style.display="block";
+            document.getElementById("client").style.width="33%";
+            document.getElementById("server").style.width="33%";
+        } });
 
-                                if(startResponseNow) {
-                                    anim.startResponse();
-                                }
-                            }).bind(anim));    
-                        }).bind(anim)
-                    });
-                sa.animate();
-}
-
-				});
-	*/
     var browser = new Browser({divId: 'content', 
                                 animation: animation,
                                 sourceElement: 'src_ace',
@@ -335,8 +267,8 @@ function init() {
         }
         
         tabs[mode].classList.add("active");
-		browser.refresh();
-		
+        browser.refresh();
+        
     }
 
     var doToolbar = function() {

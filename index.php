@@ -62,15 +62,13 @@ class EPHPPage extends Page {
 			</div>
 		</div>
 
-		<div id="network">
+		<div id="network" style="width: 320px">
 		<div id='network_header' class='component_header'>
 		network<br />
 			<img src='assets/images/rgtaylor_csc_net_wan_cloud.med.png'
 				alt='network' />
 		</div>
 
-			<canvas id="network_canvas" width="320px">  </canvas>
-			<div id="network_controls"> </div>
 		</div>
 
 		<div id="server">

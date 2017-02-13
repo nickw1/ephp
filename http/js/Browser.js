@@ -45,6 +45,11 @@ function Browser(options) {
             }).bind(this));
     this.addedCssRules = [];
     this.setRequestingState(false);
+
+    this.animation.addOnMessageStartListener
+        (this.setRequestingState.bind(this,true));
+    this.animation.addOnMessageEndListener
+        (this.setRequestingState.bind(this,false));
 }
 
 Browser.prototype.sendRequest = function(method,url,formData) {
@@ -72,23 +77,20 @@ Browser.prototype.sendRequest = function(method,url,formData) {
               }
             );
 
-		this.animation.stop(); // stop any previous animations
+        this.animation.stop(); // stop any previous animations
         this.animation.setMessage(pXHR);
-        this.animation.animate({onmessagestart:
-                                    this.setRequestingState.bind(this,true),
-                                onmessageend:
-                                    this.setRequestingState.bind(this,false)});
+        this.animation.animate();
     }
 }
 
 Browser.prototype.setRequestingState = function(state) {
-	/*
+    /*
     if(state) {
         this.addressButton.setAttribute("disabled", "disabled");
     } else {
         this.addressButton.removeAttribute("disabled");
     }
-	*/
+    */
     this.requesting = state;
 }
 
@@ -338,5 +340,5 @@ Browser.prototype.loadDocumentOrImage = function(mimetype, url, responseText) {
 }
 
 Browser.prototype.refresh = function() {
-	this.editor.resize();
+    this.editor.resize();
 }
