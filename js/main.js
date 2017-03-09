@@ -43,8 +43,18 @@ function init() {
                                     interval: 20,
                                     step : 2,
                                     fileExplorer: fileExplorer,
-                                    serverAnimation: phpAnimation });
+                                    serverAnimation: phpAnimation,
 
+				onerror: function() {
+				/*
+            document.getElementById("network").style.display="block";
+            document.getElementById("client").style.width="33%";
+            document.getElementById("server").style.width="33%";
+				*/
+ 			}
+			});
+
+	/*
     animation.addOnMessageEndListener(function(msgtype) {
         if(msgtype==GenericAnimation.prototype.messageTypes.REQUEST) { 
             document.getElementById("network").style.display="none";
@@ -58,6 +68,7 @@ function init() {
             document.getElementById("client").style.width="33%";
             document.getElementById("server").style.width="33%";
         } });
+	*/
 
     var browser = new Browser({divId: 'content', 
                                 animation: animation,
