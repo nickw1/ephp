@@ -7,10 +7,9 @@ function FileExplorer(divId, urls, dropId, callbacks)
     this.serverUrl = urls.http || 'fs.php';
     this.ftpUrl = urls.ftp || null; 
     this.callbacks = callbacks || {};
-
     this.urlType = "text/uri-list";
-
     this.dropDiv = document.getElementById(dropId);
+    this.selectedFiles = {};
 
     this.dropDiv.addEventListener("drop",
         (function(e) {
@@ -50,6 +49,17 @@ function FileExplorer(divId, urls, dropId, callbacks)
 
 
     this.swappedChildNodes = []; 
+   this.div.addEventListener("keyup", (function(e) {
+            if(e.keyCode==46) {
+                var str="";
+                for(k in this.selectedFiles) {
+                    str+=k+",";
+                }
+                alert(str);
+                this.sendAjaxDelete();
+            }
+            }).bind(this));
+    this.div.setAttribute("tabindex",0);
 }
 
 FileExplorer.prototype.filetypes = { UNKNOWN: 0, DIR: 1, HTML: 2, PHP: 3};
@@ -81,6 +91,26 @@ FileExplorer.prototype.sendAjax = function(options)
                 }).bind(this);
     }
     http.get(url).then(callback);
+}
+
+FileExplorer.prototype.sendAjaxDelete = function() {
+    var xhr2 = new XMLHttpRequest();
+    xhr2.addEventListener("load", function(e) {
+            var data = JSON.parse(e.target.responseText);
+            if(data.status==0) {
+                alert('Deleted successfully: response=' +
+                    e.target.responseText);
+            } else {
+                alert('Error: ' + data.status + " full="+
+                    e.target.responseText);
+            }
+        });    
+    var fd = new FormData();
+    fd.append("action","delete");    
+    alert(JSON.stringify(Object.keys(this.selectedFiles)));
+    fd.append("files", JSON.stringify(Object.keys(this.selectedFiles)));
+    xhr2.open('POST',this.ftpUrl);
+    xhr2.send(fd);
 }
 
 FileExplorer.prototype.images = 
@@ -151,6 +181,31 @@ FileExplorer.prototype.onAjaxDirResponse = function(xmlHTTP)
                              json.content[i].name);
                     }
                     }).bind(this,i));
+
+        span.addEventListener
+        ("click", (function(i,ev)
+            {
+               if(ev.target.selected) {
+                ev.target.selected=false;
+                ev.target.style.backgroundColor='white';
+                ev.target.style.border='';
+                this.div.focus();
+                delete(this.selectedFiles
+                    [this.dir+"/"+json.content[i].name]);
+               } else {
+                ev.target.selected=true;
+                ev.target.style.backgroundColor='#c0c0ff';
+                ev.target.style.border='1px solid black';
+                this.selectedFiles
+                    [this.dir+"/"+json.content[i].name] = 
+                    true;
+               }
+            }).bind(this,i));
+
+        span.addEventListener
+            ("mouseover", function() {
+                document.body.style.cursor='default';
+                } );
             }
 
             span.appendChild(img);
