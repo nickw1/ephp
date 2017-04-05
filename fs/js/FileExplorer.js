@@ -1,7 +1,19 @@
 
 function FileExplorer(divId, urls, dropId, callbacks)
 {
-    this.div = document.getElementById(divId);
+    var container = document.getElementById(divId);
+    var toolbar = document.createElement("div");
+    var trash = document.createElement("img");
+    trash.src = "assets/images/trash.png";
+    trash.addEventListener("click", (function(e) {
+	this.sendAjaxDelete(); 
+	}).bind(this));   
+    toolbar.appendChild(trash);
+    container.appendChild(toolbar);
+ 
+    this.div = document.createElement("div");
+    container.appendChild(this.div);
+
     this.dir = ".";
     this.curFile = "";
     this.serverUrl = urls.http || 'fs.php';
@@ -51,14 +63,18 @@ function FileExplorer(divId, urls, dropId, callbacks)
     this.swappedChildNodes = []; 
    this.div.addEventListener("keyup", (function(e) {
             if(e.keyCode==46) {
+                var first=true;
                 var str="";
                 for(k in this.selectedFiles) {
-                    str+=k+",";
+                    if(first==true) {
+                        first=false;
+                    } else {
+                        str+=",";
+                    }
+                    str+=k;
                 }
-                alert(str);
-                this.sendAjaxDelete();
-            }
-            }).bind(this));
+            this.sendAjaxDelete();
+        } }).bind(this));
     this.div.setAttribute("tabindex",0);
 }
 
@@ -95,19 +111,17 @@ FileExplorer.prototype.sendAjax = function(options)
 
 FileExplorer.prototype.sendAjaxDelete = function() {
     var xhr2 = new XMLHttpRequest();
-    xhr2.addEventListener("load", function(e) {
+    xhr2.addEventListener("load", (function(e) {
             var data = JSON.parse(e.target.responseText);
             if(data.status==0) {
-                alert('Deleted successfully: response=' +
-                    e.target.responseText);
+                alert('Deleted successfully');
+        this.sendAjax();
             } else {
-                alert('Error: ' + data.status + " full="+
-                    e.target.responseText);
+                alert('Error deleting: code ' + data.status);
             }
-        });    
+        }).bind(this));    
     var fd = new FormData();
     fd.append("action","delete");    
-    alert(JSON.stringify(Object.keys(this.selectedFiles)));
     fd.append("files", JSON.stringify(Object.keys(this.selectedFiles)));
     xhr2.open('POST',this.ftpUrl);
     xhr2.send(fd);
