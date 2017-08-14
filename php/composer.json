@@ -1,0 +1,8 @@
+{
+    "require": {
+        "nikic/php-parser": "^3.0",
+		"cboden/ratchet": "^0.3.6",
+		"react/zmq": "0.2.*|0.3.*",
+		"react/socket": "0.3.*|0.4.*"
+    }
+}
