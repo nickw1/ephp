@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>websocket</title>
+<script type='text/javascript'>
+
+var ws;
+
+function init() {
+
+    ws=new WebSocket('ws://ephp.solent.ac.uk:8080');
+
+    ws.onopen = function(e) {
+        ws.send(JSON.stringify({"cmd":"open"}));
+    }    
+
+    ws.onmessage =function(e) {
+        document.getElementById("response").innerHTML += e.data + "<br />";
+        var data = JSON.parse(e.data);
+        if(data.started && data.started == 1) {
+            alert('received start command');
+            var xhr2 = new XMLHttpRequest();
+            xhr2.addEventListener("load", function(e) {
+                alert('launched: ' + e.target.responseText);
+            });
+//            var formData = new FormData();    
+//            formData.append('file', 'xd.php');
+            xhr2.open('GET', '/~nick/sock/' + 
+                document.getElementById('script').value + 
+                    '?XDEBUG_SESSION_START=' +
+                    document.getElementById('user').value
+                    +'&u='+
+                    document.getElementById('user').value);
+            xhr2.send();
+        }
+    }
+
+    ws.onerror = function(e) {
+        alert('ERROR: ' + e.data);
+    }
+
+    document.getElementById("go").onclick = function() {
+        ws.send(JSON.stringify({"cmd":"user",
+                                "data":document.getElementById("user").value}));
+    }
+}
+
+
+</script>
+<style type='text/css'>
+body { font-family: helvetica, arial, sans-serif; }
+</style>
+</head>
+
+<body onload='init()'>
+<h1>Websocket</h1>
+<label for="user">Which user?</label>
+<select id="user">
+<option>ephp001</option>
+<option>ephp002</option>
+<option>ephp003</option>
+</select>
+<br />
+<label for="script">Which script?</label>
+<input id="script" value="xd.php" />
+<br />
+<input type="submit" id="go" value="go" />
+<br />
+<div id="response"></div>
+
+</body>
+</html> 
