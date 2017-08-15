@@ -2,6 +2,9 @@
 
 require('vendor/autoload.php');
 
+define('TMPDIR','/home/nick/tmp/');
+define('LOCKFILE', TMPDIR."wsocksrv.lock");
+
 use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
 use Ratchet\Server\IoServer;
@@ -71,17 +74,22 @@ class MessageHandler implements MessageComponentInterface {
     }
 }
 
-$wshandler = new MessageHandler();
-$loop = React\EventLoop\Factory::create();
-$zmqctx = new React\ZMQ\Context($loop);
-$pull = $zmqctx->getSocket(ZMQ::SOCKET_PULL);
-$pull->bind('tcp://127.0.0.1:9001');
-$pull->on('message',array($wshandler,'onDbgMsg'));
-//$server = IoServer::factory(new HttpServer(new WsServer($wshandler)), 8081);
-$reactSockServ = new React\Socket\Server($loop);
-$reactSockServ->listen(8080, '0.0.0.0');
-$wsserver = new IoServer(new HttpServer(new WsServer($wshandler)), 
+register_shutdown_function('unlink',LOCKFILE);
+if(@symlink("/proc/".getmypid(),LOCKFILE)!==false) {
+    $wshandler = new MessageHandler();
+    $loop = React\EventLoop\Factory::create();
+    $zmqctx = new React\ZMQ\Context($loop);
+    $pull = $zmqctx->getSocket(ZMQ::SOCKET_PULL);
+    $pull->bind('tcp://127.0.0.1:9001');
+    $pull->on('message',array($wshandler,'onDbgMsg'));
+    //$server = IoServer::factory(new HttpServer(new WsServer($wshandler)), 8081);
+    $reactSockServ = new React\Socket\Server($loop);
+    $reactSockServ->listen(8082, '0.0.0.0');
+    $wsserver = new IoServer(new HttpServer(new WsServer($wshandler)), 
             $reactSockServ);
-$loop->run();
+    $loop->run();
+} else {
+    echo "wsocksrv already running";
+}
 
 ?>

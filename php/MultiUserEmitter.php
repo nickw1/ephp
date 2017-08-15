@@ -1,5 +1,5 @@
 <?php
-require_once('../xdclient/Emitter.php');
+require_once('../../xdclient/Emitter.php');
 
 abstract class MultiUserEmitter implements \XDClient\Emitter {
     protected $user;
