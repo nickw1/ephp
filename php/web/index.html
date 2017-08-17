@@ -8,40 +8,66 @@ var ws;
 
 function init() {
 
-    ws=new WebSocket('ws://ephp.solent.ac.uk:8080');
+    document.getElementById('start').onclick = function() {
+        var xhr2 = new XMLHttpRequest();
+        xhr2.addEventListener('load', function(e) {
+            alert('launched processes: ' + e.target.responseText);
+        });
 
-    ws.onopen = function(e) {
-        ws.send(JSON.stringify({"cmd":"open"}));
-    }    
+            xhr2.open('POST', '/ephpii/launcher.php');
+        var fd = new FormData();
+        fd.append('cmd', 'start');
+        xhr2.send(fd);
+    };
 
-    ws.onmessage =function(e) {
-        document.getElementById("response").innerHTML += e.data + "<br />";
-        var data = JSON.parse(e.data);
-        if(data.started && data.started == 1) {
-            alert('received start command');
-            var xhr2 = new XMLHttpRequest();
-            xhr2.addEventListener("load", function(e) {
-                alert('launched: ' + e.target.responseText);
-            });
-//            var formData = new FormData();    
-//            formData.append('file', 'xd.php');
-            xhr2.open('GET', '/~nick/sock/' + 
+    document.getElementById("connect").onclick = function() {
+        ws=new WebSocket('ws://ephp.solent.ac.uk:8080');
+
+        ws.onopen = function(e) {
+            alert('opened');
+            ws.send(JSON.stringify({"cmd":"open"}));
+        }    
+
+        ws.onmessage =function(e) {
+            console.log("message="+e.data);
+            document.getElementById("response").innerHTML += e.data + "<br />";
+            var data = JSON.parse(e.data);
+            if(data.started && data.started == 1) {
+                alert('received start command');
+                var xhr2_2 = new XMLHttpRequest();
+                xhr2_2.addEventListener('load', function(e) {
+                    alert('launched: ' + e.target.responseText);
+                });
+                xhr2_2.open('GET', '/ephpii/' + 
                 document.getElementById('script').value + 
                     '?XDEBUG_SESSION_START=' +
                     document.getElementById('user').value
                     +'&u='+
                     document.getElementById('user').value);
-            xhr2.send();
+                xhr2_2.send();
+            }
+        };
+
+        ws.onerror = function(e) {
+            alert('ERROR: ' + e.data);
         }
-    }
+    };
 
-    ws.onerror = function(e) {
-        alert('ERROR: ' + e.data);
-    }
-
-    document.getElementById("go").onclick = function() {
+    document.getElementById('go').onclick = function() {
         ws.send(JSON.stringify({"cmd":"user",
                                 "data":document.getElementById("user").value}));
+    }
+
+    document.getElementById('stop').onclick = function() {
+        var xhr2 = new XMLHttpRequest();
+        xhr2.addEventListener('load', function(e) {
+            alert('stopped: ' + e.target.responseText);
+            document.getElementById("response").innerHTML = "";
+        });
+        xhr2.open('POST', '/ephpii/launcher.php');
+        var fd=new FormData();
+        fd.append('cmd', 'stop');
+        xhr2.send(fd);
     }
 }
 
@@ -62,9 +88,12 @@ body { font-family: helvetica, arial, sans-serif; }
 </select>
 <br />
 <label for="script">Which script?</label>
-<input id="script" value="xd.php" />
+<input id="script" value="xdtest.php" />
 <br />
-<input type="submit" id="go" value="go" />
+<input type="button" id="start" value="start servers" />
+<input type="button" id="connect" value="websocket connect" />
+<input type="button" id="go" value="debug" />
+<input type="button" id="stop" value="stop servers" />
 <br />
 <div id="response"></div>
 

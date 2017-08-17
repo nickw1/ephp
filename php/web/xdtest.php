@@ -1,10 +1,9 @@
 <?php
-require_once('dbpass.php');
+require_once('../../scripts/dbpass.php');
 $a = "Oasis";
-$b = $_GET["title"];
 echo $a."\n";
-$u = $_GET["u"];
-if(preg_match("/^ephp{\d}3$/", $u)) {
+$u = isset($_GET["u"]) ? $_GET["u"]:"ephp001";
+if(preg_match("/^ephp\d{3}$/", $u)) {
 
     $conn=new PDO("mysql:host=localhost;dbname=$u",
                 "$u", DBPASS);

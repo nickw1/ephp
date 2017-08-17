@@ -1,6 +1,6 @@
 <?php 
 
-require_once('../../xdclient/VarWatcher.php');
+require_once('/home/nick/xdclient/VarWatcher.php');
 require('DBLoopFinder.php');
 require('DBLoops.php');
 require_once('dbpass.php');
