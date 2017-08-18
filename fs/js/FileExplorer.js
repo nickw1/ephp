@@ -114,24 +114,19 @@ FileExplorer.prototype.sendAjax = function(options)
 }
 
 FileExplorer.prototype.sendAjaxDelete = function() {
-    if(true) {
-    var xhr2 = new XMLHttpRequest();
-    xhr2.addEventListener("load", (e)=> {
-            var data = JSON.parse(e.target.responseText);
+    var fd = new FormData();
+    fd.append("action","delete");    
+    fd.append("files", JSON.stringify(Object.keys(this.selectedFiles)));
+	http.post(this.ftpUrl, fd).then( (xmlHTTP)=> {
+            data = JSON.parse(xmlHTTP.responseText);
             if(data.status==0) {
                 alert('Deleted successfully');
-		this.selectedFiles={};
-        this.sendAjax();
+				this.selectedFiles={};
+        		this.sendAjax();
             } else {
                 alert('Error deleting: code ' + data.status);
             }
         });
-    var fd = new FormData();
-    fd.append("action","delete");    
-    fd.append("files", JSON.stringify(Object.keys(this.selectedFiles)));
-    xhr2.open('POST',this.ftpUrl);
-    xhr2.send(fd);
-    }
 }
 
 FileExplorer.prototype.images = 
