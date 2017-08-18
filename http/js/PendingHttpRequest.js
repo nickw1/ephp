@@ -51,7 +51,7 @@ PendingHttpRequest.prototype.send = function(immediateCallback) {
 		actualUrl = noQsUrl + "?killcache="+new Date().getTime();
 	}
 
-	http.send (this.method, actualUrl, this.formData).then( (function(xmlHTTP)
+	http.send (this.method, actualUrl, this.formData).then( (xmlHTTP)=>
 		{
 				
 			var responseHeaders = xmlHTTP.getAllResponseHeaders().
@@ -97,7 +97,7 @@ PendingHttpRequest.prototype.send = function(immediateCallback) {
 			//Note:
 			// -url is always relative (to root, no server) e.g. /~ephp001/..
 			// -responseURL contains full server details
-		}).bind(this));
+		});
 
 }
 

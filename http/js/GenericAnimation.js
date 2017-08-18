@@ -24,13 +24,13 @@ function GenericAnimation(options) {
     this.lastMoveTime = -1;
     this.box = new MessageBox(this.message, { parent: options.parentId });
     this.calculateCanvasPos();
-    this.canvas.addEventListener("mousemove", (function(e) {
+    this.canvas.addEventListener("mousemove", (e)=> {
                 if(this.animationState!=this.messageTypes.NONE) {
                     var localX=e.pageX-this.canvasX,
                         localY=e.pageY-this.canvasY;
                     this.showMessageBox(localX, localY);
                 }    
-            }).bind(this));
+            });
 
     this.onmessagestart = options.onmessagestart || [];
     this.onmessageend = options.onmessageend || [];
@@ -66,9 +66,9 @@ function GenericAnimation(options) {
         }
 
         var slider = new Slider(50, 10, {
-        onchange: (function(value) {
+        onchange: (value)=> {
             this.interval = value;
-        }).bind(this) ,
+        } ,
 
         parent: controlsDiv 
         } );

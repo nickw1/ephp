@@ -23,7 +23,7 @@ function MessageBox(msg, options) {
 	var btn = document.createElement("input");
 	btn.setAttribute("type", "button");
 	btn.setAttribute("value", "OK");
-	btn.addEventListener("click", (function(e) {
+	btn.addEventListener("click", (e)=> {
 				if(this.messageType == this.messageTypes.REQUEST) {
 					var lines = this.textarea.value.split("\n");
 					var components = lines[0].split(" ");
@@ -55,7 +55,7 @@ function MessageBox(msg, options) {
 					this.message.setContent(responseText);
 				}
 				this.hide();
-			}).bind(this));
+			});
 	this.div.appendChild(btn);
 	this.messageType = this.messageTypes.NONE;
 }

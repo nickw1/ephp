@@ -12,8 +12,8 @@ function init() {
     var fileExplorer=new FileExplorer('serverContent', 
                             {http: 'fs/fs.php',
                             ftp: 'ftp/ftp.php' } ,'client',
-                            { showContentCallback: function(mime,src) {
-                                    saveOld(function() {
+                            { showContentCallback: (mime,src)=> {
+                                    saveOld(()=> {
                                         browser.setContent(mime,src);
                                         fileInfo = newFileInfo;
                                         // remove the . from the current dir 
@@ -29,7 +29,7 @@ function init() {
                                         });
                                     }, 
                                  fileInfoCallback: 
-                                    function(fInfo) { 
+                                    (fInfo)=> { 
                                         newFileInfo = fInfo;
                                     }
                                  } 
@@ -45,36 +45,14 @@ function init() {
                                     fileExplorer: fileExplorer,
                                     serverAnimation: phpAnimation,
 
-				onerror: function() {
-				/*
-            document.getElementById("network").style.display="block";
-            document.getElementById("client").style.width="33%";
-            document.getElementById("server").style.width="33%";
-				*/
- 			}
+				onerror: ()=> { }
 			});
-
-	/*
-    animation.addOnMessageEndListener(function(msgtype) {
-        if(msgtype==GenericAnimation.prototype.messageTypes.REQUEST) { 
-            document.getElementById("network").style.display="none";
-            document.getElementById("client").style.width="50%";
-            document.getElementById("server").style.width="50%";
-        } });
-
-    animation.addOnMessageStartListener(function(msgtype) {
-        if(msgtype==GenericAnimation.prototype.messageTypes.RESPONSE) { 
-            document.getElementById("network").style.display="block";
-            document.getElementById("client").style.width="33%";
-            document.getElementById("server").style.width="33%";
-        } });
-	*/
 
     var browser = new Browser({divId: 'content', 
                                 animation: animation,
                                 sourceElement: 'src_ace',
-                                saveOldCallback: function(cb) {
-                                    saveOld ( function() {
+                                saveOldCallback: (cb)=> {
+                                    saveOld ( ()=> {
                                         cb();
                                         fileInfo.file=fileInfo.dir=null;
                                         showFilename();
@@ -115,7 +93,7 @@ function init() {
 
     var dialog = new Dialog ("client",
                             { 
-                                'Yes': function() {
+                                'Yes': ()=> {
                                     dialog.hide();
                                     uploadContent();
                                     if(dialog.additionalCallback) {
@@ -123,14 +101,14 @@ function init() {
                                         dialog.additionalCallback = null;
                                     }
                                 }, 
-                                'No': function() {
+                                'No': ()=> {
                                     dialog.hide();
                                     if(dialog.additionalCallback) {
                                         dialog.additionalCallback();
                                         dialog.additionalCallback = null;
                                     }
                                 },
-                                'Cancel': function() {
+                                'Cancel': ()=> {
                                     dialog.hide();
                                 }
                             },
@@ -146,13 +124,13 @@ function init() {
                             );
 
 
-    var askUploadFile = function(additionalCallback) {
+    var askUploadFile = (additionalCallback)=> {
         dialog.additionalCallback = additionalCallback;
         dialog.setContent("Unsaved file. Upload to server?");
         dialog.show();
     }
 
-    var uploadContent = function() {
+    var uploadContent = ()=> {
         var formData = new FormData();
         savedLoginHTML = document.getElementById("login").innerHTML;
 
@@ -180,7 +158,7 @@ function init() {
             formData.append("src",browser.getCode());
             msg = "Transferring file...";
 
-            http.post('ftp/ftp.php', formData).then(function(xmlHTTP) {
+            http.post('ftp/ftp.php', formData).then((xmlHTTP)=> {
                 var json = JSON.parse(xmlHTTP.responseText);
                 if(json.status!=0 && (json.status>=256)) {
                     alert('Error: ' + errors[json.status]);
@@ -197,7 +175,7 @@ function init() {
         }
     };
 
-    var login = function(e) {
+    var login = (e)=> {
         var formData = new FormData();
         savedLoginHTML = document.getElementById("login").innerHTML;
 
@@ -216,7 +194,7 @@ function init() {
         document.getElementById("login").innerHTML = msg +
                     "<img src='assets/images/ajax-loader.gif' "+
                     "alt='ajax loader' />";
-        http.post('ftp/ftp.php', formData).then(function(xmlHTTP) {
+        http.post('ftp/ftp.php', formData).then((xmlHTTP)=> {
                     var json = JSON.parse(xmlHTTP.responseText);
                     if(json.status!=0 && (json.status>=1024)) {
                         alert('Error: ' + errors[json.status]);
@@ -236,9 +214,9 @@ function init() {
         });
     };
 
-    var loadBackedUpFile = function() {
+    var loadBackedUpFile = ()=> {
             http.get('ftp/backup.php').then (
-                function(xmlHTTP) {
+                (xmlHTTP)=> {
                     var json=JSON.parse(xmlHTTP.responseText);
                                     browser.setCode(json.src);
                                     if(json.filename!="") {
@@ -252,25 +230,25 @@ function init() {
                             setInterval(backup, 10000);
     };
 
-    var backup = function() {
+    var backup = ()=> {
         var data = new FormData();
         data.append("src", browser.getCode());
         data.append("filename", fileInfo.file==null ? "":
                         fileInfo.file);
         msgDiv.innerHTML = "Backing up...";
-        http.post('ftp/backup.php', data).then(function(xmlHTTP) {
+        http.post('ftp/backup.php', data).then((xmlHTTP)=> {
             setTimeout ( showFilename, 2000);
             });
     };
 
-    var showFilename = function(fInfo) {
+    var showFilename = (fInfo)=> {
         fInfo = fInfo || fileInfo;
         filenameDiv.innerHTML = (fInfo.file!=null) ?
                  fInfo.file: "UNSAVED";
     }
 
 
-    var doTabs = function() {
+    var doTabs = ()=> {
         var tabs = document.getElementById('client_tabs').
             getElementsByTagName("span");
         for(var j=0; j<tabs.length; j++) {
@@ -282,7 +260,7 @@ function init() {
         
     }
 
-    var doToolbar = function() {
+    var doToolbar = ()=> {
         for(id in showInModes[mode] ) {
             document.getElementById(id).style.display = 
                 (showInModes[mode][id].length==2 &&
@@ -292,17 +270,17 @@ function init() {
         }
     }
 
-    var resetLogin = function() {
+    var resetLogin = ()=> {
         document.getElementById("login").innerHTML = savedLoginHTML;
         initFtpSubmitBtn();
     }
 
-    var initFtpSubmitBtn = function() {
+    var initFtpSubmitBtn = ()=> {
         document.getElementById("ftpsubmit").addEventListener
                     ("click",login);
     }
 
-    var saveOld = function(cb) {
+    var saveOld = (cb)=> {
         if(browser.isAltered()) { 
             askUploadFile(cb);
         } else {
@@ -319,7 +297,7 @@ function init() {
     }
 
     document.getElementById("file_upload").addEventListener
-            ("click",function() {
+            ("click",()=> {
                 if(loggedin==null) {
                     alert("Not logged in!");
                 } else {
@@ -329,9 +307,9 @@ function init() {
             });
 
     document.getElementById("file_new").addEventListener
-            ("click", function()
+            ("click", ()=>
                 {
-                    saveOld (function() {
+                    saveOld (()=>{
                         fileInfo.file = null;
                         browser.setCode("");
                         showFilename();
@@ -341,7 +319,7 @@ function init() {
 
     // stackoverflow.com/questions/2897619/using-html5-javascript-to-generate-and-save-a-file
     document.getElementById("file_save").addEventListener
-            ("click", function(e)
+            ("click", (e)=>
                 {
                     var a = document.createElement("a"); 
                     fileInfo.file = (fileInfo.file==null ?
@@ -367,13 +345,13 @@ function init() {
         getElementsByTagName("span");
     for(var i=0; i<tabs.length; i++) {
         tabs[i].addEventListener
-                ("click", (function(i,e) {
+                ("click", ((i,e)=> {
                     mode=i;
                     doTabs();
                     doToolbar();
                 }).bind(this,i));
         tabs[i].addEventListener
-                ("mouseover", function(e) {
+                ("mouseover", (e)=> {
                     e.target.style.cursor="default";
                 } );
     }

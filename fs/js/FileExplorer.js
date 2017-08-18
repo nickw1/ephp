@@ -5,14 +5,16 @@ function FileExplorer(divId, urls, dropId, callbacks)
     var toolbar = document.createElement("div");
     var trash = document.createElement("img");
     trash.src = "assets/images/trash.png";
-    trash.addEventListener("click", (function(e) {
+    trash.alt = "Delete selected file(s)";
+    trash.addEventListener("click", (e)=> {
 	this.sendAjaxDelete(); 
-	}).bind(this));   
+	});
     toolbar.appendChild(trash);
-    container.appendChild(toolbar);
+  container.appendChild(toolbar);
  
     this.div = document.createElement("div");
-    container.appendChild(this.div);
+   container.appendChild(this.div);
+
 
     this.dir = ".";
     this.curFile = "";
@@ -21,10 +23,12 @@ function FileExplorer(divId, urls, dropId, callbacks)
     this.callbacks = callbacks || {};
     this.urlType = "text/uri-list";
     this.dropDiv = document.getElementById(dropId);
+    console.log("dropId="+dropId);
     this.selectedFiles = {};
 
     this.dropDiv.addEventListener("drop",
-        (function(e) {
+        (e)=> {
+		console.log("drop event");
                 e.preventDefault();
                 var data = e.dataTransfer.getData(this.urlType);
                 console.log("data returned: " + data);
@@ -39,14 +43,14 @@ function FileExplorer(divId, urls, dropId, callbacks)
                 }
                 this.sendAjax({name:data});
                 
-            }).bind(this));    
+            });
 
 
     
     
     
     document.getElementById(dropId).addEventListener("dragover", 
-                    function(e) {
+                    (e)=> {
                 console.log("DRAGOVER EVENT");
                 // drag and drop will NOT work without e.preventDefault()
                 e.preventDefault();
@@ -61,7 +65,7 @@ function FileExplorer(divId, urls, dropId, callbacks)
 
 
     this.swappedChildNodes = []; 
-   this.div.addEventListener("keyup", (function(e) {
+   this.div.addEventListener("keyup", (e)=> {
             if(e.keyCode==46) {
                 var first=true;
                 var str="";
@@ -74,7 +78,7 @@ function FileExplorer(divId, urls, dropId, callbacks)
                     str+=k;
                 }
             this.sendAjaxDelete();
-        } }).bind(this));
+        } });
     this.div.setAttribute("tabindex",0);
 }
 
@@ -98,33 +102,36 @@ FileExplorer.prototype.sendAjax = function(options)
     }
     else {
         url = this.serverUrl+"?dir="+this.dir;
-        callback =  (function(xmlHTTP)
+        callback =  (xmlHTTP) =>
                 { 
                     this.onAjaxDirResponse(xmlHTTP);
                     if(options.callback) {
                         options.callback();
                     }
-                }).bind(this);
+                };
     }
     http.get(url).then(callback);
 }
 
 FileExplorer.prototype.sendAjaxDelete = function() {
+    if(true) {
     var xhr2 = new XMLHttpRequest();
-    xhr2.addEventListener("load", (function(e) {
+    xhr2.addEventListener("load", (e)=> {
             var data = JSON.parse(e.target.responseText);
             if(data.status==0) {
                 alert('Deleted successfully');
+		this.selectedFiles={};
         this.sendAjax();
             } else {
                 alert('Error deleting: code ' + data.status);
             }
-        }).bind(this));    
+        });
     var fd = new FormData();
     fd.append("action","delete");    
     fd.append("files", JSON.stringify(Object.keys(this.selectedFiles)));
     xhr2.open('POST',this.ftpUrl);
     xhr2.send(fd);
+    }
 }
 
 FileExplorer.prototype.images = 
@@ -167,7 +174,7 @@ FileExplorer.prototype.onAjaxDirResponse = function(xmlHTTP)
                         this.changeDir(json.content[i].name);
                         this.sendAjax({name:name});
                     }).bind(this,i,name));
-                img.addEventListener("dragstart", function (ev) {
+                img.addEventListener("dragstart", (ev)=> {
                     ev.preventDefault();
                 });
             } else {    
@@ -181,6 +188,7 @@ FileExplorer.prototype.onAjaxDirResponse = function(xmlHTTP)
                         // this to work in chrome?
                         // JS The Definitive Guide 6th edition p479
                     if(ev.dataTransfer.types.contains) {
+			console.log("YES");
                         ev.dataTransfer.clearData('text/plain');
                         // to send a link the mime type needs to be 
                         // text/uri-list
@@ -201,7 +209,7 @@ FileExplorer.prototype.onAjaxDirResponse = function(xmlHTTP)
             {
                if(ev.target.selected) {
                 ev.target.selected=false;
-                ev.target.style.backgroundColor='white';
+                ev.target.style.backgroundColor='';
                 ev.target.style.border='';
                 this.div.focus();
                 delete(this.selectedFiles
@@ -217,7 +225,7 @@ FileExplorer.prototype.onAjaxDirResponse = function(xmlHTTP)
             }).bind(this,i));
 
         span.addEventListener
-            ("mouseover", function() {
+            ("mouseover", () =>{
                 document.body.style.cursor='default';
                 } );
             }

@@ -20,9 +20,9 @@ function Browser(options) {
     this.addressButton.setAttribute("type", "button");
     this.addressButton.setAttribute("value","Go!");
     this.addressButton.addEventListener("click", 
-                    (function()  {
+                    () =>  {
                         this.sendRequest("GET", this.addressBox.value);
-                    }).bind(this));
+                    });
     this.addressDiv.appendChild(this.addressButton);
     this.div.appendChild(this.addressDiv);
     this.content = document.createElement("div");
@@ -39,10 +39,10 @@ function Browser(options) {
     this.editor = ace.edit(options.sourceElement);
     this.editor.setOptions({fontSize:"8pt"});
     this.editor.getSession().setMode("ace/mode/php");
-    this.editor.on("change", (function(e) {
+    this.editor.on("change", (e)=> {
         this.showContent('text/html', this.editor.getValue());
         this.altered=true;
-            }).bind(this));
+            });
     this.addedCssRules = [];
     this.setRequestingState(false);
 
@@ -60,10 +60,10 @@ Browser.prototype.sendRequest = function(method,url,formData) {
         alert("Invalid URL");
     } else if(this.animation==null) {
         http.send(method, url, formData).then(
-                (function() {
+                () =>{
                     this.setRequestingState(false);
                     this.loadResponse();
-                    } ).bind(this));
+                    } );
     } else {
         var pXHR = new PendingHttpRequest
             ( {
@@ -255,28 +255,28 @@ Browser.prototype.showContent = function(mimetype, responseText) {
 
         var links = this.content.getElementsByTagName("a"); 
         for(var i=0; i<links.length; i++) {
-            links[i].addEventListener("click", (function(e) {
+            links[i].addEventListener("click", (e)=> {
                 e.preventDefault();
                 var href=e.target.getAttribute("href");
                 this.sendRequest('GET',
                     href.substr(0,7)=="http://" ? href:
                         this.webDir+"/"+href);
-            }).bind(this));
+            });
         }
     }
 }
 
 Browser.prototype.showImage = function(url) {
     var img = new Image();
-    img.onerror = (function() {
+    img.onerror = ()=> {
         this.content.innerHTML = url + 
             " could not be loaded as it is an invalid image.";
-        }).bind(this);
+        };
     img.src = url; 
-    img.onload = (function() {
+    img.onload = ()=> {
         this.content.innerHTML = "";
         this.content.appendChild(img);
-    }).bind(this);
+    };
 }
 
 Browser.prototype.highlightFormField = function(fieldName, colour) {
