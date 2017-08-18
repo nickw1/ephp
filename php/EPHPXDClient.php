@@ -19,8 +19,12 @@ class EPHPXDClient extends XDClient\VarWatcher  {
         $this->filename = $filename;
         $this->loops = new DBLoops();
         $this->lf = new DBLoopFinder($filename);
-        $this->dbconn = new PDO("mysql:host=localhost;dbname={$dbname};",
-            $dbuser, $dbpass);    
+		$this->dbconn = 
+		($loginCredentials = $this->lf->getLoginCredentials())===false ?
+			false:  
+        	new PDO($loginCredentials["connstring"],
+					$loginCredentials["username"],
+					$loginCredentials["password"]);
         $emitter->setUser($dbuser);
     }
 
@@ -28,7 +32,7 @@ class EPHPXDClient extends XDClient\VarWatcher  {
         parent::handleObject($n, $prop);
         switch($prop["classname"]) {
                 case "PDOStatement":
-                    if ($prop["children"]==1) {
+                    if ($this->dbconn!==false && $prop["children"]==1) {
                         $sql = base64_decode($prop->property);
                         $this->vars[$n] = ["type"=>"query", "value"=>$sql];
                         $n1 = str_replace('$','',$n);
@@ -66,8 +70,11 @@ class EPHPXDClient extends XDClient\VarWatcher  {
 
 
     protected function executeSQL($sql) {
-        $result = $this->dbconn->query($sql);
-        return $result ? $result->fetchAll(PDO::FETCH_ASSOC) : false;
+		if($this->dbconn!==false) {
+        	$result = $this->dbconn->query($sql);
+        	return $result ? $result->fetchAll(PDO::FETCH_ASSOC) : false;
+		}
+		return false;
     }
 }
 
