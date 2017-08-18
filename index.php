@@ -3,13 +3,13 @@
 session_start();
 
 require_once('defines.php');
-require_once(DOCUMENT_ROOT.'/lib/Page.php');
+require_once(LIBDIR.'/Page.php');
 
 class EPHPPage extends Page {
 	public function writeBody() {
 		?>
 		<body onload='init()'>
-		<h1>ephp</h1>
+		<h1>ephp<sup>ii</sup></h1>
 		<div id="login">
 		<?php
 		if(isset($_SESSION["ephpuser"])) {

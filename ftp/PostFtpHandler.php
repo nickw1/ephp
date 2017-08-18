@@ -1,7 +1,7 @@
 <?php
 
 require_once('../defines.php');
-require_once(DOCUMENT_ROOT."/lib/FileUploader.php");
+require_once(LIBDIR."/FileUploader.php");
 require_once('ReadWriteFtpHandler.php');
 
 session_start();

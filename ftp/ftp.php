@@ -4,7 +4,8 @@ require_once('FileUploadFtpHandler.php');
 require_once('PostFtpHandler.php');
 
 session_start();
-$server = EPHP_HOSTNAME;
+// $server = EPHP_HOSTNAME;
+$server = "193.63.200.53";
 $u = isset($_POST["ephp_username"]) ? $_POST["ephp_username"] :
         (isset($_SESSION["ephpuser"]) ? $_SESSION["ephpuser"]: null);
 $p = isset($_POST["ephp_password"]) ? $_POST["ephp_password"] :
