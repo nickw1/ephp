@@ -16,11 +16,8 @@ class DBLoops {
 
         foreach($loops as $resultvar=>$details) {
             if($lineno>=$details['startLine'] && $lineno<=$details['endLine']) {
-                $match = $this->doGetMatchingLoop($details['loops'], $lineno);    
-                if($match===false) {
-                    $match = $loops[$resultvar];
-                    $match["resultvar"] = $resultvar;
-                }
+				$match = $loops[$resultvar];
+				$match["resultvar"] = $resultvar;
             }
         }
         return $match;
