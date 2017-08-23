@@ -54,7 +54,7 @@ class DBLoopFinder {
     }
 
     public function getLoops($resultvars) {
-		$a = $this->recurse($this->stmts, $resultvars);
+		return $this->recurse($this->stmts, $resultvars);
 	}
 
 	public function recurse($stmts, $resultvars) {

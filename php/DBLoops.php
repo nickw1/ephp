@@ -1,139 +1,62 @@
 <?php
 
-require('vendor/autoload.php');
-require_once('Recurser.php');
+class DBLoops {
+    private $loops, $results;
 
-use PhpParser\ParserFactory;
-
-class DBLoopFinder {
-
-    private $stmts, $rec, $loopsRec;
- 
-    public function __construct($filename) {
-        $parser=(new ParserFactory)->create(ParserFactory::PREFER_PHP7);
-        $code = file_get_contents($filename);
-        $this->stmts = $parser->parse($code);
-        $this->rec = new Recurser($this, "doGetLoginCredentials");
-        $this->loopsRec = new LoopsRecurser($this, "recurse", $this, "doGetLoops");
-        $this->depth=-1;
+    public function __construct(&$loops=[]) {
+        $this->loops = $loops;
     }
 
-    
-    public function getLoginCredentials() {
-        return $this->doGetLoginCredentials($this->stmts);
+    public function getMatchingLoop($lineno) {
+        return $this->doGetMatchingLoop($this->loops, $lineno);
     }
 
-    public function doGetLoginCredentials($node) {
-        for($i=0; $i<count($node); $i++) {
-            switch($node[$i]->getType()) {
-                case "Expr_Assign":
-                if($node[$i]->getType()=="Expr_Assign" &&
-                    $node[$i]->expr->getType()=="Expr_New"
-                    && $node[$i]->expr->class->parts[0]=="PDO" && 
-                    count($node[$i]->expr->args)==3) {
-                        return
-                         ["connstring" =>
-                        $node[$i]->expr->args[0]->value->value,
-                            "username" =>
-                        $node[$i]->expr->args[1]->value->value,
-                            "password" =>
-                        $node[$i]->expr->args[2]->value->value
-                        ];
+    protected function doGetMatchingLoop($loops, $lineno) {
+        $match = false;
+
+        foreach($loops as $resultvar=>$details) {
+            if($lineno>=$details['startLine'] && $lineno<=$details['endLine']) {
+                $match = $this->doGetMatchingLoop($details['loops'], $lineno);    
+                if($match===false) {
+                    $match = $loops[$resultvar];
+                    $match["resultvar"] = $resultvar;
                 }
-                break;
-
-                default:
-                    if(($result=$this->rec->recursiveTraversal($node[$i]))
-                        !==false) {
-                        return $result;
-                    }
-                                        
             }
         }
-        return false;    
+        return $match;
     }
 
-    public function getLoops($resultvars) {
-		$a = $this->recurse($this->stmts, $resultvars);
-	}
+    public function addLoop($loop) {
+        $this->loops = array_merge($this->loops, $loop);
+    }
 
-	public function recurse($stmts, $resultvars) {
-		$this->depth++;
-        try {
-			for($i=0; $i<count($stmts); $i++) {
-				if(($result=$this->loopsRec->recursiveTraversal
-						($stmts[$i], $resultvars))!==false) {
-					return $result;
-				}	
-			}
-			return false;
-        
-        } catch(Error $e ) {
-            throw $e;
+    public function setLastId($resultvar, $lastId) {
+        if($this->loops[$resultvar]) {
+            $this->loops[$resultvar]["lastId"] = $lastId;
         }
-		$this->depth--;
     }
 
-    public function doGetLoops($whilenode, $resultvars) {
-		$loops = false;
-                switch($whilenode->cond->getType()) {
-                    case "Expr_Assign":
-                        if(in_array($whilenode->cond->expr->var->name,
-                            $resultvars)) {
-                        $loop = 
-                            [ "rowvar"=>$whilenode->cond->var->name,
-                                "startLine"=>
-                                    $whilenode->getAttributes()['startLine'],
-                                "endLine"=>
-                                   $whilenode->getAttributes()['endLine']];
-                            for($j=0; $j<count($whilenode->stmts); $j++) {
-                                $result=$this->loopsRec->recursiveTraversal
-                                    ($whilenode->stmts[$j],$resultvars);
-                                if($result!==false) {
-                                    $loops = $loops===false ? $result:
-                                        array_merge($loops,$result);
-                                }    
-                            }
-                            $loop["loops"] = [];
-                            $loops = $loops===false ? []:$loops;
-                            $loops[$whilenode->cond->expr->var->name] = $loop;
-                        }
-                        break;
+    public function getLastId($resultvar) {
+        return $this->loops[$resultvar] && 
+            isset($this->loops[$resultvar]["lastId"]) ?  
+            $this->loops[$resultvar]["lastId"] : false;
+    }
 
-                    case "Expr_Variable":
-                        for($j=0; $j<count($whilenode->stmts); $j++) {
-                            if($whilenode->stmts[$j]->getType()=="Expr_Assign"){
-                                if(in_array
-                                    ($whilenode->stmts[$j]->expr->var->name,
-                                    $resultvars) && 
-                                    $whilenode->stmts[$j]->var->name ==
-                                    $whilenode->cond->name) {
-                                        $loop= 
-                                    [ "rowvar"=>$whilenode->cond->name,
-                                    "startLine"=>
-                                        $whilenode->getAttributes()
-										['startLine'],
-                                    "endLine"=>
-                                        $whilenode->getAttributes()['endLine']];
-                                    $loop["loops"] = [];
-                                    $loops = $loops===false ? []:$loops;
-                                    $loops
-                                        [$whilenode->stmts[$j]->expr->var->name]
-                                         = $loop;
-                                }
-                            } else {
-                                $result=$this->loopsRec->recursiveTraversal
-                                    ( $whilenode->stmts[$j],$resultvars);
-                                if($result!==false) {    
-                                    $loops = $loops===false ? $result:
-                                        array_merge($loops,$result);
-                                }    
-                            }
-                        }
-                        break;    
-                }
-        return $loops;
-    } // function
+    public function display() {
+        print_r($this->loops);
+    }
+
+    public function setResults($resultvar, $results) {
+        if(isset($this->loops[$resultvar])) {
+            $this->loops[$resultvar]["results"] = $results;
+        }
+    }
+
+    public function getResults($resultvar) {
+        return isset($this->loops[$resultvar]) && 
+                isset($this->loops[$resultvar]["results"]) ? 
+                $this->loops[$resultvar]["results"] : false;
+    }
 }
 
 ?>
