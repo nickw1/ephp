@@ -53,7 +53,7 @@ PHPAnimation.prototype.setupGUI = function() {
     var btn = document.createElement("input");
     btn.setAttribute("type","button");
     btn.setAttribute("value","Run PHP and send back output");
-    btn.addEventListener("click", (function() {
+    btn.addEventListener("click", ()=> {
         this.showing=false;
         while(this.div.childNodes.length > 0) {
             this.div.removeChild(this.div.firstChild);
@@ -66,13 +66,13 @@ PHPAnimation.prototype.setupGUI = function() {
             this.callback();
         }
 
-        }).bind(this)); 
+        }); 
 
     var slider = new Slider(2000, 10, {
-        onchange: (function(value) {
+        onchange: (value)=> {
             this.interval = value;
             this.loopAnimation.interval = value;
-        }).bind(this) ,
+        } ,
 
         parent: this.btndiv
         } );

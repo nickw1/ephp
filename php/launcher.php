@@ -3,17 +3,20 @@
 // launcher.php
 
 define('TMPDIR','/var/www/tmp/');
-define('SCRIPTDIR','/var/www/scripts/');
+define('SCRIPTDIR','/var/www/_scripts/');
 
 session_start();
 
 //$user = $_SESSION["username"];
 //$script = $_POST["script"];
-$user = "ephp001";
-$cmd = (isset($_POST["cmd"]) && $_POST["cmd"]=="stop") ? "stop":"";
 
+$_SESSION["ephpuser"] = "ephp001";
 
-if(preg_match("/^ephp\d{3}$/", $user)) {
+$user = null;
+
+if(isset($_SESSION["ephpuser"]) &&
+		preg_match("/^ephp\d{3}$/", $_SESSION["ephpuser"])) {
+	$cmd = (isset($_POST["cmd"]) && $_POST["cmd"]=="stop") ? "stop":"";
 
     $scripts = ["wsocksrv", "xdclient"];
 
@@ -24,5 +27,7 @@ if(preg_match("/^ephp\d{3}$/", $user)) {
 		system($cmd1);
         usleep(500000);
     }
+	$user = $_SESSION["ephpuser"];
 }
+echo json_encode(["user"=>$user]);
 ?>

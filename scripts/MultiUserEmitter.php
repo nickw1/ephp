@@ -9,7 +9,11 @@ abstract class MultiUserEmitter implements \XDClient\Emitter {
     }
 
     protected function addUserToData($data) {
-        return array_merge(["user"=>$this->user],$data);
+		echo "addUserToData()\n";
+		print_r($data);
+        $m= array_merge(["user"=>$this->user],$data);
+		print_r($m);
+		return $m;
     }
 }
 

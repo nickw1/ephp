@@ -53,15 +53,24 @@ class MessageHandler implements MessageComponentInterface {
         $data = json_decode($json);    
         if(isset($data->error)) {
         } elseif(isset($data->cmd)) {
+			echo "data=$json\n";
+			/*
             switch($data->cmd) {
                 case "line":
-                case "newrow":
                     if(isset($this->clients[$this->clientIDs[$data->user]])) {
                         $this->clients[$this->clientIDs[$data->user]]->
                             send(json_encode($data->data));
                     }
                     break;
+	
+				case "newrow":
+                    if(isset($this->clients[$this->clientIDs[$data->user]])) {
+                        $this->clients[$this->clientIDs[$data->user]]->
+                            send(json_encode($data));
+                    }
+				
             }
+			*/
         }
     }
 

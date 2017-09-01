@@ -11,21 +11,13 @@ require_once('dbpass.php');
 class EPHPXDClient extends XDClient\VarWatcher  {
     protected  $lineno, $curLine, $loops, $dbconn, $lf, $user;
 
-    public function __construct($filename, $dbname, $dbuser, $dbpass,
-                                    MultiUserEmitter $emitter) {
+    public function __construct($filename, MultiUserEmitter $emitter) {
 
         parent::__construct($emitter);
         $this->curLine = [];
         $this->filename = $filename;
         $this->loops = new DBLoops();
         $this->lf = new DBLoopFinder($filename);
-		$this->dbconn = 
-		($loginCredentials = $this->lf->getLoginCredentials())===false ?
-			false:  
-        	new PDO($loginCredentials["connstring"],
-					$loginCredentials["username"],
-					$loginCredentials["password"]);
-        $emitter->setUser($dbuser);
     }
 
     public function handleObject($n, $prop) {
@@ -76,6 +68,23 @@ class EPHPXDClient extends XDClient\VarWatcher  {
 		}
 		return false;
     }
+
+	public function handleIdeKey($idekey) {
+		$loginCredentials = $this->lf->getLoginCredentials();
+		echo "LOGIN CREDENTIALS:";
+		print_r($loginCredentials);
+		if($loginCredentials["username"]==$idekey) {
+			$this->dbconn = new PDO
+					($loginCredentials["connstring"],
+					$loginCredentials["username"],
+					$loginCredentials["password"]);
+        	$this->emitter->setUser($idekey);
+			echo "match";
+		} else {
+			echo "dont match idekey $idekey\n";
+		}
+		return true;
+	}
 }
 
 ?>

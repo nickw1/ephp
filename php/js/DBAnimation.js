@@ -17,7 +17,7 @@ function DBAnimation (elements, callback, otherOptions)  {
     }
         
     this.client.addEventListener
-            ("animationend", (function(e) {
+            ("animationend", (e)=> {
             if(e.animationName==this.forwardAnimName) {
                         this.client.style.display="none";
                         this.network.style.display="none";
@@ -27,7 +27,7 @@ function DBAnimation (elements, callback, otherOptions)  {
                     this.dbconnect.style.display="none";
 					callback();
                 }
-            }).bind(this));
+            });
 }
 
 DBAnimation.prototype.animate = function() {

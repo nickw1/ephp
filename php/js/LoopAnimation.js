@@ -195,11 +195,11 @@ LoopAnimation.prototype.createResultsDiv = function(i, x, y, hostDiv) {
     close.setAttribute("src", "assets/images/cross.png");
 
     close.addEventListener("click",
-        (function(e) {
+        (e)=> {
             this.pauseLoopAnimate();
             this.resetLoop();
             hostDiv.style.display='none';
-        }).bind(this));
+        });
 
     var titlebar = document.createElement("div");
     titlebar.style.textAlign = 'right';
@@ -232,15 +232,15 @@ LoopAnimation.prototype.createResultsDiv = function(i, x, y, hostDiv) {
     range.setAttribute("max", 10);
     range.setAttribute("step", 1);
     range.setAttribute("value", 2000.0 / this.interval);
-    range.addEventListener("change", (function(e) {
+    range.addEventListener("change", (e)=> {
          this.interval = 2000.0 / e.target.value;
-        }).bind(this));
+        });
 
     play.addEventListener("click", this.resumeLoopAnimate.bind(this));
     pause.addEventListener("click",this.pauseLoopAnimate.bind(this)); 
 
     rewind.addEventListener("click", 
-        (function(e) {
+        (e)=> {
     		document.getElementById("row"+this.rowIndex).
 				classList.remove("selected");
             if(this.contLoopAnimate) {
@@ -253,16 +253,16 @@ LoopAnimation.prototype.createResultsDiv = function(i, x, y, hostDiv) {
             this.clearConsole();
     //            this.resumeLoopAnimate();
             
-        }).bind(this));
+        });
 
     div.appendChild(play);
     div.appendChild(rewind);
     div.appendChild(pause);
 
     var slider = new Slider(2000, 10, {
-        onchange: (function(value) {
+        onchange: (value)=> {
             this.interval = value;
-        }).bind(this) ,
+        } ,
 
         parent: div
         } );
