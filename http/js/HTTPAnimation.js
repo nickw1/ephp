@@ -27,13 +27,13 @@ HTTPAnimation.prototype.finishRequest = function() {
 
 		var dbgMsgHandler = { 
 			handleLine: function(data) {
-				alert("LINE: "+ data); 
+				msg("LINE: number="+ data.lineno); 
 			},
 			handleNewRow: function(data) {
-				this.handleLine(data);
+				msg("NEWROW: id="+ data); 
 			},
 			handleStop: function() {
-				alert("STOPPED");
+				msg("STOPPED");
 			}
 		};
 

@@ -32,11 +32,12 @@ class MessageHandler implements MessageComponentInterface {
     public function onMessage(ConnectionInterface $from, $msg) {
         $this->lastActivity = time();
         $data=json_decode($msg);
-        if($data!==null) {
+        if($data!==null && isset($data->cmd)) {
             switch($data->cmd) {
                 case "user":
                     $this->clientIDs[$data->data] = $from->resourceId;;
-                    $from->send(json_encode(["started"=>"1"]));
+                    $from->send(json_encode
+                        (["cmd"=>"opened","user"=>$data->data]));
                     break;
             }
         }
@@ -53,24 +54,16 @@ class MessageHandler implements MessageComponentInterface {
         $data = json_decode($json);    
         if(isset($data->error)) {
         } elseif(isset($data->cmd)) {
-			echo "data=$json\n";
-			/*
             switch($data->cmd) {
                 case "line":
-                    if(isset($this->clients[$this->clientIDs[$data->user]])) {
-                        $this->clients[$this->clientIDs[$data->user]]->
-                            send(json_encode($data->data));
-                    }
-                    break;
-	
-				case "newrow":
-                    if(isset($this->clients[$this->clientIDs[$data->user]])) {
+                case "newrow":
+                    if($this->clients[$this->clientIDs[$data->user]]){
                         $this->clients[$this->clientIDs[$data->user]]->
                             send(json_encode($data));
                     }
-				
+					
+                    break;
             }
-			*/
         }
     }
 

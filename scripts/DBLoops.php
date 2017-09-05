@@ -27,7 +27,11 @@ class DBLoops {
     }
 
     public function addLoop($loop) {
-        $this->loops = array_merge($this->loops, $loop);
+		// 0509 only add if not already there
+		if(count($loop)==1 &&
+			!array_key_exists(array_keys($loop)[0], $this->loops)) {
+        	$this->loops = array_merge($this->loops, $loop);
+		}
     }
 
     public function setLastId($resultvar, $lastId) {

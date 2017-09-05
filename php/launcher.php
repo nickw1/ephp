@@ -16,14 +16,18 @@ $user = null;
 
 if(isset($_SESSION["ephpuser"]) &&
 		preg_match("/^ephp\d{3}$/", $_SESSION["ephpuser"])) {
-	$cmd = (isset($_POST["cmd"]) && $_POST["cmd"]=="stop") ? "stop":"";
 
+	$cmd = (isset($_POST["cmd"]) && $_POST["cmd"]=="stop") ? "stop":
+			(isset($argv[1]) && $argv[1]=="stop" ? "stop":"");
+
+	$stopping = $cmd=="stop";
     $scripts = ["wsocksrv", "xdclient"];
 
-    foreach($scripts as $script) {
-		
-        $cmd1="/usr/bin/php ".SCRIPTDIR."{$script}.php $cmd > ".
-                TMPDIR."{$script}_out.txt &";
+    for($i=($stopping ? count($scripts)-1 : 0); 
+		$i!=($stopping ?  -1: count($scripts));
+		$i+=($stopping ? -1:1)) {
+        $cmd1="/usr/bin/php ".SCRIPTDIR."{$scripts[$i]}.php $cmd > ".
+                TMPDIR."{$scripts[$i]}_out.txt &";
 		system($cmd1);
         usleep(500000);
     }

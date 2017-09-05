@@ -46,13 +46,13 @@ PendingHttpRequest.prototype.send = function(callback, debugMgr=null) {
 		} 
 		actualUrl = scriptUrl;
 		debugMgr.setCompleteCallback (this.processResponse.bind(this,
-				callback));
+				callback, debugPHP));
 		debugMgr.runLauncher(this.method, scriptUrl, this.formData);
 	} else {
 		// ALSO do it for HTML urls
 		actualUrl = noQsUrl + "?killcache="+new Date().getTime();
 		http.send (this.method, actualUrl, this.formData).then
-			(this.processResponse.bind(this, callback));
+			(this.processResponse.bind(this, callback, debugPHP));
 	}
 }
 
@@ -85,9 +85,11 @@ PendingHttpRequest.prototype.getResponse = function() {
 	return response; 
 }
 
-PendingHttpRequest.prototype.processResponse = function(xmlHTTP, callback)
+PendingHttpRequest.prototype.processResponse = function( callback, 
+		debugPHP, xmlHTTP)
 {
-				
+				alert('callback: ' + callback +
+						' xmlHTTP=' + xmlHTTP);	
 			var responseHeaders = xmlHTTP.getAllResponseHeaders().
 				split("\r\n");
 			// getAllResponseHeaders() seems to return 1 more than there 

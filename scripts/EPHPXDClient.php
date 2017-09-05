@@ -29,9 +29,11 @@ class EPHPXDClient extends XDClient\VarWatcher  {
                         $this->vars[$n] = ["type"=>"query", "value"=>$sql];
                         $n1 = str_replace('$','',$n);
                         $loop=$this->lf->getLoops([$n1]);
-                        $this->loops->addLoop($loop);
-                        $this->loops->setResults($n1, 
-                            $this->executeSQL($sql));
+                        if($loop!==false) {
+                            $this->loops->addLoop($loop);
+                            $this->loops->setResults($n1, 
+                                $this->executeSQL($sql));
+                        }
                     }
                 
                  break;
@@ -62,29 +64,24 @@ class EPHPXDClient extends XDClient\VarWatcher  {
 
 
     protected function executeSQL($sql) {
-		if($this->dbconn!==false) {
-        	$result = $this->dbconn->query($sql);
-        	return $result ? $result->fetchAll(PDO::FETCH_ASSOC) : false;
-		}
-		return false;
+        if($this->dbconn!==false) {
+            $result = $this->dbconn->query($sql);
+            return $result ? $result->fetchAll(PDO::FETCH_ASSOC) : false;
+        }
+        return false;
     }
 
-	public function handleIdeKey($idekey) {
-		$loginCredentials = $this->lf->getLoginCredentials();
-		echo "LOGIN CREDENTIALS:";
-		print_r($loginCredentials);
-		if($loginCredentials["username"]==$idekey) {
-			$this->dbconn = new PDO
-					($loginCredentials["connstring"],
-					$loginCredentials["username"],
-					$loginCredentials["password"]);
-        	$this->emitter->setUser($idekey);
-			echo "match";
-		} else {
-			echo "dont match idekey $idekey\n";
-		}
-		return true;
-	}
+    public function handleIdeKey($idekey) {
+        $loginCredentials = $this->lf->getLoginCredentials();
+        if($loginCredentials["username"]==$idekey) {
+            $this->dbconn = new PDO
+                    ($loginCredentials["connstring"],
+                    $loginCredentials["username"],
+                    $loginCredentials["password"]);
+            $this->emitter->setUser($idekey);
+        }
+        return true;
+    }
 }
 
 ?>
