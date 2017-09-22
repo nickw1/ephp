@@ -13,11 +13,11 @@ DebugMgr.prototype.runLauncher = function(method, url, formData) {
 					// startup the websocket stuff
 					var data = JSON.parse(xmlHTTP.responseText);
 					this.user = data.user;
-					alert("Launcher returned: "+ xmlHTTP.responseText +
+					msg("Launcher returned: "+ xmlHTTP.responseText +
 							" user="+this.user);
 					this.connect(method, url, formData);
 				} ).catch( (statusCode) => {
-					alert('http error: ' + statusCode);
+					msg('http error: ' + statusCode);
 					} );
 }
 
@@ -25,37 +25,46 @@ DebugMgr.prototype.connect = function(method, url, formData) {
 	this.ws=new WebSocket('ws://ephp.solent.ac.uk:8080');
 
 	this.ws.onopen = (e) => {
-			alert('opened websocket! now starting the debugging');
-
-			// the ajax callback should run when the debug session is
-			// complete???
-			http.send(method, url+
-				'&XDEBUG_SESSION_START='+
-					this.user, formData).then((xmlHTTP)=>
-				{alert('completed: ' + xmlHTTP.responseText);
-				if(this.completeCallback != null) {
-					this.completeCallback(xmlHTTP.responseText);
-				}
-					// sned back to whatever called this 
-				}).
-				catch((code)=>alert(code));
+			msg('opened websocket! sending user to socket server', true);
+			this.ws.send(JSON.stringify({"cmd":"user", "data":this.user}));
 	}    
 
 	this.ws.onmessage = (e) => {
-		console.log("Message from websocket="+e.data);
+		msg("<strong>websocket sent:</strong>" + e.data);
 		var data = JSON.parse(e.data);
 		// all debug commands have a user field to identify which user is
 		// sending them, others will be ignored
 		if(data.cmd && data.user && this.user == data.user &&
 			this.dbgMsgHandler != null) {
-			if (data.cmd && data.cmd=='line') {
-				// handle line number
-				this.dbgMsgHandler.handleLine(data.data);
-			} else if (data.cmd && data.cmd=='newrow') {
-				// handle a new database row
-				this.dbgMsgHandler.handleNewRow(data.data);
-			} else if (data.cmd.stop) {
-				this.dbgMsgHandler.handleStop();
+			msg('received <strong>' + data.cmd + 
+				'</strong> command from web socket server');
+			switch(data.cmd) {
+				case 'opened':
+
+					http.send(method, url+
+						'&XDEBUG_SESSION_START='+
+							this.user, formData).then((xmlHTTP)=>
+						{alert('script has finished:<br />'
+							+xmlHTTP.responseText);
+						if(this.completeCallback != null) {
+							this.completeCallback(xmlHTTP);
+						}
+					// sned back to whatever called this 
+					}).catch((code)=>alert(code));
+					break;
+
+
+				case 'line':
+					this.dbgMsgHandler.handleLine(data.data);
+					break;
+
+				case 'newrow':
+					this.dbgMsgHandler.handleNewRow(data.data);
+					break;
+
+				case 'stop':
+					this.dbgMsgHandler.handleStop();
+					break;
 			}
 		}
 	};
@@ -75,7 +84,7 @@ DebugMgr.prototype.stopServers = function() {
         fd.append('cmd', 'stop');
 		http.send('POST', this.launcher,fd).
 				then((e)=>
-            {alert('stopped: ' + e.target.responseText); }).
+            {msg('stopped: ' + e.target.responseText); }).
 				catch((code)=>{alert(code)});
 }
 

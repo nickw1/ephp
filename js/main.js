@@ -227,7 +227,7 @@ function init() {
                                         showFilename();
                                     }
                                 });
-                            setInterval(backup, 10000);
+// TODO dealwith                            setInterval(backup, 10000);
     };
 
     var backup = ()=> {
@@ -361,4 +361,9 @@ function init() {
     doToolbar();
 }
 
-
+function msg(msg, bold=false) {
+	document.getElementById('msg2').innerHTML += 
+		(bold?"<strong>":"")+msg + 
+		(bold?"</strong>":"")+
+		 "<br />";
+}

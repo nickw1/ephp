@@ -25,20 +25,24 @@ HTTPAnimation.prototype.fireAnimation = function()  {
 // Overridden to do the ServerFilesystemAnimation and analyser stuff
 HTTPAnimation.prototype.finishRequest = function() {
 
+		/*
 		var dbgMsgHandler = { 
 			handleLine: function(data) {
 				msg("LINE: number="+ data.lineno); 
+				this.serverAnimation.receiveLineCommand(data);
 			},
 			handleNewRow: function(data) {
 				msg("NEWROW: id="+ data); 
+				this.serverAnimation.receiveNewrowCommand(data);
 			},
 			handleStop: function() {
 				msg("STOPPED");
 			}
 		};
+		*/
 
 		var debugMgr = new DebugMgr("/_ephpii/php/launcher.php",
-				{ dbgMsgHandler: dbgMsgHandler } );
+				{ dbgMsgHandler: this.serverAnimation } );
 
         var urlParts = this.message.url.split("/");    
 
@@ -48,9 +52,14 @@ HTTPAnimation.prototype.finishRequest = function() {
             repeat:2, 
             interval:500, 
             callback: ()=> {
-				 this.message.send( (xmlHTTP) => { 
-				 		this.startResponse.send(this) // TODO as in Animation.js
-									}, debugMgr);
+				 this.message.send( 
+						(data)=> {
+							if(data.errors) {
+								alert("error(s):\n" + data.errors.join("\n"));
+							} else {
+								this.serverAnimation.showSrc(data);
+							}
+						} , debugMgr);
 				}
             });
         sa.animate();

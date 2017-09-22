@@ -4,6 +4,7 @@ function PendingHttpRequest(options) {
 	this.formData = options.formData;
 	this.finalCallback = options.callback;
 	this.server = options.server;
+	this.analyser=options.analyser;
 	this.editableResponse = { headers: {}, content: null };
 }
 
@@ -34,20 +35,43 @@ PendingHttpRequest.prototype.send = function(callback, debugMgr=null) {
 		actualUrl;
 
 	if(debugPHP) {
-		var scriptUrl = this.url;
+		// added new code from old version to retrieve the source code
+		var analyserUrl = this.analyser;
 		// Kill the cache - this caused no reload at times
 		if(this.method=='GET') {
-			scriptUrl+="?killcache="+new Date().getTime()+
-				"&";
+			analyserUrl+="?killcache="+new Date().getTime()+
+				"&target=";
 			var parts = this.url.split("?");
-			scriptUrl+=(parts.length==2 ? parts[0]+"&"+parts[1] : this.url);
+			analyserUrl+=(parts.length==2 ? parts[0]+"&"+parts[1] : this.url);
 		} else if (this.method=='POST') {
-			//TODO  do nothing???
+			this.formData.append("target", this.url);
 		} 
-		actualUrl = scriptUrl;
-		debugMgr.setCompleteCallback (this.processResponse.bind(this,
-				callback, debugPHP));
-		debugMgr.runLauncher(this.method, scriptUrl, this.formData);
+		actualUrl = analyserUrl;
+		http.send (this.method, actualUrl, this.formData).then
+			((xmlHTTP) => {
+			
+				// TODO send the php to the code window...	
+				var data= JSON.parse(xmlHTTP.responseText);
+				callback(data);
+
+				// launch the dbebug process
+				var scriptUrl = this.url;
+				// Kill the cache - this caused no reload at times
+				if(this.method=='GET') {
+					scriptUrl+="?killcache="+new Date().getTime()+
+						"&";
+					var parts = this.url.split("?");
+					scriptUrl+=(parts.length==2 ? parts[0]+"&"+parts[1] : 
+						this.url);
+				} else if (this.method=='POST') {
+			//TODO  do nothing???
+				}		 
+				debugMgr.setCompleteCallback (this.processResponse.bind(this,
+					callback, debugPHP));
+				debugMgr.runLauncher(this.method, scriptUrl, this.formData);
+
+			} );
+
 	} else {
 		// ALSO do it for HTML urls
 		actualUrl = noQsUrl + "?killcache="+new Date().getTime();
@@ -89,7 +113,8 @@ PendingHttpRequest.prototype.processResponse = function( callback,
 		debugPHP, xmlHTTP)
 {
 				alert('callback: ' + callback +
-						' xmlHTTP=' + xmlHTTP);	
+						' xmlHTTP=' + xmlHTTP + 
+						' responseText=' + xmlHTTP.responseText);	
 			var responseHeaders = xmlHTTP.getAllResponseHeaders().
 				split("\r\n");
 			// getAllResponseHeaders() seems to return 1 more than there 
@@ -105,6 +130,8 @@ PendingHttpRequest.prototype.processResponse = function( callback,
 			// otherwise we get it out of the debugMgr json
 			var json=null;
 			if(debugPHP) {
+				/* TODO what we do after the debug session has finished
+				needs to be sorted
 				json = JSON.parse(xmlHTTP.responseText); 
 				if(xmlHTTP.status==200 && json.response) {
 					for(header in json.response.headers) {
@@ -117,6 +144,18 @@ PendingHttpRequest.prototype.processResponse = function( callback,
 					this.editableResponse.statusText = 
 						json.response.status.message;
 					this.editableResponse.content = json.response.content;
+				} else {
+					this.editableResponse.status = xmlHTTP.status;
+					this.editableResponse.statusText = xmlHTTP.statusText;
+					this.editableResponse.content="";
+				}
+				*/
+
+				// fix for now by placing the response text inside the 
+				// content
+				// TODO we still need to deal with different types of content
+				if(xmlHTTP.status==200) {
+					this.editableResponse.content = xmlHTTP.responseText; 
 				} else {
 					this.editableResponse.status = xmlHTTP.status;
 					this.editableResponse.statusText = xmlHTTP.statusText;
