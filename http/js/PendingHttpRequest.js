@@ -132,30 +132,24 @@ PendingHttpRequest.prototype.processResponse = function( callback,
 			if(debugPHP) {
 				/* TODO what we do after the debug session has finished
 				needs to be sorted
+				Now JSON isn't being sent back, but straight response text
 				json = JSON.parse(xmlHTTP.responseText); 
-				if(xmlHTTP.status==200 && json.response) {
+				*/
+				if(xmlHTTP.status==200) { // && json.response) {
+					/*
 					for(header in json.response.headers) {
 						if(header!="Server") {
 							this.editableResponse.headers[header] = 
 								json.response.headers[header];
 						}
 					}
-					this.editableResponse.status = json.response.status.code;
-					this.editableResponse.statusText = 
-						json.response.status.message;
-					this.editableResponse.content = json.response.content;
-				} else {
-					this.editableResponse.status = xmlHTTP.status;
-					this.editableResponse.statusText = xmlHTTP.statusText;
-					this.editableResponse.content="";
-				}
-				*/
-
-				// fix for now by placing the response text inside the 
-				// content
-				// TODO we still need to deal with different types of content
-				if(xmlHTTP.status==200) {
-					this.editableResponse.content = xmlHTTP.responseText; 
+					*/
+					//this.editableResponse.status = json.response.status.code;
+					this.editableResponse.status = 200;
+					this.editableResponse.statusText =  xmlHTTP.statusText;
+	//					json.response.status.message;
+					this.editableResponse.content =  xmlHTTP.responseText;
+	//json.response.content;
 				} else {
 					this.editableResponse.status = xmlHTTP.status;
 					this.editableResponse.statusText = xmlHTTP.statusText;
