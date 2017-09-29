@@ -36,7 +36,8 @@ function init() {
                              
                             );
 
-    var phpAnimation = new PHPAnimation({divId:"serverContent"});
+    var phpAnimation = new PHPAnimation({divId:"serverContent",
+										consoleElement: "console"});
 
     var animation = new HTTPAnimation({parentId: 'network',
                                         height:canvasHeight,

@@ -156,6 +156,7 @@ LoopAnimation.prototype.createResultsDiv = function(i, x, y, hostDiv) {
     var div = document.createElement("div");
     var table = document.createElement("table");
 
+	/*
     var sqlquery = this.phpAnim.getSQLQuery(i);
 
     for(var row=0; row<sqlquery.results.length; row++) {
@@ -208,11 +209,7 @@ LoopAnimation.prototype.createResultsDiv = function(i, x, y, hostDiv) {
 
     div.appendChild(titlebar);
     div.appendChild(table);
-    /*
-    var play = document.createElement("input");
-    play.setAttribute("type", "button");    
-    play.setAttribute("value", "Show Loop Running");    
-    */
+
     var play = document.createElement("img");
     play.setAttribute("alt", "Play/Resume Loop");
     play.setAttribute("src", "assets/images/control_play_blue.2.png");
@@ -267,7 +264,7 @@ LoopAnimation.prototype.createResultsDiv = function(i, x, y, hostDiv) {
         parent: div
         } );
     slider.setValue(this.interval);
-
+	*/
     var console = document.createElement("div");
     console.setAttribute("id", "databaseResultsConsole");
     console.style.height="200px";
@@ -278,7 +275,8 @@ LoopAnimation.prototype.createResultsDiv = function(i, x, y, hostDiv) {
     console.style.border="1px solid white";
     console.innerHTML = "--Output--<br />";
     div.appendChild(console);
-    return { x: x+"px", hideOnMouseOut:false, y: (y+200)+"px", node: div };
+    return { x: x+"px", hideOnMouseOut:false, y: (y+200)+"px", node: div,
+				console:console, w: '800px' };
 }
 
 LoopAnimation.prototype.clearConsole = function() {

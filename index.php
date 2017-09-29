@@ -76,7 +76,8 @@ class EPHPPage extends Page {
 				<img src='assets/images/web_server.small.png'
 				alt='server' />
 			</div>
-			<div id="serverContent"> </div>
+			<div id="serverContent"> 
+    		</div>
 		</div>
 
 		<div id='dbconnect'>
@@ -97,8 +98,8 @@ class EPHPPage extends Page {
 
 		</div>
 
-
-		<div id="msg"></div>
+		<div id="msg">msg</div>
+		<div id="msg2" style="background-color: white; color: black; font-family: Courier; border: 1px solid black; overflow: auto; height: 160px; width:800px;float:left">--messages--</div>
 
 
 
@@ -120,6 +121,8 @@ $scripts = array
 			'php/js/PHPAnimation.js',
 			'php/js/LoopAnimation.js',
 			'php/js/DBAnimation.js',
+			'php/js/DebugMgr.js',
+			'php/js/VarsBox.js',
 			'lib/js/Slider.js',
 			'http://www.free-map.org.uk/jslib/PromiseAjax.js',
 			'http://www.free-map.org.uk/jslib/Dialog.js',
