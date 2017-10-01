@@ -119,7 +119,7 @@ $scripts = array
 			'http/js/MessageBox.js',
 			'http/js/ServerFilesystemAnimation.js',
 			'php/js/PHPAnimation.js',
-			'php/js/LoopAnimation.js',
+			'php/js/DBResults.js',
 			'php/js/DBAnimation.js',
 			'php/js/DebugMgr.js',
 			'php/js/VarsBox.js',

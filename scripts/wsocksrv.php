@@ -53,16 +53,11 @@ class MessageHandler implements MessageComponentInterface {
     public function onDbgMsg($json) {
         $data = json_decode($json);    
         if(isset($data->error)) {
+			// TODO...
         } elseif(isset($data->cmd)) {
-            switch($data->cmd) {
-                case "line":
-                case "newrow":
-                    if($this->clients[$this->clientIDs[$data->user]]){
-                        $this->clients[$this->clientIDs[$data->user]]->
-                            send(json_encode($data));
-                    }
-					
-                    break;
+			if($this->clients[$this->clientIDs[$data->user]]){
+				$this->clients[$this->clientIDs[$data->user]]->
+					send(json_encode($data));
             }
         }
     }

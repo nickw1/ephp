@@ -31,8 +31,12 @@ class EPHPXDClient extends XDClient\VarWatcher  {
                         $loop=$this->lf->getLoops([$n1]);
                         if($loop!==false) {
                             $this->loops->addLoop($loop);
-                            $this->loops->setResults($n1, 
-                                $this->executeSQL($sql));
+							$results = $this->executeSQL($sql); 
+                            $this->loops->setResults($n1, $results);
+							$this->emitter->emit
+								(["cmd"=>"dbresults","data"=>
+									["varName"=>$n1,"results"=>$results]]);
+								
                         }
                     }
                 

@@ -66,6 +66,10 @@ DebugMgr.prototype.connect = function(method, url, formData) {
                 case 'stdout':
                     this.dbgMsgHandler.handleStdout(data.data);
                     break;
+				
+				case 'dbresults':
+					this.dbgMsgHandler.handleDBResults(data.data);
+					break;
 
                 case 'stop':
                     this.dbgMsgHandler.handleStop();

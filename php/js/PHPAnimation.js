@@ -56,9 +56,23 @@ function PHPAnimation(options) {
 
 	this.varWindow.innerHTML += "<strong>--Vars--</strong><br />";
 	
+	this.dbWindow = document.createElement("div");
+
+	this.dbWindow.style.backgroundColor = '#ffffc0';
+	this.dbWindow.style.color = 'black';
+	this.dbWindow.style.border = '1px solid black';
+	this.dbWindow.style.font = '10pt Helvetica';
+	this.dbWindow.style.position = 'absolute';
+	this.dbWindow.style.left = '300px';
+	this.dbWindow.style.top = '300px';
+	this.dbWindow.style.width = '800px';
+	this.dbWindow.style.overflow = 'auto';
+	this.dbWindow.style.display = 'none';
+	this.dbWindow.style.zIndex = 4;
+
 	this.varsBox = new VarsBox(this.varWindow);
 
-    this.loopAnimation = new LoopAnimation(this);
+    this.dbResults = new DBResults(this);
     this.dbAnimation = options.dbAnimation || null;
 
     this.interval = options.interval || 1000;
@@ -106,7 +120,6 @@ PHPAnimation.prototype.setupGUI = function() {
     var slider = new Slider(2000, 10, {
         onchange: (value)=> {
             this.interval = value;
-            this.loopAnimation.interval = value;
         } ,
 
         parent: this.btndiv
@@ -117,7 +130,6 @@ PHPAnimation.prototype.setupGUI = function() {
     this.btndiv.appendChild(btn);    
 
 
-	var p = this.loopAnimation.createResultsDiv (0, 0, 0, this.consoleWindow);
 	this.consoleWindow.appendChild(p.node);
 	this.console = p.console;
 }
@@ -127,6 +139,7 @@ PHPAnimation.prototype.setupGUI = function() {
 PHPAnimation.prototype.showSrc = function(data) {
 	this.consoleWindow.style.display = 'block';
 	this.varWindow.style.display = 'block';
+	this.dbWindow.style.display = 'block';
 	console.log("consoleWindow: settiong display blick");
     var codeLines = data.src || [];
     this.isRunning = true;
@@ -174,6 +187,7 @@ PHPAnimation.prototype.showSrc = function(data) {
 		console.log("consoleWindow: settiong display blick");
 
 		this.div.appendChild(this.varWindow);
+		this.div.appendChild(this.dbWindow);
 
         return true;
     }
@@ -182,15 +196,20 @@ PHPAnimation.prototype.showSrc = function(data) {
 PHPAnimation.prototype.handleLine = function(data) {
     this.unhighlightLastLine();
     this.highlightLine(data.lineno);
+	for(varName in data.vars) {
+		switch(data.vars[varName]) {
+			case 'string':
+				this.varsBox.setVar(varName, data.vars[varName].value);
+				break;
+		}
+	}
     if(this.varsBox) {
         this.varsBox.setMultipleVars(data.vars);
     }
 }
 
 PHPAnimation.prototype.handleNewRow = function(data) {
-// row: {type:"array", "value": { array }
-    var id = data;
-
+	this.dbResults.highlightRow(data);
 }
 
 PHPAnimation.prototype.handleStdout = function(data)  {
@@ -199,6 +218,10 @@ PHPAnimation.prototype.handleStdout = function(data)  {
 	if(this.console!==null) {
 		this.console.innerHTML += data.replace("\n","<br />");
 	}
+}
+
+PHPAnimation.prototype.handleDBResults = function(data) {
+	this.dbResults.showResults(data, this.dbWindow);
 }
 
 PHPAnimation.prototype.handleStop = function() {
@@ -228,7 +251,6 @@ PHPAnimation.prototype.stop = function() {
 	
         this.isRunning = false;
     }
-    this.loopAnimation.stop();
 }
 
 PHPAnimation.prototype.clearTimer = function() {
