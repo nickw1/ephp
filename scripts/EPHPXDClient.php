@@ -10,6 +10,7 @@ require_once('dbpass.php');
 //class EPHPXDClient extends VarWatcherXDClient {
 class EPHPXDClient extends XDClient\VarWatcher  {
     protected  $lineno, $curLine, $loops, $dbconn, $lf, $user;
+    protected $startTime;
 
     public function __construct($filename, MultiUserEmitter $emitter) {
 
@@ -18,6 +19,7 @@ class EPHPXDClient extends XDClient\VarWatcher  {
         $this->filename = $filename;
         $this->loops = new DBLoops();
         $this->lf = new DBLoopFinder($filename);
+        $this->startTime = time();
     }
 
     public function handleObject($n, $prop) {
@@ -26,17 +28,23 @@ class EPHPXDClient extends XDClient\VarWatcher  {
                 case "PDOStatement":
                     if ($this->dbconn!==false && $prop["children"]==1) {
                         $sql = base64_decode($prop->property);
-                        $this->vars[$n] = ["type"=>"query", "value"=>$sql];
+                        echo "this->vars...\n";
+                        print_r($this->vars);
                         $n1 = str_replace('$','',$n);
-                        $loop=$this->lf->getLoops([$n1]);
-                        if($loop!==false) {
-                            $this->loops->addLoop($loop);
-							$results = $this->executeSQL($sql); 
-                            $this->loops->setResults($n1, $results);
-							$this->emitter->emit
-								(["cmd"=>"dbresults","data"=>
-									["varName"=>$n1,"results"=>$results]]);
-								
+                        if(!isset($this->vars[$n])) {
+                            echo "this->vars(inside isset)...";
+                            $this->vars[$n] = ["type"=>"query", "value"=>$sql];
+                            print_r($this->vars);
+                            $loop=$this->lf->getLoops([$n1]);
+                            if($loop!==false) {
+                                $this->loops->addLoop($loop);
+                                $results = $this->executeSQL($sql); 
+                                $this->loops->setResults($n1, $results);
+                                $this->emitter->emit
+                                    (["cmd"=>"dbresults","data"=>
+                                    ["varName"=>$n1,"results"=>$results]]);
+                                
+                            }
                         }
                     }
                 
@@ -48,8 +56,9 @@ class EPHPXDClient extends XDClient\VarWatcher  {
     public function handleArray($n, $prop) {
         parent::handleArray($n, $prop);
         $loop = $this->loops->getMatchingLoop($this->lineno);
+        $n1 = str_replace('$','',$n);
         // if the loop's rowvar matches this variable...
-        if($loop!==false && $loop["rowvar"]== str_replace('$','',$n)) {
+        if($loop!==false && $loop["rowvar"]== $n1) {
             $row = $this->vars[$n]["value"];    
                         
             // find the row's id if it has one

@@ -3,6 +3,7 @@ function DBResults(phpAnim) {
 }
 
 DBResults.prototype.highlightRow = function(id) {
+	console.log("DBResults.highlightRow(): id=" + id);
     if(this.lastId) {
         var lastRow = document.getElementById('rec'+this.lastId);
         lastRow.classList.remove("selected");
@@ -11,8 +12,9 @@ DBResults.prototype.highlightRow = function(id) {
             tds[i].classList.remove('selected');
         }
     }
+	console.log('trying to get eelemnt: rec'+id);
     var thisRow = document.getElementById('rec'+id);
-    var tds = thistRow.getElementsByTagName('td');
+    var tds = thisRow.getElementsByTagName('td');
     for(var i=0; i<tds.length; i++) {
         tds[i].classList.add('selected');
     }
@@ -38,12 +40,14 @@ DBResults.prototype.showResults = function(sqlquery, hostDiv) {
             tr=document.createElement("tr");
         }
         id = sqlquery.results[row].id ? sqlquery.results[row].id : 
-            -(row+1);
+            (sqlquery.results[row].ID ? sqlquery.results[row].ID :-(row+1));
         tr.setAttribute('id','rec'+id);
+		console.log('created element: rec'+id);
 
         for(var col in sqlquery.results[row]) {
             var td=document.createElement("td");
             td.setAttribute("id", "rec"+id+"_" + col);
+            console.log("Creating rec"+id+"_" + col);
             td.appendChild
                 (document.createTextNode
                     (sqlquery.results[row][col]));
@@ -62,8 +66,8 @@ DBResults.prototype.showResults = function(sqlquery, hostDiv) {
 
     close.addEventListener("click",
         (e)=> {
-            this.pauseLoopAnimate();
-            this.resetLoop();
+            //this.pauseLoopAnimate();
+            //this.resetLoop();
             hostDiv.style.display='none';
         });
 
@@ -98,21 +102,21 @@ DBResults.prototype.showResults = function(sqlquery, hostDiv) {
          this.interval = 2000.0 / e.target.value;
         });
 
-    play.addEventListener("click", this.resumeLoopAnimate.bind(this));
-    pause.addEventListener("click",this.pauseLoopAnimate.bind(this)); 
+//    play.addEventListener("click", this.resumeLoopAnimate.bind(this));
+//    pause.addEventListener("click",this.pauseLoopAnimate.bind(this)); 
 
     rewind.addEventListener("click", 
         (e)=> {
             document.getElementById("row"+this.rowIndex).
                 classList.remove("selected");
             if(this.contLoopAnimate) {
-                this.pauseLoopAnimate();
+                //this.pauseLoopAnimate();
         }
         document.getElementById("row"+this.rowIndex).classList.
                     remove("selected");
-            this.unselectSelectedCells();
-            this.resetLoop();
-            this.clearConsole();
+            //this.unselectSelectedCells();
+            //this.resetLoop();
+            //this.clearConsole();
     //            this.resumeLoopAnimate();
             
         });

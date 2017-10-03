@@ -15,20 +15,8 @@ function PHPAnimation(options) {
         elem = elem.offsetParent;
     }
     this.consoleWindow = document.createElement("div");
-	var props =
-		{ 'backgroundColor' : '#ffffc0',
-			'color' : 'white',
-			'border': '1px solid black',
-			'font' : '10pt Helvetica',	
-			'position' : 'absolute',
-			'left' : '0px',
-			'top' : '0px',
-			'width' : '800px',
-			'overflow' : 'auto',
-			'display': 'none',
-			'zIndex' : 2 };
 
-	this.consoleWindow.style.backgroundColor = '#ffffc0';
+	this.consoleWindow.style.backgroundColor = 'black';
 	this.consoleWindow.style.color = 'white';
 	this.consoleWindow.style.border = '1px solid black';
 	this.consoleWindow.style.font = '10pt Courier New';
@@ -128,10 +116,6 @@ PHPAnimation.prototype.setupGUI = function() {
 
     this.btndiv.appendChild(document.createElement("br"));
     this.btndiv.appendChild(btn);    
-
-
-	this.consoleWindow.appendChild(p.node);
-	this.console = p.console;
 }
 
 // this now just shows the source codee codeLines
@@ -209,14 +193,15 @@ PHPAnimation.prototype.handleLine = function(data) {
 }
 
 PHPAnimation.prototype.handleNewRow = function(data) {
+	console.log("handleNewRow(): " + data);
 	this.dbResults.highlightRow(data);
 }
 
 PHPAnimation.prototype.handleStdout = function(data)  {
 	console.log("Stdout command: " + data);
     // TODO handle stdout sent from the debugger
-	if(this.console!==null) {
-		this.console.innerHTML += data.replace("\n","<br />");
+	if(this.consoleWindow!==null) {
+		this.consoleWindow.innerHTML += data.replace("\n","<br />");
 	}
 }
 
