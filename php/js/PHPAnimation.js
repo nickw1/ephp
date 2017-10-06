@@ -2,63 +2,38 @@
 // ref sqlquery - this.data.sqlqueries[queeyIndex]
 
 function PHPAnimation(options) {
-    this.div = document.getElementById(options.divId);
+	this.parentDiv = document.getElementById(options.divId);
+    this.srcDiv = document.createElement("div");
+	this.srcDiv.style.height = '50%';
     this.callback = options.callback || null; 
     this.browserCallback = options.browserCallback || null;
     this.audio = new Audio('assets/sound/Game-Spawn.ogg');
 
-    this.divPos = {x:0, y:0};
-    var elem = this.div;
+    this.srcDivPos = {x:0, y:0};
+    var elem = this.parentDiv;
     while(elem != null) {
-        this.divPos.x += elem.offsetLeft;
-        this.divPos.y += elem.offsetTop;
+        this.srcDivPos.x += elem.offsetLeft;
+        this.srcDivPos.y += elem.offsetTop;
         elem = elem.offsetParent;
     }
     this.consoleWindow = document.createElement("div");
-
-	this.consoleWindow.style.backgroundColor = 'black';
-	this.consoleWindow.style.color = 'white';
-	this.consoleWindow.style.border = '1px solid black';
-	this.consoleWindow.style.font = '10pt Courier New';
-	this.consoleWindow.style.position = 'absolute';
-	this.consoleWindow.style.left = '0px';
-	this.consoleWindow.style.top = '0px';
-	this.consoleWindow.style.width = '800px';
-	this.consoleWindow.style.overflow = 'auto';
-	this.consoleWindow.style.display = 'none';
-	this.consoleWindow.style.zIndex = 2;
-
+	this.consoleWindow.innerHTML += "<strong>--Console--</strong><br />";
+	this.consoleWindowInner = document.createElement("div");
+	this.consoleWindow.appendChild(this.consoleWindowInner);
 	this.varWindow = document.createElement("div");
-
-	this.varWindow.style.backgroundColor = 'blue';
-	this.varWindow.style.color = 'yellow';
-	this.varWindow.style.border = '1px solid black';
-	this.varWindow.style.font = '10pt Courier New';
-	this.varWindow.style.position = 'absolute';
-	this.varWindow.style.left = '200px';
-	this.varWindow.style.top = '200px';
-	this.varWindow.style.width = '200px';
-	this.varWindow.style.overflow = 'auto';
-	this.varWindow.style.display = 'none';
-	this.varWindow.style.zIndex = 3;
-
 	this.varWindow.innerHTML += "<strong>--Vars--</strong><br />";
-	
+	this.varWindowInner = document.createElement("div");
+	this.varWindow.appendChild(this.varWindowInner);
 	this.dbWindow = document.createElement("div");
+	this.dbWindow.innerHTML += "<strong>DB Results:</strong><br />";
+	this.dbWindowInner = document.createElement("div");
+	this.dbWindow.appendChild(this.dbWindowInner);
+	this.consoleWindow.setAttribute("class","srcconsole");
+	this.varWindow.setAttribute("class","srcvar");
+	this.dbWindow.setAttribute("class","srcdb");
 
-	this.dbWindow.style.backgroundColor = '#ffffc0';
-	this.dbWindow.style.color = 'black';
-	this.dbWindow.style.border = '1px solid black';
-	this.dbWindow.style.font = '10pt Helvetica';
-	this.dbWindow.style.position = 'absolute';
-	this.dbWindow.style.left = '300px';
-	this.dbWindow.style.top = '300px';
-	this.dbWindow.style.width = '800px';
-	this.dbWindow.style.overflow = 'auto';
-	this.dbWindow.style.display = 'none';
-	this.dbWindow.style.zIndex = 4;
 
-	this.varsBox = new VarsBox(this.varWindow);
+	this.varsBox = new VarsBox(this.varWindowInner);
 
     this.dbResults = new DBResults(this);
     this.dbAnimation = options.dbAnimation || null;
@@ -92,13 +67,18 @@ PHPAnimation.prototype.setupGUI = function() {
     btn.setAttribute("value","Run PHP and send back output");
     btn.addEventListener("click", ()=> {
         this.showing=false;
-        while(this.div.childNodes.length > 0) {
-            this.div.removeChild(this.div.firstChild);
+		this.varWindowInner.innerHTML = this.dbWindowInner.innerHTML = 
+			this.consoleWindowInner.innerHTML = "";
+        while(this.parentDiv.childNodes.length > 0) {
+			var d = this.parentDiv.firstChild;
+			console.log("REMOVING:"  + d.innerHTML);
+            this.parentDiv.removeChild(d);
         }
+
         for(var i=0; i<this.originalDivContents.length; i++) {
-            this.div.appendChild(this.originalDivContents[i]); 
+            this.parentDiv.appendChild(this.originalDivContents[i]); 
         }
-        this.div.classList.remove("serverCode");
+        this.parentDiv.classList.remove("serverCode");
         if(this.callback) {
             this.callback();
         }
@@ -121,6 +101,7 @@ PHPAnimation.prototype.setupGUI = function() {
 // this now just shows the source codee codeLines
 // codeLines is now an array of codeLines
 PHPAnimation.prototype.showSrc = function(data) {
+	this.srcDiv.innerHTML = "";
 	this.consoleWindow.style.display = 'block';
 	this.varWindow.style.display = 'block';
 	this.dbWindow.style.display = 'block';
@@ -131,15 +112,16 @@ PHPAnimation.prototype.showSrc = function(data) {
         // If showing some other code from a previous request, blank out the
         // div, otherwise save the original contents
         if(this.showing) {
-            this.div.innerHTML = "";
+            this.parentDiv.innerHTML = "";
         } else {
             this.showing=true;
             this.originalDivContents = [];
-            while(this.div.childNodes.length > 0) {    
-                this.originalDivContents.push(this.div.firstChild);
-                this.div.removeChild(this.div.firstChild);
+            while(this.parentDiv.childNodes.length > 0) {    
+                this.originalDivContents.push(this.parentDiv.firstChild);
+                this.parentDiv.removeChild(this.parentDiv.firstChild);
             }
-            this.div.classList.add("serverCode");
+            this.parentDiv.classList.add("serverCode");
+			this.parentDiv.appendChild(this.srcDiv);
         }
 
         this.codeLines = [];
@@ -158,20 +140,18 @@ PHPAnimation.prototype.showSrc = function(data) {
               lineNoSpan.appendChild(document.createTextNode(lineNoText));
               line = document.createElement("span");
               line.setAttribute("class", "code");
-              this.div.appendChild(lineNoSpan);
+              this.srcDiv.appendChild(lineNoSpan);
               line.appendChild(document.createTextNode(codeLines[i]));
-              this.div.appendChild(line);
-              this.div.appendChild(document.createElement("br"));
+              this.srcDiv.appendChild(line);
+              this.srcDiv.appendChild(document.createElement("br"));
               this.codeLines.push(line);
             }
         }
-		this.div.appendChild(this.btndiv);
-		this.div.appendChild(this.consoleWindow);
-		this.consoleWindow.style.display = 'block';
-		console.log("consoleWindow: settiong display blick");
-
-		this.div.appendChild(this.varWindow);
-		this.div.appendChild(this.dbWindow);
+		console.log("APPENDING DIVS TO PARENTDIV");
+		this.parentDiv.appendChild(this.btndiv);
+		this.parentDiv.appendChild(this.dbWindow);
+		this.parentDiv.appendChild(this.consoleWindow);
+		this.parentDiv.appendChild(this.varWindow);
 
         return true;
     }
@@ -201,12 +181,13 @@ PHPAnimation.prototype.handleStdout = function(data)  {
 	console.log("Stdout command: " + data);
     // TODO handle stdout sent from the debugger
 	if(this.consoleWindow!==null) {
-		this.consoleWindow.innerHTML += data.replace("\n","<br />");
+		this.consoleWindowInner.innerHTML += data.replace("<","&lt;").
+				replace(">","&gt;").replace("\n","<br />");
 	}
 }
 
 PHPAnimation.prototype.handleDBResults = function(data) {
-	this.dbResults.showResults(data, this.dbWindow);
+	this.dbResults.showResults(data, this.dbWindowInner);
 }
 
 PHPAnimation.prototype.handleStop = function() {
@@ -231,7 +212,7 @@ PHPAnimation.prototype.stop = function() {
 		console.log("consoleWindow display none");	
        this.consoleWindow.style.display='none';
         if(this.showing) {
-            this.div.removeChild(this.consoleWindow);
+            //this.srcDiv.removeChild(this.consoleWindow);
         }
 	
         this.isRunning = false;

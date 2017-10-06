@@ -29,6 +29,8 @@ PendingHttpRequest.prototype.setPostData = function(postDataQS) {
 // it might for example run the http respojse part of an animation, to ensure
 // we have the response available
 PendingHttpRequest.prototype.send = function(callback, debugMgr=null) {
+	this.debugMgr = debugMgr;
+
 	var noQsUrl = this.url.indexOf("?")==-1 ? this.url: this.url.split("?")[0];
 	var debugPHP = debugMgr!=null && 
 		noQsUrl.substring(noQsUrl.length-4)==".php",
@@ -52,23 +54,24 @@ PendingHttpRequest.prototype.send = function(callback, debugMgr=null) {
 			
 				// TODO send the php to the code window...	
 				var data= JSON.parse(xmlHTTP.responseText);
+
 				callback(data);
 
 				// launch the dbebug process
-				var scriptUrl = this.url;
+				this.scriptUrl = this.url;
 				// Kill the cache - this caused no reload at times
 				if(this.method=='GET') {
-					scriptUrl+="?killcache="+new Date().getTime()+
+					this.scriptUrl+="?killcache="+new Date().getTime()+
 						"&";
 					var parts = this.url.split("?");
-					scriptUrl+=(parts.length==2 ? parts[0]+"&"+parts[1] : 
+					this.scriptUrl+=(parts.length==2 ? parts[0]+"&"+parts[1] : 
 						this.url);
 				} else if (this.method=='POST') {
 			//TODO  do nothing???
 				}		 
-				debugMgr.setCompleteCallback (this.processResponse.bind(this,
-					callback, debugPHP));
-				debugMgr.runLauncher(this.method, scriptUrl, this.formData);
+				// can this goi  in callback?
+				
+				// todo WTF? WHY IS CALLBACK RUN TWICWE???
 
 			} );
 
@@ -78,6 +81,12 @@ PendingHttpRequest.prototype.send = function(callback, debugMgr=null) {
 		http.send (this.method, actualUrl, this.formData).then
 			(this.processResponse.bind(this, callback, debugPHP));
 	}
+}
+
+PendingHttpRequest.prototype.launchDebugMgr = function() {
+	this.debugMgr.setCompleteCallback (this.processResponse.bind(this,
+				null, true));
+	this.debugMgr.runLauncher(this.method, this.scriptUrl, this.formData);
 }
 
 PendingHttpRequest.prototype.getRequest = function() {
@@ -162,7 +171,7 @@ PendingHttpRequest.prototype.processResponse = function( callback,
 				this.editableResponse.status = xmlHTTP.status;
 				this.editableResponse.statusText = xmlHTTP.statusText;
 			}
-			callback(xmlHTTP);
+			if(callback) callback(xmlHTTP); // TODO wtf? why being called twixe?
 			//Note:
 			// -url is always relative (to root, no server) e.g. /~ephp001/..
 			// -responseURL contains full server details

@@ -45,8 +45,11 @@ function init() {
                                     step : 2,
                                     fileExplorer: fileExplorer,
                                     serverAnimation: phpAnimation,
-
-				onerror: ()=> { }
+									componentAnimator:	
+										new ComponentAnimator
+											(3000, 150, 100,
+												'client', 'network', 'server'),
+									onerror: ()=> { }
 			});
 
     var browser = new Browser({divId: 'content', 
@@ -363,8 +366,5 @@ function init() {
 }
 
 function msg(msg, bold=false) {
-	document.getElementById('msg2').innerHTML += 
-		(bold?"<strong>":"")+msg + 
-		(bold?"</strong>":"")+
-		 "<br />";
 }
+
