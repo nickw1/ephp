@@ -73,7 +73,7 @@ Browser.prototype.sendRequest = function(method,url,formData) {
                 callback: this.loadResponse.bind(this),
                 server: parts[1]?parts[1].replace("http://",""):
                         window.location.hostname,
-                analyser: 'php/retriever.php'
+                sourceRetriever: 'php/retriever.php'
               }
             );
 

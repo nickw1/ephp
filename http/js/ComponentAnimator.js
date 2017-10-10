@@ -1,12 +1,12 @@
 
 function ComponentAnimator (totalTime, interval, minWidth,
-		clientId, networkId, serverId){
+        clientId, networkId, serverId){
     this.interval = interval;
     var nSteps = totalTime / this.interval;
 
-	this.client = document.getElementById(clientId);
-	this.network = document.getElementById(networkId);
-	this.server = document.getElementById(serverId);
+    this.client = document.getElementById(clientId);
+    this.network = document.getElementById(networkId);
+    this.server = document.getElementById(serverId);
 
     this.csStep = Math.round(this.client.offsetWidth / nSteps);
     this.netStep = Math.round(this.network.offsetWidth / nSteps);
@@ -15,13 +15,13 @@ function ComponentAnimator (totalTime, interval, minWidth,
     this.origNetworkWidth = this.network.offsetWidth;
     this.origServerWidth = this.server.offsetWidth;
 
-	this.minWidth = minWidth;
+    this.minWidth = minWidth;
 
     this.timer = null;
 }
 
 ComponentAnimator.prototype.setCanvas = function(canvas) {
-	this.networkCanvas = canvas;
+    this.networkCanvas = canvas;
 }
 
 ComponentAnimator.prototype.startForwardAnim = function(cb) {
@@ -48,34 +48,36 @@ ComponentAnimator.prototype.doAnim = function (direction, cb) {
 
     shrinker.style.width = (shrinker.offsetWidth-this.csStep)+"px";
     this.network.style.width = (this.network.offsetWidth-
-			(this.netStep*direction))+"px";
-    this.networkCanvas.width = (this.network.offsetWidth-
-			(this.netStep*direction))+"px";
+            (this.netStep*direction))+"px";
+    console.log("network width (componentAnimator)="+this.network.offsetWidth);
+    this.networkCanvas.width = this.network.offsetWidth; 
+    console.log("canvas width (ComponentAnimator)=" + this.networkCanvas.width);
     grower.style.width =  (grower.offsetWidth+this.csStep+this.netStep)+"px"; 
 
-	document.getElementById("client_img").width = 
-		(shrinker.offsetWidth> 75 ? 75: shrinker.offsetWidth);
-	document.getElementById("network_img").width = 
-		(this.network.offsetWidth> 75 ? 75: this.network.offsetWidth);
+    document.getElementById("client_img").width = 
+        (shrinker.offsetWidth> 75 ? 75: shrinker.offsetWidth);
+    document.getElementById("network_img").width = 
+        (this.network.offsetWidth> 75 ? 75: this.network.offsetWidth);
 
     if(direction==1 && this.client.offsetWidth<this.minWidth+this.csStep) {
-		this.client.style.width = this.minWidth + 'px';
-		this.network.style.width = this.minWidth*
-			(this.origNetworkWidth/this.origClientWidth)+"px";
-		this.finishAnim(cb);
+        this.client.style.width = this.minWidth + 'px';
+        this.network.style.width = this.minWidth*
+            (this.origNetworkWidth/this.origClientWidth)+"px";
+        this.finishAnim(cb);
     } else if (direction==-1 && this.client.offsetWidth>
                 this.origClientWidth-this.csStep) {
         this.client.style.width = this.origClientWidth+'px';
         this.network.style.width = this.origNetworkWidth+'px';
+        this.networkCanvas.width = this.network.offsetWidth;
         this.server.style.width = this.origServerWidth+'px';
-		this.finishAnim(cb);
+        this.finishAnim(cb);
     }
 }
 
 ComponentAnimator.prototype.finishAnim = function (cb) {
-	clearTimeout(this.timer);
-	this.timer = null;
-	if(cb) {
-		cb();
-	}
+    clearTimeout(this.timer);
+    this.timer = null;
+    if(cb) {
+        cb();
+    }
 }

@@ -29,52 +29,37 @@ HTTPAnimation.prototype.fireAnimation = function()  {
 // Overridden to do the ServerFilesystemAnimation and analyser stuff
 HTTPAnimation.prototype.finishRequest = function() {
 
-        /*
-        var dbgMsgHandler = { 
-            handleLine: function(data) {
-                msg("LINE: number="+ data.lineno); 
-                this.serverAnimation.receiveLineCommand(data);
-            },
-            handleNewRow: function(data) {
-                msg("NEWROW: id="+ data); 
-                this.serverAnimation.receiveNewrowCommand(data);
-            },
-            handleStop: function() {
-                msg("STOPPED");
-            }
-        };
-        */
-
         var debugMgr = new DebugMgr("/ephpii/php/launcher.php",
                 { dbgMsgHandler: this.serverAnimation } );
 
         var urlParts = this.message.url.split("/");    
 
-        // TODO this whole damned process is getting horribly convoluted...
-        // sort it out!
         var sa = new ServerFilesystemAnimation(
             {fileExplorer: this.fileExplorer,
             urlParts: urlParts,
             repeat:2, 
             interval:500, 
             callback: ()=> {
-                 this.message.send( 
-                        (data)=> {
-                            if(data.errors) {
-                                alert("error(s):\n" + data.errors.join("\n"));
-                            } else if (this.componentAnimator) { 
-                                // should only start the debugmgr once
-                                // the compoonent animator has finished
-                				this.componentAnimator.startForwardAnim  (
+				if(this.message.isPHPScript()) {
+					this.message.retrieveSrc ( (data) => {
+						if(data.errors) {
+							alert("error(s):\n" + data.errors.join("\n"));
+						} else if (this.componentAnimator) { 
+							// should only start the debugmgr once
+							// the compoonent animator has finished
+							this.componentAnimator.startForwardAnim(
+								this.showSrcAndLaunchDebug.bind
+									(this, data, debugMgr));
 
-                        			() => {
-                            			this.serverAnimation.showSrc(data);
-                            			this.message.launchDebugMgr();
-                        			});
-                            }
-                        } , debugMgr);
-                }
-            });
+						} else {
+							this.showSrcAndLaunchDebug(data, debugMgr);
+						}
+					});
+				} else {
+                 	this.message.send(this.startResponse.bind(this));
+				}
+			}
+		});
         sa.animate();
 }
 
@@ -83,4 +68,12 @@ HTTPAnimation.prototype.startResponse = function() {
         this.componentAnimator.startReverseAnim
             (GenericAnimation.prototype.startResponse.bind(this));
     }    
+}
+
+HTTPAnimation.prototype.showSrcAndLaunchDebug = function(data, debugMgr) {
+	this.serverAnimation.showSrc(data);
+	debugMgr.launchDebugSession (this.message.url, this.message.method,
+										(xmlHTTP) => {
+							this.message.processResponse(xmlHTTP, true);
+									});
 }

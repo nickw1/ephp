@@ -123,6 +123,8 @@ GenericAnimation.prototype.fireAnimation = function(){
 GenericAnimation.prototype.doAnimate = function(messageType) {
     this.animationState = messageType || this.animationState;
     var direction = (this.animationState==this.messageTypes.RESPONSE) ? -1 : 1;
+	console.log("direction="+direction+" x="+ this.x+ " canvas width=" +
+			this.canvas.width);
     if((direction==1 && this.x < this.canvas.width) || 
         (direction==-1 && this.x>0)) {
         var y = (this.animationState==this.messageTypes.RESPONSE) ?
@@ -202,7 +204,6 @@ GenericAnimation.prototype.finishRequest = function() {
 }
 
 GenericAnimation.prototype.startResponse = function() {
-
     for(var i=0; i<this.onmessagestart.length; i++) {
         this.onmessagestart[i](this.messageTypes.RESPONSE);
     }

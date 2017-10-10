@@ -45,10 +45,9 @@ DebugMgr.prototype.connect = function(method, url, formData) {
                     http.send(method, url+
                         '&XDEBUG_SESSION_START='+
                             this.user, formData).then((xmlHTTP)=>
-                        {alert('script has finished:<br />'
-                            +xmlHTTP.responseText);
-                        if(this.completeCallback != null) {
-                            this.completeCallback(xmlHTTP);
+                        {
+                        	if(this.completeCallback != null) {
+                            	this.completeCallback(xmlHTTP);
                         }
                     // sned back to whatever called this 
                     }).catch((code)=>alert(code));
@@ -100,3 +99,19 @@ DebugMgr.prototype.stopServers = function() {
 DebugMgr.prototype.setCompleteCallback = function(cb) {
     this.completeCallback = cb;
 }
+
+DebugMgr.prototype.launchDebugSession = function(url, method, callback) {
+	var formData = [];
+	// added new code from old version to retrieve the source code
+	// Kill the cache - this caused no reload at times
+		var scriptUrl = url;
+		if(method=='GET') {
+			scriptUrl+="?killcache="+new Date().getTime()+ "&";
+			var parts = url.split("?");
+			scriptUrl+=(parts.length==2 ? parts[0]+"&"+parts[1] : url);
+			this.setCompleteCallback (callback);
+			this.runLauncher(method, scriptUrl, formData);
+		} else if (method=='POST') {
+			//TODO  do nothing???
+		}		 
+} 

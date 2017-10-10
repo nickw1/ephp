@@ -71,7 +71,6 @@ PHPAnimation.prototype.setupGUI = function() {
 			this.consoleWindowInner.innerHTML = "";
         while(this.parentDiv.childNodes.length > 0) {
 			var d = this.parentDiv.firstChild;
-			console.log("REMOVING:"  + d.innerHTML);
             this.parentDiv.removeChild(d);
         }
 
@@ -105,7 +104,6 @@ PHPAnimation.prototype.showSrc = function(data) {
 	this.consoleWindow.style.display = 'block';
 	this.varWindow.style.display = 'block';
 	this.dbWindow.style.display = 'block';
-	console.log("consoleWindow: settiong display blick");
     var codeLines = data.src || [];
     this.isRunning = true;
     if(true) {
@@ -147,7 +145,6 @@ PHPAnimation.prototype.showSrc = function(data) {
               this.codeLines.push(line);
             }
         }
-		console.log("APPENDING DIVS TO PARENTDIV");
 		this.parentDiv.appendChild(this.btndiv);
 		this.parentDiv.appendChild(this.dbWindow);
 		this.parentDiv.appendChild(this.consoleWindow);
@@ -173,12 +170,10 @@ PHPAnimation.prototype.handleLine = function(data) {
 }
 
 PHPAnimation.prototype.handleNewRow = function(data) {
-	console.log("handleNewRow(): " + data);
 	this.dbResults.highlightRow(data);
 }
 
 PHPAnimation.prototype.handleStdout = function(data)  {
-	console.log("Stdout command: " + data);
     // TODO handle stdout sent from the debugger
 	if(this.consoleWindow!==null) {
 		this.consoleWindowInner.innerHTML += data.replace("<","&lt;").
@@ -191,7 +186,6 @@ PHPAnimation.prototype.handleDBResults = function(data) {
 }
 
 PHPAnimation.prototype.handleStop = function() {
-	console.log("STOP received");
 }
 
 PHPAnimation.prototype.highlightLine = function(line) {
@@ -209,7 +203,6 @@ PHPAnimation.prototype.unhighlightLastLine = function(line) {
 PHPAnimation.prototype.stop = function() {
     this.clearTimer();
     if(this.isRunning) {
-		console.log("consoleWindow display none");	
        this.consoleWindow.style.display='none';
         if(this.showing) {
             //this.srcDiv.removeChild(this.consoleWindow);
