@@ -12,15 +12,20 @@ class EPHPXDClient extends XDClient\VarWatcher  {
     protected  $lineno, $curLine, $loops, $dbconn, $lf, $user;
     protected $startTime;
 
-    public function __construct($filename, MultiUserEmitter $emitter) {
+    public function __construct(MultiUserEmitter $emitter) {
 
         parent::__construct($emitter);
         $this->curLine = [];
-        $this->filename = $filename;
         $this->loops = new DBLoops();
-        $this->lf = new DBLoopFinder($filename);
         $this->startTime = time();
     }
+
+	public function onInit($doc) {
+		parent::onInit($doc);
+		if($doc["fileuri"]) {
+			$this->lf = new DBLoopFinder((string)$doc["fileuri"]);
+		}
+	}
 
     public function handleObject($n, $prop) {
         parent::handleObject($n, $prop);
@@ -31,7 +36,7 @@ class EPHPXDClient extends XDClient\VarWatcher  {
                         echo "this->vars...\n";
                         print_r($this->vars);
                         $n1 = str_replace('$','',$n);
-                        if(!isset($this->vars[$n])) {
+                        if(!isset($this->vars[$n]) && $this->lf) {
                             echo "this->vars(inside isset)...";
                             $this->vars[$n] = ["type"=>"query", "value"=>$sql];
                             print_r($this->vars);
@@ -85,15 +90,20 @@ class EPHPXDClient extends XDClient\VarWatcher  {
     }
 
     public function handleIdeKey($idekey) {
-        $loginCredentials = $this->lf->getLoginCredentials();
-        if($loginCredentials["username"]==$idekey) {
-            $this->dbconn = new PDO
+		if($this->lf) {
+        	$loginCredentials = $this->lf->getLoginCredentials();
+        	if($loginCredentials["username"]==$idekey) {
+            	$this->dbconn = new PDO
                     ($loginCredentials["connstring"],
                     $loginCredentials["username"],
                     $loginCredentials["password"]);
-            $this->emitter->setUser($idekey);
+            	$this->emitter->setUser($idekey);
+			} elseif($loginCredentials===false) {
+            	$this->emitter->setUser($idekey);
+			}
+			return true;
         }
-        return true;
+        return false;
     }
 }
 

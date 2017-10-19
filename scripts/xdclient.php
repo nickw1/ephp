@@ -26,8 +26,7 @@ if(count($argv) > 1 && $argv[1]=="stop") {
     register_shutdown_function('unlink_with_test', LOCKFILE);
     try {
         if(@symlink("/proc/".getmypid(),LOCKFILE)!==false) {
-            $dc = new EPHPXDClient("/var/www/html/_ephpii/php/xdtest.php", 
-                     new ZMQEmitter('127.0.0.1', $xdupdateport));
+            $dc = new EPHPXDClient(new ZMQEmitter('127.0.0.1', $xdupdateport));
             $dc->init(9000, $launchport);
             $dc->run();
         } else {
