@@ -25,6 +25,8 @@ function GenericAnimation(options) {
     this.box = new MessageBox(this.message, { parent: options.parentId });
     this.calculateCanvasPos();
     this.canvas.addEventListener("mousemove", (e)=> {
+    	//		this.calculateCanvasPos(); // because might be moving
+				// now above done in the startResponse()
                 if(this.animationState!=this.messageTypes.NONE) {
                     var localX=e.pageX-this.canvasX,
                         localY=e.pageY-this.canvasY;
@@ -123,8 +125,7 @@ GenericAnimation.prototype.fireAnimation = function(){
 GenericAnimation.prototype.doAnimate = function(messageType) {
     this.animationState = messageType || this.animationState;
     var direction = (this.animationState==this.messageTypes.RESPONSE) ? -1 : 1;
-	console.log("direction="+direction+" x="+ this.x+ " canvas width=" +
-			this.canvas.width);
+//	console.log("direction="+direction+" x="+ this.x+ " canvas width=" + this.canvas.width);
     if((direction==1 && this.x < this.canvas.width) || 
         (direction==-1 && this.x>0)) {
         var y = (this.animationState==this.messageTypes.RESPONSE) ?
@@ -204,6 +205,7 @@ GenericAnimation.prototype.finishRequest = function() {
 }
 
 GenericAnimation.prototype.startResponse = function() {
+	this.calculateCanvasPos(); //eg ComponentAnimator might change this
     for(var i=0; i<this.onmessagestart.length; i++) {
         this.onmessagestart[i](this.messageTypes.RESPONSE);
     }
@@ -254,6 +256,7 @@ GenericAnimation.prototype.rewind = function() {
 }
 
 GenericAnimation.prototype.showMessageBox = function(localX, localY) {
+	console.log("*** localX="+localX+ " localY=" + localY+" ***");
     var y = (this.animationState==this.messageTypes.RESPONSE) ?
                 (this.canvas.height/4)*3: this.canvas.height/4;
     var direction = (this.animationState==

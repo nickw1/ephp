@@ -8,6 +8,8 @@ function init() {
     var savedLoginHTML="", originalLoginDivContents = "";
     var mq = window.matchMedia("screen and (max-device-height: 799px)");
     var canvasHeight =  mq.matches? "312px": "512px";
+	var compAnim = new ComponentAnimator(2500, 250, 100, 
+											'client', 'network', 'server');
 
     var fileExplorer=new FileExplorer('serverContent', 
                             {http: 'fs/fs.php',
@@ -45,10 +47,7 @@ function init() {
                                     step : 2,
                                     fileExplorer: fileExplorer,
                                     serverAnimation: phpAnimation,
-									componentAnimator:	
-										new ComponentAnimator
-											(3000, 150, 100,
-												'client', 'network', 'server'),
+									componentAnimator: compAnim,
 									onerror: ()=> { }
 			});
 
@@ -63,8 +62,10 @@ function init() {
                                     } )
                                 }});
 
-    window.addEventListener("resize", 
-            animation.calculateCanvasPos.bind(animation));
+    window.addEventListener("resize",  () => {
+            animation.calculateCanvasPos();
+			compAnim.recalculateDimensions();
+			} );
 
     var errors = { 
                     256: 'Unable to move temporary file on server',

@@ -20,7 +20,7 @@ body
 }
 
 #client, #network, #server {
-	display: inline-block;
+	display: inline-block; 
     background-color: white;
     margin: 10px;
 	height: 100%; 
@@ -186,7 +186,7 @@ tr,td,th
     border: 2px solid black;
     color: black;
 }
-
+#serverContent { height:100%; } 
 #serverContent code, #serverContent .code
 {
     font-size: 8pt;
@@ -223,12 +223,14 @@ tr,td,th
 	background-color: black;
 	color: white;
 	font-family: courier, monospace; 
-	height: 200px;
-	min-height: 200px;
+	height: 25%;
+	min-height: 25%; 
 	width: 100%;
 	position: relative;
+	border: 1px solid red;
+	overflow: auto;
 }
-
+/*TODO % heights do not work here - investigate why */
 .srcvar {
 	background-color: blue;
 	color: yellow;
@@ -243,9 +245,10 @@ tr,td,th
 .srcdb {
 	background-color: #ffffc0;
 	color: black;
-	height: 20px;
-	min-height: 160px;
+	height: 25%;
+	min-height: 25%;
 	width: 100%;
 	position: relative;
+	overflow: auto;
 }
 

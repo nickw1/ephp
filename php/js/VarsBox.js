@@ -31,3 +31,8 @@ VarsBox.prototype.setMultipleVars = function(vars) {
 		}
 	}
 }
+
+VarsBox.prototype.reset = function() {
+	this.varList = {};
+	this.element.innerHTML = "";
+}

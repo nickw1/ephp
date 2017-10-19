@@ -5,6 +5,7 @@ function PHPAnimation(options) {
 	this.parentDiv = document.getElementById(options.divId);
     this.srcDiv = document.createElement("div");
 	this.srcDiv.style.height = '50%';
+	this.srcDiv.style.overflow = 'auto';
     this.callback = options.callback || null; 
     this.browserCallback = options.browserCallback || null;
     this.audio = new Audio('assets/sound/Game-Spawn.ogg');
@@ -67,8 +68,9 @@ PHPAnimation.prototype.setupGUI = function() {
     btn.setAttribute("value","Run PHP and send back output");
     btn.addEventListener("click", ()=> {
         this.showing=false;
-		this.varWindowInner.innerHTML = this.dbWindowInner.innerHTML = 
-			this.consoleWindowInner.innerHTML = "";
+		this.dbWindowInner.innerHTML = this.consoleWindowInner.innerHTML = "";
+		this.varsBox.reset();
+		this.dbResults.reset();
         while(this.parentDiv.childNodes.length > 0) {
 			var d = this.parentDiv.firstChild;
             this.parentDiv.removeChild(d);
@@ -170,6 +172,7 @@ PHPAnimation.prototype.handleLine = function(data) {
 }
 
 PHPAnimation.prototype.handleNewRow = function(data) {
+	console.log("handleNewRow(): id="+data);
 	this.dbResults.highlightRow(data);
 }
 
@@ -177,7 +180,7 @@ PHPAnimation.prototype.handleStdout = function(data)  {
     // TODO handle stdout sent from the debugger
 	if(this.consoleWindow!==null) {
 		this.consoleWindowInner.innerHTML += data.replace("<","&lt;").
-				replace(">","&gt;").replace("\n","<br />");
+				replace(">","&gt;").replace("\n","<br />")+"<br />";
 	}
 }
 

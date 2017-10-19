@@ -1,9 +1,10 @@
 function DBResults(phpAnim) {
     this.phpAnim = phpAnim;
+	this.lastId = null;
 }
 
 DBResults.prototype.highlightRow = function(id) {
-    if(this.lastId) {
+    if(this.lastId!==null) {
         var lastRow = document.getElementById('rec'+this.lastId);
         lastRow.classList.remove("selected");
         var tds = lastRow.getElementsByTagName('td');
@@ -130,4 +131,8 @@ DBResults.prototype.showResults = function(sqlquery, hostDiv) {
         } );
     slider.setValue(this.interval);
     hostDiv.appendChild(div);
+}
+
+DBResults.prototype.reset = function() {
+	this.lastId = null;
 }

@@ -38,7 +38,7 @@ DebugMgr.prototype.connect = function(method, url, formData) {
             this.dbgMsgHandler != null) {
             msg('received <strong>' + data.cmd + 
                 '</strong> command from web socket server');
-//			console.log("cmd from web socket server=" + data.cmd);
+	console.log("cmd from web socket server=" + data.cmd);
             switch(data.cmd) {
                 case 'opened':
 
