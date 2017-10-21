@@ -10,13 +10,17 @@ require('ZMQEmitter.php');
 $xdupdateport = 9001;
 $launchport = 9002;
 
-if(count($argv) > 1 && $argv[1]=="stop") {
+if(count($argv) > 1 && $argv[1]!="start") {
     $client=stream_socket_client("tcp://127.0.0.1:$launchport",$errno,$errmsg);
     if($client!==false) {
-        fwrite($client,"STOP");
+		$data = [ "cmd" => $argv[1] ];
+		if(isset($argv[2])) {
+			$data["data"] = $argv[2];
+		}
+        fwrite($client, json_encode($data));
         $recv = stream_get_contents($client);
         if($recv=="STOPPED") {
-            unlink(LOCKFILE);
+            unlink_with_test(LOCKFILE);
         }
         fclose($client);
     } else {
