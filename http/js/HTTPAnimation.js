@@ -73,6 +73,7 @@ HTTPAnimation.prototype.startResponse = function() {
 HTTPAnimation.prototype.showSrcAndLaunchDebug = function(data, debugMgr) {
 	this.serverAnimation.showSrc(data);
 	debugMgr.launchDebugSession (this.message.url, this.message.method,
+									this.message.formData,
 										(xmlHTTP) => {
 							this.message.processResponse(xmlHTTP, true);
 									});

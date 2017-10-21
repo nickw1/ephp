@@ -98,6 +98,7 @@ PendingHttpRequest.prototype.getResponse = function() {
 PendingHttpRequest.prototype.processResponse = function( xmlHTTP,
 		debugPHP, callback)
 {
+		console.log("response headers: " + xmlHTTP.getAllResponseHeaders());
             var responseHeaders = xmlHTTP.getAllResponseHeaders().split("\r\n");
             // getAllResponseHeaders() seems to return 1 more than there 
             // actually is

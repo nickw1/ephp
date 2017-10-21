@@ -205,6 +205,7 @@ GenericAnimation.prototype.finishRequest = function() {
 }
 
 GenericAnimation.prototype.startResponse = function() {
+	console.log("GenericAnimation.startResonse()");
 	this.calculateCanvasPos(); //eg ComponentAnimator might change this
     for(var i=0; i<this.onmessagestart.length; i++) {
         this.onmessagestart[i](this.messageTypes.RESPONSE);
@@ -256,7 +257,7 @@ GenericAnimation.prototype.rewind = function() {
 }
 
 GenericAnimation.prototype.showMessageBox = function(localX, localY) {
-	console.log("*** localX="+localX+ " localY=" + localY+" ***");
+	//console.log("*** localX="+localX+ " localY=" + localY+" ***");
     var y = (this.animationState==this.messageTypes.RESPONSE) ?
                 (this.canvas.height/4)*3: this.canvas.height/4;
     var direction = (this.animationState==
