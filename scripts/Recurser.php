@@ -50,6 +50,7 @@ class Recurser {
                     return $result;
                 }
             }
+			return false;
         }
     }    
 }
