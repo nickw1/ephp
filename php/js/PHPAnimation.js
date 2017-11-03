@@ -160,7 +160,7 @@ PHPAnimation.prototype.handleLine = function(data) {
     this.unhighlightLastLine();
     this.highlightLine(data.lineno);
 	for(varName in data.vars) {
-		switch(data.vars[varName]) {
+		switch(data.vars[varName].type) {
 			case 'string':
 			case 'int':
 			case 'float':
