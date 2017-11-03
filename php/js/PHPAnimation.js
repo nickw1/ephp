@@ -162,6 +162,9 @@ PHPAnimation.prototype.handleLine = function(data) {
 	for(varName in data.vars) {
 		switch(data.vars[varName]) {
 			case 'string':
+			case 'int':
+			case 'float':
+			case 'bool':
 				this.varsBox.setVar(varName, data.vars[varName].value);
 				break;
 		}
@@ -186,6 +189,10 @@ PHPAnimation.prototype.handleStdout = function(data)  {
 
 PHPAnimation.prototype.handleDBResults = function(data) {
 	this.dbResults.showResults(data, this.dbWindowInner);
+}
+
+PHPAnimation.prototype.handleDBError = function(data) {
+	alert('Error with SQL statement: ' + data);
 }
 
 PHPAnimation.prototype.handleStop = function() {
