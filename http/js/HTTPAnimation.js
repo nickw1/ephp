@@ -29,7 +29,7 @@ HTTPAnimation.prototype.fireAnimation = function()  {
 // Overridden to do the ServerFilesystemAnimation and analyser stuff
 HTTPAnimation.prototype.finishRequest = function() {
 
-        var debugMgr = new DebugMgr("/ephpii/php/launcher.php",
+        var debugMgr = new DebugMgr("php/launcher.php",
                 { dbgMsgHandler: this.serverAnimation } );
 
         var urlParts = this.message.url.split("/");    
