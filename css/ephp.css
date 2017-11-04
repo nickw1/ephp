@@ -46,11 +46,28 @@ body
 	#ephp_container {
 		height: 600px;
 	}
+
+	/* TODO - is there a better way? */
+	#src_ace {
+		height: 480px;
+	}
+
+	#content {
+		height: 480px; 
+	}
 }
 
 @media screen and (min-device-height: 800px) {
 	#ephp_container {
 		height: 800px;
+	}
+
+	#src_ace {
+		height: 600px;
+	}
+
+	#content {
+		height: 600px; 
 	}
 }
 
@@ -90,18 +107,15 @@ body
     color: black;
 }
 
-#src_ace
-{
-    justify-content: center;
-    background-color: #e0e0e0;
-	height: 600px;
+#src_ace {
+	justify-content: center;
+	background-color: #e0e0e0;
 }
-#content
-{
-    background-color:#e0e0e0;
-    border: 2px solid black;
-    overflow: auto;
-	height: 600px; 
+
+#content {
+   	background-color:#e0e0e0;
+   	border: 2px solid black;
+   	overflow: auto;
 }
 
 #server
