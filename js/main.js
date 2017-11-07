@@ -365,6 +365,7 @@ function init() {
     doTabs();
     doToolbar();
 	var rw = new ResizableWindowSet(['client', 'network', 'server']);
+	rw.setOnFinishCallback(animation.calculateCanvasPos.bind(animation));
 	rw.setup();
 }
 

@@ -6,6 +6,11 @@ function ResizableWindowSet(windows, vert=false) {
         this.elem[i++] = document.getElementById(winid);
     }
     this.vert = vert;
+	this.onFinishCallback = null;
+}
+
+ResizableWindowSet.prototype.setOnFinishCallback = function(cb) {
+	this.onFinishCallback = cb;
 }
 
 // used this to help out here..
@@ -91,4 +96,7 @@ ResizableWindowSet.prototype.dragend = function(e) {
     document.documentElement.removeEventListener("mousemove", this.realDrag);
     document.documentElement.removeEventListener("mouseup", this.dragend);
     document.body.style.cursor='auto';
+	if(this.onFinishCallback) {
+		this.onFinishCallback();
+	}
 }
