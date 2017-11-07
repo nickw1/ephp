@@ -364,6 +364,8 @@ function init() {
     showFilename();
     doTabs();
     doToolbar();
+	var rw = new ResizableWindowSet(['client', 'network', 'server']);
+	rw.setup();
 }
 
 function msg(msg, bold=false) {

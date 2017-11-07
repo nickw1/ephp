@@ -108,6 +108,7 @@ class EPHPPage extends Page {
 
 $page = new EPHPPage();
 $scripts = [ 'js/main.js',
+			'ui/js/ResizableWindowSet.js',
              'fs/js/FileExplorer.js',
             'http/js/Browser.js',
             'http/js/GenericAnimation.js',

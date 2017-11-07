@@ -31,7 +31,7 @@ DebugMgr.prototype.connect = function(method, scriptUrl, formData) {
     }    
 
     this.ws.onmessage = (e) => {
-        //console.log("websocket sent: " + e.data);
+        console.log("websocket sent: " + e.data);
         var data = JSON.parse(e.data);
         var fullDebugUrl = scriptUrl;
         // all debug commands have a user field to identify which user is
@@ -81,6 +81,10 @@ DebugMgr.prototype.connect = function(method, scriptUrl, formData) {
                 case 'dbresults':
                     this.dbgMsgHandler.handleDBResults(data.data);
                     break;
+
+				case 'dberror':
+					this.dbgMsgHandler.handleDBError(data.data);
+					break;
 
                 case 'stop':
                     this.dbgMsgHandler.handleStop();
