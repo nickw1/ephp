@@ -7,7 +7,7 @@ function init() {
     var mode=0;
     var savedLoginHTML="", originalLoginDivContents = "";
     var mq = window.matchMedia("screen and (max-device-height: 799px)");
-    var canvasHeight =  mq.matches? "312px": "512px";
+    var canvasHeight =  mq.matches? "472px": "592px";
 	var compAnim = new ComponentAnimator(2500, 250, 100, 
 											'client', 'network', 'server');
 
