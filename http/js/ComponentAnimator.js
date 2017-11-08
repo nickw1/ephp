@@ -9,15 +9,12 @@ function ComponentAnimator (totalTime, interval, minWidth,
     this.network = document.getElementById(networkId);
     this.server = document.getElementById(serverId);
 
-
+	// noete canvas doesn't exist here yet
+	// does exist on doAnim though
     this.minWidth = minWidth;
     this.recalculateDimensions();
 
     this.timer = null;
-}
-
-ComponentAnimator.prototype.setCanvas = function(canvas) {
-    this.networkCanvas = canvas;
 }
 
 ComponentAnimator.prototype.startForwardAnim = function(cb) {
@@ -41,8 +38,8 @@ ComponentAnimator.prototype.doAnim = function (direction, cb) {
     var shrinker = direction==-1 ? this.server: this.client;
 
     shrinker.style.width = (shrinker.offsetWidth-this.csStep)+"px";
-    this.network.style.width = (this.network.offsetWidth-
-            (this.netStep*direction))+"px";
+	this.networkCanvas = this.network.querySelector("canvas");
+    this.setNetworkWidth(this.network.offsetWidth- (this.netStep*direction));
  //   console.log("network width (componentAnimator)="+this.network.offsetWidth);
     this.networkCanvas.width = this.network.offsetWidth; 
 //    console.log("canvas width (ComponentAnimator)=" + this.networkCanvas.width);
@@ -55,14 +52,12 @@ ComponentAnimator.prototype.doAnim = function (direction, cb) {
 
     if(direction==1 && this.client.offsetWidth<this.minWidth) {
         this.client.style.width = this.minWidth + 'px';
-        this.network.style.width = this.minWidth*
-            (this.origNetworkWidth/this.origClientWidth)+"px";
-        this.networkCanvas.width = this.network.offsetWidth; 
+        this.setNetworkWidth(this.minWidth* 
+			(this.origNetworkWidth/this.origClientWidth));
         this.finishAnim(cb);
     } else if (direction==-1 && this.client.offsetWidth> this.origClientWidth) {
         this.client.style.width = this.origClientWidth+'px';
-        this.network.style.width = this.origNetworkWidth+'px';
-        this.networkCanvas.width = this.network.offsetWidth;
+        this.setNetworkWidth(this.origNetworkWidth);
         this.server.style.width = this.origServerWidth+'px';
         this.finishAnim(cb);
     }
@@ -83,4 +78,9 @@ ComponentAnimator.prototype.recalculateDimensions = function() {
     this.csStep = Math.round((this.client.offsetWidth-this.minWidth) / 
             this.nSteps);
     this.netStep=this.csStep*(this.network.offsetWidth/this.client.offsetWidth);
+}
+
+ComponentAnimator.prototype.setNetworkWidth = function(width) {
+	this.network.style.width = width + 'px';
+	this.networkCanvas.width = width;
 }

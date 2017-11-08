@@ -5,7 +5,6 @@ function HTTPAnimation(options) {
     this.fileExplorer = options.fileExplorer;
 	if(options.componentAnimator) {
     	this.componentAnimator = options.componentAnimator;
-		this.componentAnimator.setCanvas(this.canvas);
 	} 
     this.onerror = options.onerror;
 }

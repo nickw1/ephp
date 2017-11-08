@@ -13,10 +13,10 @@ function GenericAnimation(options) {
     this.message = options.message;
    // this.canvas = document.getElementById(options.canvasId);
     this.canvas = document.createElement("canvas");
-    var parentElement = document.getElementById(options.parentId);
+    this.parentElement = document.getElementById(options.parentId);
     this.canvas.setAttribute("height", options.height);
-    this.canvas.setAttribute("width", parentElement.offsetWidth+"px"); 
-    parentElement.appendChild(this.canvas);
+    this.canvas.setAttribute("width", this.parentElement.offsetWidth+"px"); 
+    this.parentElement.appendChild(this.canvas);
     
     this.ctx = this.canvas.getContext('2d');
     this.animationState = this.messageTypes.NONE;
@@ -45,7 +45,7 @@ function GenericAnimation(options) {
     }
 
     var controlsDiv = document.createElement("div");
-    parentElement.appendChild(controlsDiv);
+    this.parentElement.appendChild(controlsDiv);
     if(controlsDiv) {
 
         var controls = { 'Pause' : [ 'assets/images/control_pause_blue.2.png' , 
@@ -281,4 +281,8 @@ GenericAnimation.prototype.addOnMessageStartListener = function(cb) {
 
 GenericAnimation.prototype.addOnMessageEndListener = function(cb) {
     this.onmessageend.push(cb);
+}
+
+GenericAnimation.prototype.resizeCanvas = function() {
+    this.canvas.setAttribute("width", this.parentElement.offsetWidth+"px"); 
 }
