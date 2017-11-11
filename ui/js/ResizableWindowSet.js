@@ -59,14 +59,27 @@ ResizableWindowSet.prototype.setup = function() {
 }
 
 ResizableWindowSet.prototype.drag = function(index, origClientPos, e) {
+//		var canvas = this.elem[index].querySelector("canvas");
         if(this.vert) {
-            this.elem[index].style.height = 
-                    (this.elem[index].dragStartPos + 
-                    (e.clientY - origClientPos)) + "px";
+			var newHeight = (this.elem[index].dragStartPos + 
+                    (e.clientY - origClientPos));
+			/*
+            this.elem[index].style.height =  newHeight + "px";
+			if(canvas) {
+				canvas.height = newHeight;
+			}
+			*/
+			this.elem[index].fullResizeHeight(newHeight);
         } else {
-            this.elem[index].style.width = 
-                    (this.elem[index].dragStartPos + 
-                    (e.clientX - origClientPos)) + "px";
+			var newWidth = (this.elem[index].dragStartPos + 
+                    (e.clientX - origClientPos));
+			/*
+            this.elem[index].style.width = newWidth + "px";
+			if(canvas) {	
+				canvas.width = newWidth;
+			}
+			*/
+			this.elem[index].fullResizeWidth(newWidth);
         }
 
         // calculate width of all elements after the resize
@@ -78,16 +91,29 @@ ResizableWindowSet.prototype.drag = function(index, origClientPos, e) {
         
         // resize remaining elements to fit into available space
         for(var j=index+1; j<this.elem.length; j++) { 
+			var canvas = this.elem[j].querySelector("canvas");
             if(this.vert) {
-                this.elem[j].style.height = 
-                        this.elem[j].offsetHeight - 
+				var newHeight = this.elem[j].offsetHeight - 
                         ((actualTotalSpan-this.totalSpan)/
-                            (this.elem.length-(index+1))) + "px";
+                            (this.elem.length-(index+1)));
+				/*
+                this.elem[j].style.height = newHeight + "px";
+				if(canvas) {
+					canvas.height = newHeight;
+				}
+				*/
+				this.elem[j].fullResizeHeight(newHeight);
             } else {
-                this.elem[j].style.width = 
-                    this.elem[j].offsetWidth - 
+				var newWidth = this.elem[j].offsetWidth - 
                         ((actualTotalSpan-this.totalSpan)/
-                            (this.elem.length-(index+1))) + "px";
+                            (this.elem.length-(index+1)));
+				/*
+                this.elem[j].style.width = newWidth + "px";
+				if(canvas) {
+					canvas.width = newWidth;
+				}
+				*/
+				this.elem[j].fullResizeWidth(newWidth);
             }
         }
 }
@@ -98,5 +124,28 @@ ResizableWindowSet.prototype.dragend = function(e) {
     document.body.style.cursor='auto';
 	if(this.onFinishCallback) {
 		this.onFinishCallback();
+	}
+}
+
+ResizableWindowSet.addFullResize = function(elems) {
+	for(id of elems) {
+		var elem = document.getElementById(id);
+		if(elem.querySelector("canvas")) {
+			elem.fullResizeWidth = function(sz) {
+				this.style.width = sz + "px";
+				this.querySelector("canvas").width = sz;
+			}
+			elem.fullResizeHeight = function(sz) {
+				this.style.height = sz + "px";
+				this.querySelector("canvas").height = sz;
+			}
+		} else {
+			elem.fullResizeWidth = function(sz) {
+				this.style.width = sz + "px";
+			}
+			elem.fullResizeHeight = function(sz) {
+				this.style.height = sz + "px";
+			}
+		}
 	}
 }

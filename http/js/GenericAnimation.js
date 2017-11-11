@@ -15,7 +15,8 @@ function GenericAnimation(options) {
     this.canvas = document.createElement("canvas");
     this.parentElement = document.getElementById(options.parentId);
     this.canvas.setAttribute("height", options.height);
-    this.canvas.setAttribute("width", this.parentElement.offsetWidth+"px"); 
+	this.canvas.setAttribute("width", this.parentElement.offsetWidth+"px"); 
+
     this.parentElement.appendChild(this.canvas);
     
     this.ctx = this.canvas.getContext('2d');

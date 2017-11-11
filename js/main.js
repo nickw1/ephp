@@ -9,7 +9,7 @@ function init() {
     var mq = window.matchMedia("screen and (max-device-height: 799px)");
     var canvasHeight =  mq.matches? "472px": "592px";
 	var compAnim = new ComponentAnimator(2500, 250, 100, 
-											'client', 'network', 'server');
+											['client', 'network', 'server']);
 
     var fileExplorer=new FileExplorer('serverContent', 
                             {http: 'fs/fs.php',
@@ -364,6 +364,7 @@ function init() {
     showFilename();
     doTabs();
     doToolbar();
+	ResizableWindowSet.addFullResize(['client', 'network', 'server']);
 	var rw = new ResizableWindowSet(['client', 'network', 'server']);
 	rw.setOnFinishCallback(animation.calculateCanvasPos.bind(animation));
 	rw.setup();

@@ -188,6 +188,7 @@ PHPAnimation.prototype.handleStdout = function(data)  {
 }
 
 PHPAnimation.prototype.handleDBResults = function(data) {
+	console.log("handleDBResults: "+ JSON.stringify(data));
 	this.dbResults.showResults(data, this.dbWindowInner);
 }
 
