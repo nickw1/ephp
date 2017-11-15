@@ -110,6 +110,7 @@ $page = new EPHPPage();
 $scripts = [ 'js/main.js',
 			'ui/js/ResizableWindowSet.js',
             'ui/js/ComponentAnimator.js',
+            'ui/js/Draggable.js',
              'fs/js/FileExplorer.js',
             'http/js/Browser.js',
             'http/js/GenericAnimation.js',

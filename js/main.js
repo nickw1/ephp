@@ -364,8 +364,12 @@ function init() {
     showFilename();
     doTabs();
     doToolbar();
-	ResizableWindowSet.addFullResize(['client', 'network', 'server']);
-	var rw = new ResizableWindowSet(['client', 'network', 'server']);
+	ResizableWindowSet.addFullResize([document.getElementById('client'), 
+									document.getElementById('network'), 
+									document.getElementById('server')]);
+	var rw = new ResizableWindowSet([document.getElementById('client'), 
+									document.getElementById('network'), 
+									document.getElementById('server')]);
 	rw.setOnFinishCallback(animation.calculateCanvasPos.bind(animation));
 	rw.setup();
 }

@@ -2,8 +2,8 @@
 function ResizableWindowSet(windows, vert=false) {
     this.elem = [];
     var i=0;
-    for(winid of windows) {
-        this.elem[i++] = document.getElementById(winid);
+    for(win of windows) {
+        this.elem[i++] = win; 
     }
     this.vert = vert;
 	this.onFinishCallback = null;
@@ -17,9 +17,11 @@ ResizableWindowSet.prototype.setOnFinishCallback = function(cb) {
 // cssdeck.com/labs/d5u5fol7
 ResizableWindowSet.prototype.setup = function() {
     this.totalSpan = 0;
+	var setupTime = new Date().getTime();
     for(var i=0; i<this.elem.length; i++) {
         this.totalSpan += this.vert? this.elem[i].offsetHeight: 
                     this.elem[i].offsetWidth;
+		if(i<this.elem.length - 1) {
         var resizer = document.createElement("div");
         resizer.style.backgroundColor = 'lightgray';
         resizer.style.border = '1px solid darkgray';
@@ -32,15 +34,16 @@ ResizableWindowSet.prototype.setup = function() {
             resizer.style.right = '-5px';
             resizer.style.top = '50%';
         }
-        resizer.id = "r_"+i;
-        console.log("i="+i+" elem="+this.elem[i].id);
+        resizer.id = "r_"+(setupTime+i);
+		console.log("appending to : " + this.elem[i].id);
         this.elem[i].appendChild(resizer);
         resizer.addEventListener("mouseover", e =>  
             { document.body.style.cursor=this.vert? 'ns-resize':'ew-resize';} );
         resizer.addEventListener("mouseout", e =>  
             { document.body.style.cursor = 'auto'; } );
         resizer.addEventListener("mousedown", e => {
-                        var index = parseInt(e.target.id.substring(2));
+                        var index = parseInt(e.target.id.substring(2)) -
+							setupTime;
                         this.elem[index].dragStartPos =     
                             this.vert? this.elem[index].offsetHeight:
                             this.elem[index].offsetWidth;
@@ -55,6 +58,7 @@ ResizableWindowSet.prototype.setup = function() {
                     } );
 
         
+		}
     }
 }
 
@@ -128,9 +132,10 @@ ResizableWindowSet.prototype.dragend = function(e) {
 }
 
 ResizableWindowSet.addFullResize = function(elems) {
-	for(id of elems) {
-		var elem = document.getElementById(id);
+	for(elem of elems) {
 		if(elem.querySelector("canvas")) {
+			// TODO this is working with width but not height - at least it's
+			// not working with the three windows in the server view
 			elem.fullResizeWidth = function(sz) {
 				this.style.width = sz + "px";
 				this.querySelector("canvas").width = sz;
