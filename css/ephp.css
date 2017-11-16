@@ -16,15 +16,22 @@ body
 }
 
 #ephp_container {
-	overflow: visible;
+    /* How we solve the dreaded wrap to another line problem with the
+      divs being contained */
+    white-space: nowrap;
+    overflow: hidden;
 }
 
 #client, #network, #server {
-	display: inline-block; 
+    display: inline-block;  
     background-color: white;
     margin: 10px;
-	height: 100%; 
-	vertical-align: top; 
+    height: 100%; 
+    vertical-align: top; 
+    position: relative;
+    /* white-space is inherited so get the contained elements 
+    to treat whitespace normally */
+    white-space: normal;
 }
 
 @media screen and (max-device-height: 799px) {
@@ -43,32 +50,32 @@ body
         height: 32px;
     }
 
-	#ephp_container {
-		height: 600px;
-	}
+    #ephp_container {
+        height: 600px;
+    }
 
-	/* TODO - is there a better way? */
-	#src_ace {
-		height: 480px;
-	}
+    /* TODO - is there a better way? */
+    #src_ace {
+        height: 480px;
+    }
 
-	#content {
-		height: 480px; 
-	}
+    #content {
+        height: 480px; 
+    }
 }
 
 @media screen and (min-device-height: 800px) {
-	#ephp_container {
-		height: 800px;
-	}
+    #ephp_container {
+        height: 800px;
+    }
 
-	#src_ace {
-		height: 600px;
-	}
+    #src_ace {
+        height: 600px;
+    }
 
-	#content {
-		height: 600px; 
-	}
+    #content {
+        height: 600px; 
+    }
 }
 
 
@@ -81,7 +88,6 @@ body
 #client 
 {
     width: 33%;
-	position: relative;
 }
 
 
@@ -108,22 +114,21 @@ body
 }
 
 #src_ace {
-	justify-content: center;
-	background-color: #e0e0e0;
+    justify-content: center;
+    background-color: #e0e0e0;
 }
 
 #content {
-   	background-color:#e0e0e0;
-   	border: 2px solid black;
-   	overflow: auto;
+       background-color:#e0e0e0;
+       border: 2px solid black;
+       overflow: auto;
 }
 
 #server
 {
     width:33%;
     overflow: auto;
-	height: 100%;
-	position: relative;
+    height: 100%;
 }
 
 #database
@@ -134,9 +139,8 @@ body
 
 #network
 {
-	height: 100%;
-	position: relative;
-	width: 25%;
+    height: 100%;
+    width: 25%;
 }
 
 #dbconnect
@@ -227,42 +231,44 @@ tr,td,th
 }
 
 .serverCode {
-	/*
+    /*
     line-height: 8px;
-	*/
+    */
 }
 
 
 .srcconsole {
-	background-color: black;
-	color: white;
-	font-family: courier, monospace; 
-	height: 25%;
-	min-height: 25%; 
-	width: 100%;
-	position: relative;
-	border: 1px solid red;
-	overflow: auto;
+    background-color: black;
+    color: white;
+    font-family: courier, monospace; 
+    position: absolute; 
+    top: 300px;
+    right: 300px; 
+    width: 400px;
+    height: 200px;
+    border: 2px solid red;
+    overflow: auto;
 }
 /*TODO % heights do not work here - investigate why */
 .srcvar {
-	background-color: blue;
-	color: yellow;
-	font-family: courier, monospace;
-	position: absolute;
-	right:0px;	
-	width:200px;
-	height:200px;
-	top: 0px; 
+    background-color: blue;
+    color: yellow;
+    font-family: courier, monospace;
+    position: absolute;
+    right:0px;    
+    width:200px;
+    height:200px;
+    top: 0px; 
+    border: 2px solid yellow;
 }
 
 .srcdb {
-	background-color: #ffffc0;
-	color: black;
-	height: 25%;
-	min-height: 25%;
-	width: 100%;
-	position: relative;
-	overflow: auto;
+    background-color: #ffffc0;
+    color: black;
+    height: 25%;
+    min-height: 25%;
+    width: 100%;
+    position: relative;
+    overflow: auto;
 }
 

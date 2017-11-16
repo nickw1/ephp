@@ -8,8 +8,8 @@ function init() {
     var savedLoginHTML="", originalLoginDivContents = "";
     var mq = window.matchMedia("screen and (max-device-height: 799px)");
     var canvasHeight =  mq.matches? "472px": "592px";
-	var compAnim = new ComponentAnimator(2500, 250, 100, 
-											['client', 'network', 'server']);
+    var compAnim = new ComponentAnimator(2500, 250, 100, 
+                                            ['client', 'network', 'server']);
 
     var fileExplorer=new FileExplorer('serverContent', 
                             {http: 'fs/fs.php',
@@ -39,7 +39,7 @@ function init() {
                             );
 
     var phpAnimation = new PHPAnimation({divId:"serverContent",
-										consoleElement: "console"});
+                                        consoleElement: "console"});
 
     var animation = new HTTPAnimation({parentId: 'network',
                                         height:canvasHeight,
@@ -47,9 +47,9 @@ function init() {
                                     step : 2,
                                     fileExplorer: fileExplorer,
                                     serverAnimation: phpAnimation,
-									componentAnimator: compAnim,
-									onerror: ()=> { }
-			});
+                                    componentAnimator: compAnim,
+                                    onerror: ()=> { }
+            });
 
     var browser = new Browser({divId: 'content', 
                                 animation: animation,
@@ -64,8 +64,8 @@ function init() {
 
     window.addEventListener("resize",  () => {
             animation.calculateCanvasPos();
-			compAnim.recalculateDimensions();
-			} );
+            compAnim.recalculateDimensions();
+            } );
 
     var errors = { 
                     256: 'Unable to move temporary file on server',
@@ -212,7 +212,7 @@ function init() {
                             document.getElementById("login").innerHTML = 
                                 "<p>Logged in as " + loggedin +
                                 " <a href='ftp/logout.php'>Logout</a></p>";
-                            doToolbar();
+                            doModeDisplay();
                             loadBackedUpFile();
                         } 
             }
@@ -261,11 +261,10 @@ function init() {
         }
         
         tabs[mode].classList.add("active");
-        browser.refresh();
         
     }
 
-    var doToolbar = ()=> {
+    var doModeDisplay = ()=> {
         for(id in showInModes[mode] ) {
             document.getElementById(id).style.display = 
                 (showInModes[mode][id].length==2 &&
@@ -273,6 +272,13 @@ function init() {
                 loggedin==null) ? 
                 'none': showInModes[mode][id][0];
         }
+    }
+
+    var fakeEvent = (el,eventtype)=> {
+        // stackoverflow.com/questions/2705583
+        var e = document.createEvent('Events');
+        e.initEvent(eventtype, true, false);
+        document.getElementById(el).dispatchEvent(e);
     }
 
     var resetLogin = ()=> {
@@ -353,7 +359,9 @@ function init() {
                 ("click", ((i,e)=> {
                     mode=i;
                     doTabs();
-                    doToolbar();
+                    doModeDisplay();
+					// MUST be done after changing visibility
+                    browser.refresh(); 
                 }).bind(this,i));
         tabs[i].addEventListener
                 ("mouseover", (e)=> {
@@ -363,15 +371,15 @@ function init() {
 
     showFilename();
     doTabs();
-    doToolbar();
-	ResizableWindowSet.addFullResize([document.getElementById('client'), 
-									document.getElementById('network'), 
-									document.getElementById('server')]);
-	var rw = new ResizableWindowSet([document.getElementById('client'), 
-									document.getElementById('network'), 
-									document.getElementById('server')]);
-	rw.setOnFinishCallback(animation.calculateCanvasPos.bind(animation));
-	rw.setup();
+    doModeDisplay();
+    ResizableWindowSet.addFullResize([document.getElementById('client'), 
+                                    document.getElementById('network'), 
+                                    document.getElementById('server')]);
+    var rw = new ResizableWindowSet([document.getElementById('client'), 
+                                    document.getElementById('network'), 
+                                    document.getElementById('server')]);
+    rw.setOnFinishCallback(animation.calculateCanvasPos.bind(animation));
+    rw.setup();
 }
 
 function msg(msg, bold=false) {

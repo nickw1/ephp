@@ -126,7 +126,7 @@ $scripts = [ 'js/main.js',
             'lib/js/Slider.js',
             'http://www.free-map.org.uk/jslib/PromiseAjax.js',
             'http://www.free-map.org.uk/jslib/Dialog.js',
-            'ace-builds/src-noconflict/ace.js'
+            'ace-builds/src/ace.js'
         ];
 
 $css = array ('css/ephp.css');

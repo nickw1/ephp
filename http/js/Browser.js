@@ -37,7 +37,7 @@ function Browser(options) {
     this.altered=false;
     this.webDir="";
     this.editor = ace.edit(options.sourceElement);
-    this.editor.setOptions({fontSize:"8pt"});
+    this.editor.setOptions({fontSize:"12pt"});
     this.editor.getSession().setMode("ace/mode/php");
     this.editor.on("change", (e)=> {
         this.showContent('text/html', this.editor.getValue());
@@ -298,6 +298,7 @@ Browser.prototype.setCode = function(code) {
 
 Browser.prototype.setContent = function(mime,code) {
     this.editor.setValue(code);
+//	this.refresh();
     this.showContent(mime, code);
     this.markUnaltered();
 }
@@ -340,5 +341,5 @@ Browser.prototype.loadDocumentOrImage = function(mimetype, url, responseText) {
 }
 
 Browser.prototype.refresh = function() {
-    this.editor.resize();
+    this.editor.resize(true);
 }
