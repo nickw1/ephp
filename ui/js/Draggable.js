@@ -17,7 +17,7 @@ Draggable.prototype.setup = function() {
     dragger.style.width = dragger.style.height = '10px';
     dragger.style.position = 'absolute';
 	dragger.style.left='50%';
-	dragger.style.top = '5px';
+	dragger.style.top = '-5px';
     this.elem.appendChild(dragger);
     dragger.addEventListener("mouseover", e =>  
             { document.body.style.cursor='move';} );
