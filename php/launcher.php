@@ -7,7 +7,7 @@ define('SCRIPTDIR','/var/www/_scripts/');
 
 session_start();
 
-$_SESSION["ephpuser"] = "ephp001";
+//$_SESSION["ephpuser"] = "ephp001";
 //$user = $_SESSION["username"];
 //$script = $_POST["script"];
 
@@ -26,11 +26,14 @@ if(isset($_SESSION["ephpuser"]) &&
     $stopping = $cmd=="stop";
     $scripts = ["wsocksrv", "xdclient"];
 
+	$t = time() % 10000000;
     for($i=($stopping ? count($scripts)-1 : 0); 
         $i!=($stopping ?  -1: count($scripts));
         $i+=($stopping ? -1:1)) {
         $cmd1="/usr/bin/php ".SCRIPTDIR."{$scripts[$i]}.php $cmd $data ".
-				"> ".TMPDIR."{$scripts[$i]}_{$cmd}_out.txt &";
+				"> ".TMPDIR."{$scripts[$i]}_{$cmd}_".$t."_out.txt ".
+				"2> ".TMPDIR."{$scripts[$i]}_{$cmd}_".$t."_err.txt ".
+				"&";
         system($cmd1);
         usleep(500000);
     }
