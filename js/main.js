@@ -1,5 +1,6 @@
 
 function init() {
+	console.log("IS THERE ANYBODY OUT THERE???");
     var fileInfo = { "file": null, "dir": null }, newFileInfo=null;
     var loggedin = null;
     var msgDiv = document.getElementById("msg");
