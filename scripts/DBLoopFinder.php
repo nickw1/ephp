@@ -7,20 +7,27 @@ use PhpParser\ParserFactory;
 
 class DBLoopFinder {
 
-    private $stmts, $rec, $loopsRec;
+    private $stmts, $rec, $loopsRec, $sqlRec;
  
     public function __construct($filename) {
         $parser=(new ParserFactory)->create(ParserFactory::PREFER_PHP7);
         $code = file_get_contents($filename);
         $this->stmts = $parser->parse($code);
         $this->rec = new Recurser($this, "doGetLoginCredentials");
-        $this->loopsRec = new LoopsRecurser($this, "recurse", $this, "doGetLoops");
+        $this->sqlRec = new Recurser($this, "doGetSQLQueries");
+        $this->loopsRec = new LoopsRecurser
+            ($this, "recurse", $this, "doGetLoops");
         $this->depth=-1;
     }
 
     
     public function getLoginCredentials() {
         return $this->doGetLoginCredentials($this->stmts);
+    }
+
+    public function getSQLQueries($pdovar) {
+        $q=$this->doGetSQLQueries($this->stmts, $pdovar);
+        return $q;
     }
 
     public function doGetLoginCredentials($node) {
@@ -50,32 +57,66 @@ class DBLoopFinder {
                                         
             }
         }
-        return false;    
+
+      return false;    
+    }
+
+    public function doGetSQLQueries($node, $pdovar) {
+        $queries = false;
+        for($i=0; $i<count($node); $i++) {
+            switch($node[$i]->getType()) {
+                case "Expr_Assign":
+                    if($node[$i]->expr->getType()=="Expr_MethodCall" &&
+                        $node[$i]->expr->name=="query" &&
+                        $node[$i]->expr->var->name==$pdovar) {
+                            if($queries===false) {
+                                $queries = [];
+                            }
+                            $queries[] = ["query"=>
+                                    $node[$i]->expr->args[0]->value->value,
+                                            "startLine"=>
+                                    $node[$i]->expr->var->getAttributes()
+                                        ["startLine"],
+                                            "endLine"=>
+                                    $node[$i]->expr->var->getAttributes()
+                                        ["endLine"]];
+                    }
+                    break;
+
+                default:
+                    if(($result=$this->sqlRec->recursiveTraversal($node[$i],
+                            $pdovar)) !==false) {
+                        $queries =  $queries===false ? $result:
+                            array_merge($queries,$result);
+                    }
+            }
+        }
+        return $queries;
     }
 
     public function getLoops($resultvars) {
-		return $this->recurse($this->stmts, $resultvars);
-	}
+        return $this->recurse($this->stmts, $resultvars);
+    }
 
-	public function recurse($stmts, $resultvars) {
-		$this->depth++;
+    public function recurse($stmts, $resultvars) {
+        $this->depth++;
         try {
-			for($i=0; $i<count($stmts); $i++) {
-				if(($result=$this->loopsRec->recursiveTraversal
-						($stmts[$i], $resultvars))!==false) {
-					return $result;
-				}	
-			}
-			return false;
+            for($i=0; $i<count($stmts); $i++) {
+                if(($result=$this->loopsRec->recursiveTraversal
+                        ($stmts[$i], $resultvars))!==false) {
+                    return $result;
+                }    
+            }
+            return false;
         
         } catch(Error $e ) {
             throw $e;
         }
-		$this->depth--;
+        $this->depth--;
     }
 
     public function doGetLoops($whilenode, $resultvars) {
-		$loops = false;
+        $loops = false;
                 switch($whilenode->cond->getType()) {
                     case "Expr_Assign":
                         if(in_array($whilenode->cond->expr->var->name,
@@ -112,7 +153,7 @@ class DBLoopFinder {
                                     [ "rowvar"=>$whilenode->cond->name,
                                     "startLine"=>
                                         $whilenode->getAttributes()
-										['startLine'],
+                                        ['startLine'],
                                     "endLine"=>
                                         $whilenode->getAttributes()['endLine']];
                                     $loop["loops"] = [];

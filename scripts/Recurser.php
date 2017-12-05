@@ -43,14 +43,14 @@ class Recurser {
                     return $result;
                 }
             }
-            if($node->else->stmts) {
+            if(isset($node->else) && $node->else->stmts) {
                 $result = $this->cbObj->{$this->cb} 
                     ($node->else->stmts, $additional);
                 if($result!==false) {
                     return $result;
                 }
             }
-			return false;
+            return false;
         }
     }    
 }
