@@ -222,7 +222,9 @@ PHPAnimation.prototype.handleDBResults = function(data) {
 }
 
 PHPAnimation.prototype.handleDBError = function(data) {
-    alert('Error with SQL statement: ' + data);
+    console.log('******Error with SQL statement: ' + JSON.stringify(data));
+	alert(`Error with SQL statement on line ${data.lineno}: `+
+			`${data.msg}`);
 }
 
 PHPAnimation.prototype.handleStop = function() {

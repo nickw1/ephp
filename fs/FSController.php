@@ -5,7 +5,7 @@ require_once("defines.php");
 
 class FSController
 {
-    private $view;
+    private $view, $user;
 
     public function __construct ($view)
     {
@@ -17,6 +17,7 @@ class FSController
         $code = 200;
         $json = array();
         $output=true;
+        //if(isset($_SESSION["ephpuser"]))
         if(isset($_SESSION["ephpuser"]))
         {
             $webdir = HOME_DIR."/".$_SESSION["ephpuser"]."/".USER_WEB_DIR;

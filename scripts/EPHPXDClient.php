@@ -105,7 +105,8 @@ class EPHPXDClient extends XDClient\VarWatcher  {
             case "PDO":    
                 if(!isset($this->sqlqueries[$this->idekey])) {
                     $var = str_replace('$','',$n);
-                    $this->sqlqueries[$idekey]=$this->lf->getSQLQueries($var);
+                    $this->sqlqueries[$this->idekey]=
+                        $this->lf[$this->idekey]->getSQLQueries($var);
                 }
                 break;
         }
@@ -150,7 +151,7 @@ class EPHPXDClient extends XDClient\VarWatcher  {
         $this->emitter->setUser($idekey);
     }
 
-    public function onLineNo($lineno) {
+    public function onLineNo($conn, $lineno) {
         // See if there is an SQL query on this line, execute it to catch
         // errors; testing for a PDOStatement in the normal debugging flow
         // will not work as false is returned on error
@@ -160,23 +161,38 @@ class EPHPXDClient extends XDClient\VarWatcher  {
         if($this->sqlqueries[$this->idekey]!==false) {
             foreach($this->sqlqueries[$this->idekey] as $sqlquery) {
                 if($sqlquery["startLine"]==$lineno) {
-                    $result = $this->dbconn[$this->idekey]->query
+                    $executableQuery = $this->replaceQueryVariables 
                         ($sqlquery["query"]);
+                    $result = $this->dbconn[$this->idekey]->query
+                        ($executableQuery);
                     $errorInfo = $this->dbconn[$this->idekey]->errorInfo();
                     if($errorInfo[0]!="00000") {
                         // emit sql error
                         $this->emitter->emit
                                (["cmd"=>"dberror","data"=>
                                        ["lineno"=>$lineno,
+                                        "query"=>$executableQuery,
+                                        "rawcodequery"=>$sqlquery,
                                         "msg"=>$errorInfo[2]]]);
                         // stop debugger will happen automatically
-                    }
+                        // but with a horrible error, so do it here!
+                        $this->forcedShutdown = true;
+                        $this->shutdown($conn);
+                    } 
                     break;
                 }
             }
         }
     }
 
+    public function replaceQueryVariables($query) {
+        $executableQuery = $query;
+        foreach($this->vars[$this->idekey] as $k=>$v) {
+            $executableQuery = str_replace($k, $v["value"], $executableQuery);
+        }
+        return $executableQuery;
+    }
+ 
     // Must be run when a debug session finishes - we do not want
     // this stuff hanging around
     public function onStop($idekey) {

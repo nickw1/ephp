@@ -14,7 +14,8 @@ DebugMgr.prototype.runLauncher = function(method, scriptUrl, formData) {
                     // startup the websocket stuff
                     var data = JSON.parse(xmlHTTP.responseText);
                     this.user = data.user;
-                    console.log("Launcher returned: "+ xmlHTTP.responseText + " user="+this.user);
+					console.log('USER: ' + this.user);
+                    console.log("Launcher returned: "+ xmlHTTP.responseText);
                     this.connect(method, scriptUrl, formData);
                 } ).catch( (statusCode) => {
                     console.log('http error: ' + statusCode);
@@ -28,9 +29,6 @@ DebugMgr.prototype.connect = function(method, scriptUrl, formData) {
 	console.log('readystate=' + this.ws.readyState);
 
     this.ws.onopen = (e) => {
-            //console.log('opened websocket! sending user to socket server', true);
-			// TODO this only works on first open so user is scrwing up
-			// result is that all messages go to the "wrong" user
 			console.log('onopen: sending ' + this.user);
             this.ws.send(JSON.stringify({"cmd":"user", "data":this.user}));
     }    

@@ -7,7 +7,7 @@ use PhpParser\ParserFactory;
 
 class DBLoopFinder {
 
-    private $stmts, $rec, $loopsRec, $sqlRec;
+    private $stmts, $rec, $loopsRec, $sqlRec, $pp;
  
     public function __construct($filename) {
         $parser=(new ParserFactory)->create(ParserFactory::PREFER_PHP7);
@@ -72,8 +72,13 @@ class DBLoopFinder {
                             if($queries===false) {
                                 $queries = [];
                             }
+							if(!$this->pp) {
+								$this->pp=new PhpParser\PrettyPrinter\Standard;
+							}
                             $queries[] = ["query"=>
-                                    $node[$i]->expr->args[0]->value->value,
+									DBLoopFinder::makeUsableQuery
+									($this->pp->prettyPrintExpr($node[$i]->expr
+										->args[0]->value)),
                                             "startLine"=>
                                     $node[$i]->expr->var->getAttributes()
                                         ["startLine"],
@@ -175,6 +180,21 @@ class DBLoopFinder {
                 }
         return $loops;
     } // function
+
+	protected static function makeUsableQuery($q) {
+		$inQuotes = false;
+		$usableQuery = "";
+		for($i=0; $i<strlen($q); $i++) {
+			if($q[$i]=="\"" && ($i==0 ||  $q[$i-1]!="\\")) {
+				$inQuotes = !$inQuotes;
+			} elseif(($inQuotes==false && $q[$i]!="." && !ctype_space($q[$i])) 
+					||
+					($inQuotes==true && $q[$i]!="{" && $q[$i]!="}")) {
+				$usableQuery .= $q[$i];
+			}	
+		}
+		return $usableQuery;
+	}
 }
 
 ?>
