@@ -61,7 +61,20 @@ DebugMgr.prototype.connect = function(method, scriptUrl, formData) {
                     http.send(method, fullDebugUrl, formData).then((xmlHTTP)=>
                         {
                             if(this.completeCallback != null) {
-                                console.log("debug session finished: Sending completeCallback with response: " + xmlHTTP.responseText);
+
+                               console.log("debug session finished: "+
+								"Sending completeCallback with response: " + 
+								xmlHTTP.responseText);
+
+								if(xmlHTTP.responseText.indexOf("Parse error")
+									>=0) {
+								 	alert("Syntax error in your PHP script. "+
+											"Details: " + 
+											xmlHTTP.responseText.substr
+												(xmlHTTP.responseText.
+													indexOf(":")+1).
+													replace(/<[^>]+>/g, ""));
+								}
                                 this.completeCallback(xmlHTTP);
                         }
                     // sned back to whatever called this 
