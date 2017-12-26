@@ -2,8 +2,8 @@
 
 // launcher.php
 
-define('TMPDIR','/var/www/tmp/');
-define('SCRIPTDIR','/var/www/_scripts/');
+require_once('../defines.php');
+
 
 session_start();
 
