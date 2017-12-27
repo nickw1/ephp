@@ -161,6 +161,7 @@ function init() {
             alert("Transferring: " + filename);
             formData.append("filename", filename);
             formData.append("src",browser.getCode());
+			formData.append("action", "upload");
             msg = "Transferring file...";
 
             http.post('ftp/ftp.php', formData).then((xmlHTTP)=> {
@@ -183,6 +184,7 @@ function init() {
     var login = (e)=> {
         var formData = new FormData();
         savedLoginHTML = document.getElementById("login").innerHTML;
+		formData.append("action", "login"); // don't try and transfer
 
         
         if(document.getElementById("ephp_username") &&

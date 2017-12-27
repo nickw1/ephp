@@ -1,7 +1,13 @@
 <?php
+define('NOFTP_USER_ROOT','/var/www/html/epup');
 define('LIBDIR','/var/www/html/lib');
 define('EPHP_HOSTNAME','localhost');
 define('EPHP_BACKUP','/home/www-data/ephpbackup');
 define('TMPDIR','/var/www/tmp/');
 define('SCRIPTDIR','/var/www/html/ephp/scripts/');
+define('USER_DB','ephp');
+define('USER_DB_USER','ephp');
+define('USER_DB_PASS','ephp');
+define('HOME_DIR','/home');
+define('USER_WEB_DIR','public_html');
 ?>

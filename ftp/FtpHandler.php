@@ -18,7 +18,12 @@ class FtpHandler {
     }
 
     public function connect() {
-        $this->conn = ftp_connect($this->server);
+        if($this->config->ftp==1) {
+            $this->conn = ftp_connect($this->server);
+        } else {
+            $this->conn = new PDO("mysql:host=localhost;dbname=".USER_DB,
+                        USER_DB_USER, USER_DB_PASS);
+        }
         return $this->conn ? 0: FtpHandler::CANT_CONNECT;
     }
 
@@ -26,7 +31,7 @@ class FtpHandler {
         if($this->conn) {
             if(!preg_match("/^".$this->config->ephproot."\d{3}$/",$u)) {
                 return FtpHandler::INVALID_EPHP_USERNAME;
-            } else {
+            } elseif($this->config->ftp==1) {
                 $this->loginstatus = @ftp_login($this->conn, $u, $p);
                 if(!$this->loginstatus) {
                     return FtpHandler::INVALID_LOGIN;
@@ -34,6 +39,22 @@ class FtpHandler {
                     $_SESSION["ephpuser"] = $u;
                     $_SESSION["ephppass"] = $p;
                     return 0;    
+                }
+            } else {
+                $stmt = $this->conn->prepare
+                    ("SELECT * FROM ephpusers WHERE username=? AND ".
+                        "password=?");
+                $stmt->bindParam(1, $u);
+                $stmt->bindParam(2, $p);
+                $stmt->execute();
+				
+                if(($row = $stmt->fetch())!==false) {
+                    $_SESSION["ephpuser"] = $u;
+                    $_SESSION["ephppass"] = $p;
+                    $this->loginstatus = true;
+                    return 0;
+                } else {
+                    return FtpHandler::INVALID_LOGIN;
                 }
             }
         } else {
@@ -57,24 +78,31 @@ class FtpHandler {
             } else {
                 return FtpHandler::INVALID_LOGIN;
             }
+        } else {
+            $contents = file_get_contents(NOFTP_USER_ROOT.
+				"/".$_SESSION["ephpuser"]."/".$filename);
+            return $contents;
         }
-        return "";
     }
 
     public function delete($files) {
         if($this->config->ftp==1) {
             if($this->loginstatus) {
-        $failures = [];
-        foreach($files as $file) {
-            if (!preg_match("/^[\w-\.\/]+$/", $file) ||
-                strpos($file,"../")!==false|| 
-                !@ftp_delete($this->conn, "public_html/$file")){
-                $failures[] = $file;
-            }
-        }
-        return $failures;
+                $failures = [];
+                foreach($files as $file) {
+                    if (!preg_match("/^[\w-\.\/]+$/", $file) ||
+                            strpos($file,"../")!==false|| 
+                        !@ftp_delete($this->conn, "public_html/$file")){
+                        $failures[] = $file;
+                    }
+                }
+                return $failures;
             } else {
                 return FtpHandler::INVALID_LOGIN;
+            }
+        } else {
+            foreach($files as $file) {
+                unlink(NOFTP_USER_ROOT."/".$_SESSION["ephpuser"]."/".$file);
             }
         }
         return "";    

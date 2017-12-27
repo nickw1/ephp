@@ -4,7 +4,6 @@ require_once('../defines.php');
 require_once(LIBDIR."/FileUploader.php");
 require_once('ReadWriteFtpHandler.php');
 
-session_start();
 
 class PostFtpHandler extends ReadWriteFtpHandler {
 
@@ -32,6 +31,13 @@ class PostFtpHandler extends ReadWriteFtpHandler {
 		return file_put_contents($this->tmpname, $this->src) === false ?
 			PostFtpHandler::CANT_OPEN_TMP_FILE : 0;
 	}	
+
+	public function noFtpUpload() {
+		$writeFile = NOFTP_USER_ROOT."/".$_SESSION["ephpuser"]."/".
+			$this->filename;
+		return file_put_contents($writeFile, $this->src) === false ?
+				PostFtpHandler::CANT_OPEN_TMP_FILE : 0;
+	}
 }
 
 ?>

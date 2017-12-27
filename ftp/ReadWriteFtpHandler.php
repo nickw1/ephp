@@ -30,7 +30,7 @@ abstract class ReadWriteFtpHandler extends FtpHandler {
 				return FtpHandler::INVALID_LOGIN;
 			}  
 		} else {
-			$_SESSION["ephpuser"] = $u;
+			$this->noFtpUpload();
 		}
 		
 		return 0;
@@ -39,6 +39,7 @@ abstract class ReadWriteFtpHandler extends FtpHandler {
 	public abstract function specifics();
 	public abstract function getTmpName();
 	public abstract function getName();
+	public abstract function noFtpUpload();
 }
 
 
