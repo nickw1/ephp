@@ -78,6 +78,7 @@ if(@symlink("/proc/".getmypid(),LOCKFILE)!==false) {
         }
     });
     
+	// 281217 ?? update ??
     $zmqctx = new React\ZMQ\Context($loop); 
     $pull = $zmqctx->getSocket(ZMQ::SOCKET_PULL);
     $pull->bind("tcp://127.0.0.1:$xdupdateport");
@@ -94,8 +95,10 @@ if(@symlink("/proc/".getmypid(),LOCKFILE)!==false) {
     }); 
     
 
-    $reactSockServ = new React\Socket\Server($loop);
-    $reactSockServ->listen(8080, '0.0.0.0');
+	// 281217 api appears to have changed
+	// yes - see 8/1/17 commit
+    $reactSockServ = new React\Socket\Server('127.0.0.1:8080', $loop);
+    // ?? change ?? $reactSockServ->listen(8080, '0.0.0.0');
     
 
     $wsserver = new IoServer(new HttpServer(new WsServer($wshandler)), 
