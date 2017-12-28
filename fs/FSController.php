@@ -22,7 +22,7 @@ class FSController
         {
             $webdir = $this->config->ftp==1 ?
                 HOME_DIR."/".$_SESSION["ephpuser"]."/".USER_WEB_DIR:
-                NOFTP_USER_ROOT."/".$_SESSION["ephpuser"];
+                WEBROOT."/".NOFTP_USER_ROOT."/".$_SESSION["ephpuser"];
                 
             if($method=="GET")
             {

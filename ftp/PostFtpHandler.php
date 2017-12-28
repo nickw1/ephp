@@ -33,7 +33,7 @@ class PostFtpHandler extends ReadWriteFtpHandler {
 	}	
 
 	public function noFtpUpload() {
-		$writeFile = NOFTP_USER_ROOT."/".$_SESSION["ephpuser"]."/".
+		$writeFile = WEBROOT."/".NOFTP_USER_ROOT."/".$_SESSION["ephpuser"]."/".
 			$this->filename;
 		return file_put_contents($writeFile, $this->src) === false ?
 				PostFtpHandler::CANT_OPEN_TMP_FILE : 0;

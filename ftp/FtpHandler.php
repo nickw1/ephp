@@ -47,7 +47,7 @@ class FtpHandler {
                 $stmt->bindParam(1, $u);
                 $stmt->bindParam(2, $p);
                 $stmt->execute();
-				
+                
                 if(($row = $stmt->fetch())!==false) {
                     $_SESSION["ephpuser"] = $u;
                     $_SESSION["ephppass"] = $p;
@@ -79,8 +79,8 @@ class FtpHandler {
                 return FtpHandler::INVALID_LOGIN;
             }
         } else {
-            $contents = file_get_contents(NOFTP_USER_ROOT.
-				"/".$_SESSION["ephpuser"]."/".$filename);
+            $contents = file_get_contents(WEBROOT."/".NOFTP_USER_ROOT.
+                "/".$_SESSION["ephpuser"]."/".$filename);
             return $contents;
         }
     }
@@ -102,7 +102,8 @@ class FtpHandler {
             }
         } else {
             foreach($files as $file) {
-                unlink(NOFTP_USER_ROOT."/".$_SESSION["ephpuser"]."/".$file);
+                unlink(WEBROOT."/".NOFTP_USER_ROOT."/".
+                    $_SESSION["ephpuser"]."/".$file);
             }
         }
         return "";    
