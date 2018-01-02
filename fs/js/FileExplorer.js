@@ -28,24 +28,26 @@ function FileExplorer(divId, urls, dropId, callbacks)
 
     this.dropDiv.addEventListener("drop",
         (e)=> {
+		// 020118 it appears that the text/plain type of data always gets the
+		// right data (on Firefox). text/uri-list gives the image URL instead
+		// if you try to drag an image which is a child of the draggable span.
+		// so always send the contents of the text/plain data type.
+		// Untested Chrome!
 		console.log("drop event");
                 e.preventDefault();
                 var data = e.dataTransfer.getData(this.urlType);
-                console.log("data returned: " + data);
 
                 //uri-list wont work on chrome
                 if(data=="") {
                     data = e.dataTransfer.getData("text/plain");
                 } 
-                this.curFile = data;
+				var dataTextPlain = e.dataTransfer.getData("text/plain");
+                this.curFile = dataTextPlain;
                 if(this.callbacks.fileInfoCallback) {
                     this.callbacks.fileInfoCallback(this.getFileInfo());
                 }
-                this.sendAjax({name:data});
-                
-            });
-
-
+                this.sendAjax({name: dataTextPlain});
+		});
     
     
     
@@ -90,6 +92,7 @@ FileExplorer.prototype.getFileInfo = function() {
 
 FileExplorer.prototype.sendAjax = function(options)
 {
+	console.log("sendAjax(): options="+JSON.stringify(options));
     options = options || {};
     var url;
     if(options.name) {
@@ -174,6 +177,8 @@ FileExplorer.prototype.onAjaxDirResponse = function(xmlHTTP)
                     ev.preventDefault();
                 });
             } else {    
+				
+				img.draggable = true;
                 span.addEventListener
                 ("dragstart", (function(i,ev)
                     {
@@ -183,8 +188,9 @@ FileExplorer.prototype.onAjaxDirResponse = function(xmlHTTP)
                         // messy feature sensing but the only way to get
                         // this to work in chrome?
                         // JS The Definitive Guide 6th edition p479
+					/*
                     if(ev.dataTransfer.types.contains) {
-			console.log("YES");
+						console.log("YES");
                         ev.dataTransfer.clearData('text/plain');
                         // to send a link the mime type needs to be 
                         // text/uri-list
@@ -192,12 +198,21 @@ FileExplorer.prototype.onAjaxDirResponse = function(xmlHTTP)
                         // recipient element: not what we want
                         // however uri-list won't work on chrome: we deal
                         // with this in the drop event
+						// 020118 this is not being called on firefox either
+						// both using text/plain,
+						console.log("Data being sent: "+
+							json.content[i].name);
                         ev.dataTransfer.setData(this.urlType,
                              json.content[i].name);
                     } else {
+						console.log("Data being sent (notypes): "+
+							json.content[i].name);
                         ev.dataTransfer.setData('text/plain',
                              json.content[i].name);
                     }
+					*/
+					// 020118 will this work now on both firefox and chrome?
+					ev.dataTransfer.setData('text/plain', json.content[i].name);
                     }).bind(this,i));
 
         span.addEventListener
@@ -229,6 +244,7 @@ FileExplorer.prototype.onAjaxDirResponse = function(xmlHTTP)
             span.appendChild(img);
             span.appendChild(document.createTextNode(json.content[i].name));
             span.draggable = true;
+			img.draggable = true;
             this.div.appendChild(span);
             this.div.appendChild(document.createElement("br"));
 
