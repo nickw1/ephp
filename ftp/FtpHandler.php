@@ -71,7 +71,8 @@ class FtpHandler {
                     FTP_BINARY)) {
                     $contents =  file_get_contents($tmpname);
                     unlink($tmpname);
-                    return $contents;
+                    return (["content"=>$contents,"webdirUrl"=>
+                        "/~".$_SESSION["ephpuser"]."/"]);
                 } else {
                     return FtpHandler::CANT_TRANSFER_FILE;
                 }
@@ -81,7 +82,8 @@ class FtpHandler {
         } else {
             $contents = file_get_contents(WEBROOT."/".NOFTP_USER_ROOT.
                 "/".$_SESSION["ephpuser"]."/".$filename);
-            return $contents;
+            return (["content"=>$contents,"webdirUrl"=>
+                        "/".NOFTP_USER_ROOT."/".$_SESSION["ephpuser"]."/"]);
         }
     }
 

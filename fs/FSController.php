@@ -24,6 +24,10 @@ class FSController
                 HOME_DIR."/".$_SESSION["ephpuser"]."/".USER_WEB_DIR:
                 WEBROOT."/".NOFTP_USER_ROOT."/".$_SESSION["ephpuser"];
                 
+			$webdirUrl = $this->config->ftp==1 ?
+                "/~".$_SESSION["ephpuser"]."/":
+				"/".NOFTP_USER_ROOT."/".$_SESSION["ephpuser"]."/";
+
             if($method=="GET")
             {
                 if(isset($httpdata["dir"])     && 
@@ -37,8 +41,10 @@ class FSController
                         {
                             $ext = pathinfo($file,PATHINFO_EXTENSION);
                             $contents = file_get_contents($file);
-                            header("Content-type: text/html");
-                            echo $contents;    
+                            header("Content-type: application/json");
+                            echo json_encode(["webdirUrl"=>$webdirUrl,
+											"contentType"=>"text/html",
+											"content"=>$contents]);    
                             $output=false;
                         }
                         else

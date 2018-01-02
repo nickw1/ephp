@@ -14,13 +14,12 @@ function init() {
     var fileExplorer=new FileExplorer('serverContent', 
                             {http: 'fs/fs.php',
                             ftp: 'ftp/ftp.php' } ,'client',
-                            { showContentCallback: (mime,src)=> {
+                            { showContentCallback: (mime,src,webdirUrl)=> {
                                     saveOld(()=> {
                                         browser.setContent(mime,src);
                                         fileInfo = newFileInfo;
                                         // remove the . from the current dir 
-                                        var localPath = 
-                                            "/~" + loggedin +
+                                        var localPath = webdirUrl + 
                                                 fileInfo.dir.substr(1);
                                         browser.setWebDir(localPath);
                                         browser.setFile(fileInfo.file);

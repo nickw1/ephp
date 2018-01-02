@@ -136,6 +136,7 @@ FileExplorer.prototype.onAjaxDirResponse = function(xmlHTTP)
 {
     if(xmlHTTP.status!=200) return;
     this.div.innerHTML = "";
+	console.log(xmlHTTP.responseText);
     var json = JSON.parse(xmlHTTP.responseText);
     var name;
     for(var i=0; i<json.content.length; i++)
@@ -238,9 +239,9 @@ FileExplorer.prototype.onAjaxDirResponse = function(xmlHTTP)
 FileExplorer.prototype.onAjaxFileResponse = function(xmlHTTP)
 {
     if(this.callbacks.showContentCallback) {
+		var data = JSON.parse(xmlHTTP.responseText);
         this.callbacks.showContentCallback
-            (xmlHTTP.getResponseHeader("Content-type"),
-                        xmlHTTP.responseText);
+            (data.contentType, data.content, data.webdirUrl);
     }
 }
 
@@ -250,7 +251,7 @@ FileExplorer.prototype.onAjaxFileResponseFtp = function(xmlHTTP)
         var data = JSON.parse(xmlHTTP.responseText);
         if(data.status==0) {
             this.callbacks.showContentCallback
-                (data.contentType, data.content);
+                (data.contentType, data.content, data.webdirUrl);
         } else {
             alert("Error: " + data.status);
         }

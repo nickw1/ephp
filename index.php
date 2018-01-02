@@ -6,6 +6,7 @@ require_once('defines.php');
 require_once(LIBDIR.'/Page.php');
 
 class EPHPPage extends Page {
+
     public function writeBody() {
         ?>
         <body onload='init()'>
