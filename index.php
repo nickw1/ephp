@@ -124,8 +124,8 @@ $scripts = [ 'js/main.js',
             'php/js/DebugMgr.js',
             'php/js/VarsBox.js',
             'lib/js/Slider.js',
-            'http://www.free-map.org.uk/jslib/PromiseAjax.js',
-            'http://www.free-map.org.uk/jslib/Dialog.js',
+            'jslib/PromiseAjax.js',
+            'jslib/Dialog.js',
             'ace-builds/src/ace.js'
         ];
 

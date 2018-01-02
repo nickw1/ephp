@@ -1,5 +1,5 @@
 
-// ref sqlquery - this.data.sqlqueries[queeyIndex]
+// ref sqlquery - this.data.sqlqueries[queryIndex]
 
 function PHPAnimation(options) {
     this.parentDiv = document.getElementById(options.divId);
@@ -23,18 +23,25 @@ function PHPAnimation(options) {
     }
     this.srcDivPos = this.getSrcDivPos(this.parentDiv);
 
+    this.varWindow = document.createElement("div");
     this.outputWindow = document.createElement("div");
+
+    var varDraggable = new Draggable(this.varWindow), 
+            consDraggable = new Draggable(this.outputWindow);
+
+    this.varWindow.innerHTML += "<strong>--Vars--</strong><br />";
+    this.varWindowInner = document.createElement("div");
+    this.varWindow.appendChild(this.varWindowInner);
+    this.varWindow.setAttribute("id", "_var_window_" + new Date().getTime());
+
     this.outputWindow.innerHTML += "<strong>--Output--</strong><br />";
     this.outputWindowInner = document.createElement("div");
     this.outputWindow.appendChild(this.outputWindowInner);
     this.outputWindow.setAttribute
         ("id", "_cons_window_" + new Date().getTime());
 
-    this.varWindow = document.createElement("div");
-    this.varWindow.innerHTML += "<strong>--Vars--</strong><br />";
-    this.varWindowInner = document.createElement("div");
-    this.varWindow.appendChild(this.varWindowInner);
-    this.varWindow.setAttribute("id", "_var_window_" + new Date().getTime());
+    varDraggable.setup();
+    consDraggable.setup();
 
     this.dbWindow = document.createElement("div");
     this.dbWindow.style.position = 'relative';
@@ -55,10 +62,6 @@ function PHPAnimation(options) {
     var rsz = new ResizableWindowSet([this.srcDiv, this.dbWindow], true);
     rsz.setup();
 
-    var varDraggable = new Draggable(this.varWindow), 
-            consDraggable = new Draggable(this.outputWindow);
-    varDraggable.setup();
-    consDraggable.setup();
 
     this.parentDiv.addEventListener("dragover", (e)=> {
             e.preventDefault();
@@ -223,8 +226,8 @@ PHPAnimation.prototype.handleDBResults = function(data) {
 
 PHPAnimation.prototype.handleDBError = function(data) {
     console.log('******Error with SQL statement: ' + JSON.stringify(data));
-	alert(`Error with SQL statement on line ${data.lineno}: `+
-			`${data.msg}`);
+    alert(`Error with SQL statement on line ${data.lineno}: `+
+            `${data.msg}`);
 }
 
 PHPAnimation.prototype.handleStop = function() {

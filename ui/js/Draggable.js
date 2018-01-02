@@ -38,9 +38,6 @@ Draggable.prototype.setup = function() {
 }
 
 Draggable.prototype.drag = function(e) {
-    // divided by 4 otherwise drags too fast
-    //var newLeft = (e.pageX-origMouseX)/4+this.elem.offsetLeft;
-    //var newTop = (e.pageY-origMouseY)/4+this.elem.offsetTop;
     var newLeft = (e.pageX-this.origMouseX)+this.initElemLeft;
     var newTop = (e.pageY-this.origMouseY)+this.initElemTop;
     if(newLeft>0 && newTop>0 &&
