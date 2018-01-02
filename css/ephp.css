@@ -244,8 +244,8 @@ tr,td,th
     position: absolute; 
     top: 300px;
     right: 300px; 
-    width: 400px;
-    height: 200px;
+    width: 640px;
+    height: 320px;
     border: 2px solid red;
 }
 
@@ -264,7 +264,7 @@ tr,td,th
 
 .srcconsole >  div {
     overflow: auto;
-    height: 160px;
+    height: 90%;
 }
 
 .srcdb {
