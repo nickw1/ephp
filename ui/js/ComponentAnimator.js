@@ -15,13 +15,13 @@ function ComponentAnimator (totalTime, interval, minWidth, elemIds) {
     // noete canvas doesn't exist here yet
     // does exist on doAnim though
     this.minWidth = minWidth;
-    this.recalculateDimensions();
 
     this.timer = null;
 }
 
 ComponentAnimator.prototype.startForwardAnim = function(cb) {
     if(this.timer == null) {
+    	this.recalculateDimensions();
         this.timer = setInterval(this.doAnim.bind(this, 1, cb), this.interval);
     }
 }
