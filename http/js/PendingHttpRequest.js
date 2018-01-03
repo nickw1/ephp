@@ -104,8 +104,9 @@ PendingHttpRequest.prototype.processResponse = function( xmlHTTP,
             // actually is
             for(var i=0; i<responseHeaders.length-1; i++) {
                 var curHeader = responseHeaders[i].split(": ");
-                if(curHeader[0]!="Server") {
-                    this.editableResponse.headers[curHeader[0]] = curHeader[1];
+                if(curHeader[0].toLowerCase()!="server") {
+                    this.editableResponse.headers[curHeader[0].toLowerCase()] =
+						 curHeader[1];
                 }
             }
 

@@ -107,7 +107,7 @@ Browser.prototype.loadResponse = function(o) {
         url = o.url;
         responseText = o.content;
         // deal with Content-types with charset stuff after
-        mimetype = (o.headers["Content-Type"].split(";"))[0];
+        mimetype = (o.headers["content-type"].split(";"))[0];
         statusText = o.statusText;
     } else if (o.responseText) {
         status = o.status;
@@ -118,7 +118,7 @@ Browser.prototype.loadResponse = function(o) {
                 split("\r\n");
         for(var i=0; i<responseHeaders.length-1; i++) {
             var curHeader = responseHeaders[i].split(": ");
-            if(curHeader[0]=="Content-Type") {
+            if(curHeader[0]=="content-type") {
                 mimetype = (curHeader[1].split(";"))[0];
             }
         }    
