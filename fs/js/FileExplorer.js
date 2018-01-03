@@ -32,14 +32,8 @@ function FileExplorer(divId, urls, dropId, callbacks)
 		// right data (on Firefox). text/uri-list gives the image URL instead
 		// if you try to drag an image which is a child of the draggable span.
 		// so always send the contents of the text/plain data type.
-		// Untested Chrome!
+		// NOW TESTED Chrome!
                 e.preventDefault();
-                var data = e.dataTransfer.getData(this.urlType);
-
-                //uri-list wont work on chrome
-                if(data=="") {
-                    data = e.dataTransfer.getData("text/plain");
-                } 
 				var dataTextPlain = e.dataTransfer.getData("text/plain");
                 this.curFile = dataTextPlain;
                 if(this.callbacks.fileInfoCallback) {
@@ -186,33 +180,7 @@ FileExplorer.prototype.onAjaxDirResponse = function(xmlHTTP)
 						ev.stopPropagation();
                         // stops the url of the image being dragged across
 
-                        // messy feature sensing but the only way to get
-                        // this to work in chrome?
-                        // JS The Definitive Guide 6th edition p479
-					/*
-                    if(ev.dataTransfer.types.contains) {
-						console.log("YES");
-                        ev.dataTransfer.clearData('text/plain');
-                        // to send a link the mime type needs to be 
-                        // text/uri-list
-                        // if text/plain it dumps the drag data on the 
-                        // recipient element: not what we want
-                        // however uri-list won't work on chrome: we deal
-                        // with this in the drop event
-						// 020118 this is not being called on firefox either
-						// both using text/plain,
-						console.log("Data being sent: "+
-							json.content[i].name);
-                        ev.dataTransfer.setData(this.urlType,
-                             json.content[i].name);
-                    } else {
-						console.log("Data being sent (notypes): "+
-							json.content[i].name);
-                        ev.dataTransfer.setData('text/plain',
-                             json.content[i].name);
-                    }
-					*/
-					// 020118 will this work now on both firefox and chrome?
+					// 020118 will this work now on both firefox and chrome?-yes
 					ev.dataTransfer.setData('text/plain', json.content[i].name);
                     }).bind(this,i));
 
