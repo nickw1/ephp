@@ -17,12 +17,14 @@ function init() {
                             { showContentCallback: (mime,src,webdirUrl)=> {
                                     saveOld(()=> {
                                         browser.setContent(mime,src);
+                                        browser.setFreezeAlteredStatus(false);
                                         fileInfo = newFileInfo;
                                         // remove the . from the current dir 
                                         var localPath = webdirUrl + 
                                                 fileInfo.dir.substr(1);
                                         browser.setWebDir(localPath);
                                         browser.setFile(fileInfo.file);
+										browser.markUnaltered();
                                         newFileInfo = null;
                                         if(mode==0) {
                                             showFilename();
@@ -32,10 +34,14 @@ function init() {
                                  fileInfoCallback: 
                                     (fInfo)=> { 
                                         newFileInfo = fInfo;
-                                    }
-                                 } 
-                             
-                            );
+                                    },
+
+                                 onDragStart: () => {
+                                        browser.setFreezeAlteredStatus(true);
+                                    
+                                 },
+ 
+						 	});
 
     var phpAnimation = new PHPAnimation({divId:"serverContent",
                                         consoleElement: "console"});
@@ -160,7 +166,7 @@ function init() {
             alert("Transferring: " + filename);
             formData.append("filename", filename);
             formData.append("src",browser.getCode());
-			formData.append("action", "upload");
+            formData.append("action", "upload");
             msg = "Transferring file...";
 
             http.post('ftp/ftp.php', formData).then((xmlHTTP)=> {
@@ -183,7 +189,7 @@ function init() {
     var login = (e)=> {
         var formData = new FormData();
         savedLoginHTML = document.getElementById("login").innerHTML;
-		formData.append("action", "login"); // don't try and transfer
+        formData.append("action", "login"); // don't try and transfer
 
         
         if(document.getElementById("ephp_username") &&
@@ -361,7 +367,7 @@ function init() {
                     mode=i;
                     doTabs();
                     doModeDisplay();
-					// MUST be done after changing visibility
+                    // MUST be done after changing visibility
                     browser.refresh(); 
                 }).bind(this,i));
         tabs[i].addEventListener

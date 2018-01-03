@@ -35,13 +35,16 @@ function Browser(options) {
     }
     this.saveOldCallback = options.saveOldCallback || null;
     this.altered=false;
+    this.alteredStatusFrozen = false;
     this.webDir="";
     this.editor = ace.edit(options.sourceElement);
     this.editor.setOptions({fontSize:"12pt"});
     this.editor.getSession().setMode("ace/mode/php");
     this.editor.on("change", (e)=> {
         this.showContent('text/html', this.editor.getValue());
-        this.altered=true;
+		if(!this.alteredStatusFrozen) {
+        	this.altered=true;
+		}
             });
     this.addedCssRules = [];
     this.setRequestingState(false);
@@ -338,6 +341,10 @@ Browser.prototype.loadDocumentOrImage = function(mimetype, url, responseText) {
         this.setContent('text/html', 
             'This browser does not recognise the content type '+ mimetype);
     }
+}
+
+Browser.prototype.setFreezeAlteredStatus = function(value) {
+	this.alteredStatusFrozen = value;
 }
 
 Browser.prototype.refresh = function() {

@@ -33,7 +33,6 @@ function FileExplorer(divId, urls, dropId, callbacks)
 		// if you try to drag an image which is a child of the draggable span.
 		// so always send the contents of the text/plain data type.
 		// Untested Chrome!
-		console.log("drop event");
                 e.preventDefault();
                 var data = e.dataTransfer.getData(this.urlType);
 
@@ -53,7 +52,6 @@ function FileExplorer(divId, urls, dropId, callbacks)
     
     document.getElementById(dropId).addEventListener("dragover", 
                     (e)=> {
-                console.log("DRAGOVER EVENT");
                 // drag and drop will NOT work without e.preventDefault()
                 e.preventDefault();
 
@@ -92,7 +90,6 @@ FileExplorer.prototype.getFileInfo = function() {
 
 FileExplorer.prototype.sendAjax = function(options)
 {
-	console.log("sendAjax(): options="+JSON.stringify(options));
     options = options || {};
     var url;
     if(options.name) {
@@ -139,7 +136,6 @@ FileExplorer.prototype.onAjaxDirResponse = function(xmlHTTP)
 {
     if(xmlHTTP.status!=200) return;
     this.div.innerHTML = "";
-	console.log(xmlHTTP.responseText);
     var json = JSON.parse(xmlHTTP.responseText);
     var name;
     for(var i=0; i<json.content.length; i++)
@@ -182,7 +178,12 @@ FileExplorer.prototype.onAjaxDirResponse = function(xmlHTTP)
                 span.addEventListener
                 ("dragstart", (function(i,ev)
                     {
-                        console.log("DRAGSTART");
+						// to allow prevention of annoying behaviour in which 
+						// drag data is dumped in the ace editor (see above) 
+						if(this.callbacks.onDragStart) {
+							this.callbacks.onDragStart();
+						}
+						ev.stopPropagation();
                         // stops the url of the image being dragged across
 
                         // messy feature sensing but the only way to get
