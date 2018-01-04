@@ -207,8 +207,9 @@ tr,td,th
 #serverContent { height:100%; } 
 #serverContent code, #serverContent .code
 {
-    font-size: 8pt;
+    font-size: 10pt;
     margin: 0px;
+	padding: 0px;
     font-family: Courier, monospace;
 }
 

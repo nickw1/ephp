@@ -10,6 +10,7 @@ function PHPAnimation(options) {
     this.callback = options.callback || null; 
     this.browserCallback = options.browserCallback || null;
     this.audio = new Audio('assets/sound/Game-Spawn.ogg');
+    this.dbgMsgQueue = new DbgMsgQueue(this, 500);
 
     var elem = this.parentDiv;
     this.getSrcDivPos = function(elem) {
@@ -72,9 +73,7 @@ function PHPAnimation(options) {
     this.dbAnimation = options.dbAnimation || null;
 
     this.interval = options.interval || 1000;
-    this.timer=null;
     this.showing=false;
-    this.isRunning=false;
 
     this.codeLines = [];
 
@@ -94,6 +93,8 @@ PHPAnimation.prototype.setCallback = function(callback) {
 }
 
 PHPAnimation.prototype.setupGUI = function() {
+	this.controlsDiv = document.createElement("div");
+    this.setupControls(this.controlsDiv);
     this.btndiv = document.createElement("div");
     var btn = document.createElement("input");
     btn.setAttribute("type","button");
@@ -118,17 +119,9 @@ PHPAnimation.prototype.setupGUI = function() {
 
     }); 
 
-    var slider = new Slider(2000, 10, {
-        onchange: (value)=> {
-            this.interval = value;
-        } ,
-
-        parent: this.btndiv
-        } );
-    slider.setValue(this.interval);
-
     this.btndiv.appendChild(document.createElement("br"));
     this.btndiv.appendChild(btn);    
+	
 }
 
 // this now just shows the source codee codeLines
@@ -139,7 +132,6 @@ PHPAnimation.prototype.showSrc = function(data) {
     this.varWindow.style.display = 'block';
     this.dbWindow.style.display = 'block';
     var codeLines = data.src || [];
-    this.isRunning = true;
     if(true) {
         // If showing some other code from a previous request, blank out the
         // div, otherwise save the original contents
@@ -179,8 +171,9 @@ PHPAnimation.prototype.showSrc = function(data) {
               this.codeLines.push(line);
             }
         }
-        this.parentDiv.appendChild(this.btndiv);
+		this.parentDiv.appendChild(this.controlsDiv);
         this.parentDiv.appendChild(this.dbWindow);
+        this.parentDiv.appendChild(this.btndiv);
         this.parentDiv.appendChild(this.outputWindow);
         this.parentDiv.appendChild(this.varWindow);
 
@@ -231,6 +224,7 @@ PHPAnimation.prototype.handleDBError = function(data) {
 }
 
 PHPAnimation.prototype.handleStop = function() {
+//	this.dbgQueue.start();
 }
 
 PHPAnimation.prototype.highlightLine = function(line) {
@@ -244,22 +238,41 @@ PHPAnimation.prototype.unhighlightLastLine = function(line) {
         }
 }
 
+PHPAnimation.prototype.setupControls = function(div) {
 
-PHPAnimation.prototype.stop = function() {
-    this.clearTimer();
-    if(this.isRunning) {
-       this.outputWindow.style.display='none';
-        if(this.showing) {
-            //this.srcDiv.removeChild(this.outputWindow);
-        }
-    
-        this.isRunning = false;
-    }
+
+
+    var pause = document.createElement("img");
+    pause.setAttribute("alt", "Pause Loop");
+    pause.setAttribute("src", "assets/images/control_pause_blue.2.png");                            
+    var play = document.createElement("img");
+    play.setAttribute("alt", "Play/Resume Loop");
+    play.setAttribute("src", "assets/images/control_play_blue.2.png");
+
+    var rewind = document.createElement("img");
+    rewind.setAttribute("alt", "Rewind Loop");
+    rewind.setAttribute("src", "assets/images/control_rewind_blue.2.png");                            
+    pause.addEventListener("click", (e)=> {this.dbgMsgQueue.stop() });
+    play.addEventListener("click", (e)=> {this.dbgMsgQueue.start() });
+    rewind.addEventListener("click", (e)=> {this.dbgMsgQueue.rewind() });
+
+    div.appendChild(pause);
+    div.appendChild(play);
+    div.appendChild(rewind);
+
+    var slider = new Slider(2000, 20, {
+        onchange: (value)=> {
+            this.dbgMsgQueue.setInterval(value);
+        },
+		width: '400px',
+        parent: div} );
+    slider.setValue(this.dbgMsgQueue.getInterval());
 }
 
-PHPAnimation.prototype.clearTimer = function() {
-    if(this.timer!=null) {
-        clearTimeout(this.timer);
-        this.timer=null;
-    }
+PHPAnimation.prototype.addToQueue = function(msg) {
+    this.dbgMsgQueue.add(msg);
+}
+
+PHPAnimation.prototype.clearQueue = function() {
+	this.dbgMsgQueue.clear();
 }

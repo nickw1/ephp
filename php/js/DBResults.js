@@ -1,6 +1,6 @@
 function DBResults(phpAnim) {
     this.phpAnim = phpAnim;
-	this.lastId = null;
+    this.lastId = null;
 }
 
 DBResults.prototype.highlightRow = function(id) {
@@ -63,8 +63,6 @@ DBResults.prototype.showResults = function(sqlquery, hostDiv) {
 
     close.addEventListener("click",
         (e)=> {
-            //this.pauseLoopAnimate();
-            //this.resetLoop();
             hostDiv.style.display='none';
         });
 
@@ -76,63 +74,9 @@ DBResults.prototype.showResults = function(sqlquery, hostDiv) {
     div.appendChild(titlebar);
     div.appendChild(table);
 
-    var play = document.createElement("img");
-    play.setAttribute("alt", "Play/Resume Loop");
-    play.setAttribute("src", "assets/images/control_play_blue.2.png");
-
-
-    var pause = document.createElement("img");
-    pause.setAttribute("alt", "Pause Loop");
-    pause.setAttribute("src", "assets/images/control_pause_blue.2.png");                            
-    var rewind = document.createElement("img");
-    rewind.setAttribute("alt", "Rewind Loop");
-    rewind.setAttribute("src", "assets/images/control_rewind_blue.2.png");                            
-
-
-    var range = document.createElement("input");
-    range.setAttribute("type", "range");
-    range.setAttribute("min", 1);
-    range.setAttribute("max", 10);
-    range.setAttribute("step", 1);
-    range.setAttribute("value", 2000.0 / this.interval);
-    range.addEventListener("change", (e)=> {
-         this.interval = 2000.0 / e.target.value;
-        });
-
-//    play.addEventListener("click", this.resumeLoopAnimate.bind(this));
-//    pause.addEventListener("click",this.pauseLoopAnimate.bind(this)); 
-
-    rewind.addEventListener("click", 
-        (e)=> {
-            document.getElementById("row"+this.rowIndex).
-                classList.remove("selected");
-            if(this.contLoopAnimate) {
-                //this.pauseLoopAnimate();
-        }
-        document.getElementById("row"+this.rowIndex).classList.
-                    remove("selected");
-            //this.unselectSelectedCells();
-            //this.resetLoop();
-            //this.clearConsole();
-    //            this.resumeLoopAnimate();
-            
-        });
-
-    div.appendChild(play);
-    div.appendChild(rewind);
-    div.appendChild(pause);
-
-    var slider = new Slider(2000, 10, {
-        onchange: (value)=> {
-            this.interval = value;
-        } ,
-
-        parent: div
-        } );
-    slider.setValue(this.interval);
     hostDiv.appendChild(div);
 }
 
 DBResults.prototype.reset = function() {
-	this.lastId = null;
+    this.lastId = null;
 }

@@ -45,7 +45,7 @@ HTTPAnimation.prototype.finishRequest = function() {
 							alert("error(s):\n" + data.errors.join("\n"));
 						} else if (this.componentAnimator) { 
 							// should only start the debugmgr once
-							// the compoonent animator has finished
+							// the component animator has finished
 							this.componentAnimator.startForwardAnim(
 								this.showSrcAndLaunchDebug.bind
 									(this, data, debugMgr));

@@ -14,7 +14,7 @@ DebugMgr.prototype.runLauncher = function(method, scriptUrl, formData) {
                     // startup the websocket stuff
                     var data = JSON.parse(xmlHTTP.responseText);
                     this.user = data.user;
-					console.log('USER: ' + this.user);
+                    console.log('USER: ' + this.user);
                     console.log("Launcher returned: "+ xmlHTTP.responseText);
                     this.connect(method, scriptUrl, formData);
                 } ).catch( (statusCode) => {
@@ -24,24 +24,24 @@ DebugMgr.prototype.runLauncher = function(method, scriptUrl, formData) {
 
 DebugMgr.prototype.connect = function(method, scriptUrl, formData) {
     //console.log("connect(): scriptUrl="+scriptUrl);
-	console.log("create new websocket...");
+    console.log("create new websocket...");
     this.ws=new WebSocket('ws://localhost:8080');
-	console.log('readystate=' + this.ws.readyState);
+    console.log('readystate=' + this.ws.readyState);
 
     this.ws.onopen = (e) => {
-			console.log('onopen: sending ' + this.user);
+            console.log('onopen: sending ' + this.user);
             this.ws.send(JSON.stringify({"cmd":"user", "data":this.user}));
     }    
 
     this.ws.onmessage = (e) => {
-        console.log("websocket sent: " + e.data);
+//        console.log("websocket sent: " + e.data);
         var data = JSON.parse(e.data);
         var fullDebugUrl = scriptUrl;
         // all debug commands have a user field to identify which user is
         // sending them, others will be ignored
         if(data.cmd && data.user && this.user == data.user &&
             this.dbgMsgHandler != null) {
-            //console.log("cmd from web socket server=" + data.cmd);
+            console.log("cmd from web socket server=" + data.cmd);
             switch(data.cmd) {
                 case 'opened':
                     switch(method.toUpperCase()) {
@@ -63,47 +63,31 @@ DebugMgr.prototype.connect = function(method, scriptUrl, formData) {
                             if(this.completeCallback != null) {
 
                                console.log("debug session finished: "+
-								"Sending completeCallback with response: " + 
-								xmlHTTP.responseText);
+                                "Sending completeCallback with response: " + 
+                                xmlHTTP.responseText);
 
-								if(xmlHTTP.responseText.indexOf("Parse error")
-									>=0) {
-								 	alert("Syntax error in your PHP script. "+
-											"Details: " + 
-											xmlHTTP.responseText.substr
-												(xmlHTTP.responseText.
-													indexOf(":")+1).
-													replace(/<[^>]+>/g, ""));
-								}
+                                if(xmlHTTP.responseText.indexOf("Parse error")
+                                    >=0) {
+                                     alert("Syntax error in your PHP script. "+
+                                            "Details: " + 
+                                            xmlHTTP.responseText.substr
+                                                (xmlHTTP.responseText.
+                                                    indexOf(":")+1).
+                                                    replace(/<[^>]+>/g, ""));
+                                }
                                 this.completeCallback(xmlHTTP);
                         }
-                    // sned back to whatever called this 
+                    // send back to whatever called this 
                     }).catch((code)=>alert(code));
                     break;
 
-
-                case 'line':
-                    this.dbgMsgHandler.handleLine(data.data);
-                    break;
-
-                case 'newrow':
-                    this.dbgMsgHandler.handleNewRow(data.data);
-                    break;
-
-                case 'stdout':
-                    this.dbgMsgHandler.handleStdout(data.data);
-                    break;
-                
-                case 'dbresults':
-                    this.dbgMsgHandler.handleDBResults(data.data);
-                    break;
-
-				case 'dberror':
-					this.dbgMsgHandler.handleDBError(data.data);
-					break;
-
                 case 'stop':
                     this.dbgMsgHandler.handleStop();
+                    break;
+
+                default:
+					console.log("adding command to queue: "+ data.cmd);
+                    this.dbgMsgHandler.addToQueue(data);
                     break;
             }
         }
@@ -120,9 +104,9 @@ DebugMgr.prototype.initiateDebugSession = function() {
 }
 
 DebugMgr.prototype.stopServers = function() {
-        var fd=new FormData();
-        fd.append('cmd', 'stop');
-        http.send('POST', this.launcher,fd).
+    var fd=new FormData();
+    fd.append('cmd', 'stop');
+    http.send('POST', this.launcher,fd).
                 then((e)=>
             {console.log('stopped: ' + e.target.responseText); }).
                 catch((code)=>{alert(code)});
@@ -132,22 +116,19 @@ DebugMgr.prototype.setCompleteCallback = function(cb) {
     this.completeCallback = cb;
 }
 
-//!! TODO nto being called on chrome!
 DebugMgr.prototype.launchDebugSession = function(scriptUrl, method, formData, 
         callback) {
     // added new code from old version to retrieve the source code
     // Kill the cache - this caused no reload at times
-        var killcache="?killcache="+new Date().getTime();
-        if(method=='GET') {
-// !! changed this as it seemed to be adding the url twice, presumably left
-// over from original EPHP
-            var parts = scriptUrl.split("?");
-            scriptUrl=(parts.length==2 ? parts[0]+killcache+
-                "&"+parts[1] : parts[0]+killcache);
-        } else {
-            scriptUrl += killcache;
-        }
-        this.setCompleteCallback (callback);
-        //TODO  do nothing???
-        this.runLauncher(method, scriptUrl, formData);
+    var killcache="?killcache="+new Date().getTime();
+    if(method=='GET') {
+        var parts = scriptUrl.split("?");
+        scriptUrl=(parts.length==2 ? parts[0]+killcache+ 
+            "&"+parts[1] : parts[0]+killcache);
+    } else {
+        scriptUrl += killcache;
+    }
+    this.setCompleteCallback (callback);
+    this.dbgMsgHandler.clearQueue();
+    this.runLauncher(method, scriptUrl, formData);
 } 
