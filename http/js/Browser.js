@@ -53,6 +53,8 @@ function Browser(options) {
         (this.setRequestingState.bind(this,true));
     this.animation.addOnMessageEndListener
         (this.setRequestingState.bind(this,false));
+
+	this.doAnimation = true;
 }
 
 Browser.prototype.sendRequest = function(method,url,formData) {
@@ -80,9 +82,13 @@ Browser.prototype.sendRequest = function(method,url,formData) {
               }
             );
 
-        this.animation.stop(); // stop any previous animations
-        this.animation.setMessage(pXHR);
-        this.animation.animate();
+		if(this.doAnimation) {
+        	this.animation.stop(); // stop any previous animations
+        	this.animation.setMessage(pXHR);
+        	this.animation.animate();
+		} else {
+			// kick off the php stepthrough 
+		}
     }
 }
 
@@ -349,4 +355,8 @@ Browser.prototype.setFreezeAlteredStatus = function(value) {
 
 Browser.prototype.refresh = function() {
     this.editor.resize(true);
+}
+
+Browser.prototype.setAnimation = function(doAnimation) {
+	this.doAnimation = doAnimation;
 }

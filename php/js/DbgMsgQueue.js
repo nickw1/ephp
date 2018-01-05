@@ -1,10 +1,11 @@
 
-function DbgMsgQueue(dbgMsgHandler, interval) {
+function DbgMsgQueue(dbgMsgHandler, interval, callbacks) {
     this.dbgMsgHandler = dbgMsgHandler;
     this.messages = [];
     this.activeQueue = [];
     this.handle = null;
     this.interval = interval;
+	this.callbacks = callbacks || {};
 }
 
 DbgMsgQueue.prototype.add = function(msg) {
@@ -16,6 +17,9 @@ DbgMsgQueue.prototype.add = function(msg) {
 DbgMsgQueue.prototype.start = function() {
     if(this.handle == null) {
         this.handle=setInterval (this.processNextMsg.bind(this), this.interval);
+		if(this.callbacks.onStart) {
+			this.callbacks.onStart();
+		}
     }
 }
 
@@ -23,6 +27,9 @@ DbgMsgQueue.prototype.stop = function() {
     if(this.handle != null) {
         clearInterval(this.handle);
         this.handle=null;
+		if(this.callbacks.onStop) {
+			this.callbacks.onStop();
+		}
     }
 }
 

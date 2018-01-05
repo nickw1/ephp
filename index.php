@@ -64,13 +64,14 @@ class EPHPPage extends Page {
             </div>
         </div>
 
-        <div id="network">
+        <div id="networkContainer">
+		<div id="network">
         <div id='network_header' class='component_header'>
         network<br />
             <img src='assets/images/rgtaylor_csc_net_wan_cloud.med.png'
                 alt='network' id='network_img'/>
         </div>
-
+		</div>
         </div>
 
         <div id="server">

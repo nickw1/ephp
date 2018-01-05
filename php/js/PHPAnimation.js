@@ -10,7 +10,14 @@ function PHPAnimation(options) {
     this.callback = options.callback || null; 
     this.browserCallback = options.browserCallback || null;
     this.audio = new Audio('assets/sound/Game-Spawn.ogg');
-    this.dbgMsgQueue = new DbgMsgQueue(this, 500);
+    this.dbgMsgQueue = new DbgMsgQueue(this, 500, 
+            { onStart:()=> {
+                this.runBtn.setAttribute("disabled", "disabled");
+                },
+              onStop: ()=>{
+                this.runBtn.removeAttribute("disabled");
+                }
+            });
 
     var elem = this.parentDiv;
     this.getSrcDivPos = function(elem) {
@@ -93,17 +100,18 @@ PHPAnimation.prototype.setCallback = function(callback) {
 }
 
 PHPAnimation.prototype.setupGUI = function() {
-	this.controlsDiv = document.createElement("div");
+    this.controlsDiv = document.createElement("div");
     this.setupControls(this.controlsDiv);
     this.btndiv = document.createElement("div");
-    var btn = document.createElement("input");
-    btn.setAttribute("type","button");
-    btn.setAttribute("value","Run PHP and send back output");
-    btn.addEventListener("click", ()=> {
+    this.runBtn = document.createElement("input");
+    this.runBtn.setAttribute("type","button");
+    this.runBtn.setAttribute("value","Send back output from PHP");
+    this.runBtn.addEventListener("click", ()=> {
         this.showing=false;
         this.dbWindowInner.innerHTML = this.outputWindowInner.innerHTML = "";
         this.varsBox.reset();
         this.dbResults.reset();
+        this.dbgMsgQueue.clear();
         while(this.parentDiv.childNodes.length > 0) {
             var d = this.parentDiv.firstChild;
             this.parentDiv.removeChild(d);
@@ -120,8 +128,8 @@ PHPAnimation.prototype.setupGUI = function() {
     }); 
 
     this.btndiv.appendChild(document.createElement("br"));
-    this.btndiv.appendChild(btn);    
-	
+    this.btndiv.appendChild(this.runBtn);    
+    
 }
 
 // this now just shows the source codee codeLines
@@ -171,8 +179,8 @@ PHPAnimation.prototype.showSrc = function(data) {
               this.codeLines.push(line);
             }
         }
-		this.parentDiv.appendChild(this.controlsDiv);
         this.parentDiv.appendChild(this.dbWindow);
+        this.parentDiv.appendChild(this.controlsDiv);
         this.parentDiv.appendChild(this.btndiv);
         this.parentDiv.appendChild(this.outputWindow);
         this.parentDiv.appendChild(this.varWindow);
@@ -224,7 +232,6 @@ PHPAnimation.prototype.handleDBError = function(data) {
 }
 
 PHPAnimation.prototype.handleStop = function() {
-//	this.dbgQueue.start();
 }
 
 PHPAnimation.prototype.highlightLine = function(line) {
@@ -260,11 +267,11 @@ PHPAnimation.prototype.setupControls = function(div) {
     div.appendChild(play);
     div.appendChild(rewind);
 
-    var slider = new Slider(2000, 20, {
+    var slider = new Slider(2000, 50, {
         onchange: (value)=> {
             this.dbgMsgQueue.setInterval(value);
         },
-		width: '400px',
+        width: '400px',
         parent: div} );
     slider.setValue(this.dbgMsgQueue.getInterval());
 }
@@ -274,5 +281,5 @@ PHPAnimation.prototype.addToQueue = function(msg) {
 }
 
 PHPAnimation.prototype.clearQueue = function() {
-	this.dbgMsgQueue.clear();
+    this.dbgMsgQueue.clear();
 }

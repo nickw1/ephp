@@ -15,7 +15,9 @@ function GenericAnimation(options) {
     this.canvas = document.createElement("canvas");
     this.parentElement = document.getElementById(options.parentId);
     this.canvas.setAttribute("height", options.height);
-	this.canvas.setAttribute("width", this.parentElement.offsetWidth+"px"); 
+	this.canvas.setAttribute("width", this.parentElement.offsetWidth); 
+	console.log("setting canvas properties to: " + (this.canvas.width) +" " 
+		+this.canvas.height);
 
     this.parentElement.appendChild(this.canvas);
     
@@ -37,6 +39,10 @@ function GenericAnimation(options) {
 
     this.onmessagestart = options.onmessagestart || [];
     this.onmessageend = options.onmessageend || [];
+
+	// 040118 are we actually doing animation?
+	// e.g. allows us to skip straight to PHP debugging without showing request
+	this.active = true;
 
     // Replaced PHPAnimation with a generic ServerAnimation (something which
     // animates server side then returns to the response on finish)
@@ -119,8 +125,12 @@ GenericAnimation.prototype.animate = function() {
 }
 
 GenericAnimation.prototype.fireAnimation = function(){
-    this.timer = setTimeout
-        (this.doAnimate.bind(this,this.messageTypes.REQUEST), this.interval);
+	if(this.active) {
+    	this.timer = setTimeout
+          (this.doAnimate.bind(this,this.messageTypes.REQUEST), this.interval);
+	} else {
+		this.finishRequest();
+	}
 }
 
 GenericAnimation.prototype.doAnimate = function(messageType) {
@@ -211,9 +221,13 @@ GenericAnimation.prototype.startResponse = function() {
     for(var i=0; i<this.onmessagestart.length; i++) {
         this.onmessagestart[i](this.messageTypes.RESPONSE);
     }
-    this.timer = setTimeout (this.doAnimate.bind
+	if(this.active) {
+    	this.timer = setTimeout (this.doAnimate.bind
                                     (this,this.messageTypes.RESPONSE),     
                                     this.interval);
+	} else {
+		this.message.finish();	
+	}
 }
 
 GenericAnimation.prototype.pause = function() {
@@ -286,4 +300,13 @@ GenericAnimation.prototype.addOnMessageEndListener = function(cb) {
 
 GenericAnimation.prototype.resizeCanvas = function() {
     this.canvas.setAttribute("width", this.parentElement.offsetWidth+"px"); 
+}
+
+GenericAnimation.prototype.setActive = function(active) {
+	this.active = active;
+}
+
+GenericAnimation.prototype.clearCanvas = function() {
+	this.ctx.fillStyle = 'white';
+	this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 }

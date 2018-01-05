@@ -1,11 +1,11 @@
 
 function HTTPAnimation(options) {
-	console.log("HTTPAnimation constuctore");
+    console.log("HTTPAnimation constuctore");
     GenericAnimation.prototype.constructor.apply(this,[options]);
     this.fileExplorer = options.fileExplorer;
-	if(options.componentAnimator) {
-    	this.componentAnimator = options.componentAnimator;
-	} 
+    if(options.componentAnimator) {
+        this.componentAnimator = options.componentAnimator;
+    } 
     this.onerror = options.onerror;
 }
 
@@ -15,11 +15,8 @@ HTTPAnimation.prototype = Object.create(GenericAnimation.prototype);
 
 HTTPAnimation.prototype.fireAnimation = function()  {
     if(this.fileExplorer) {
-        this.fileExplorer.home ( () => {
-                    this.timer = setTimeout
-                        (this.doAnimate.bind(this,this.messageTypes.REQUEST),
-                        this.interval);
-                    }); 
+        this.fileExplorer.home 
+            (GenericAnimation.prototype.fireAnimation.bind(this)); 
     } else {
         GenericAnimation.prototype.fireAnimation.apply(this);
     }
@@ -27,7 +24,7 @@ HTTPAnimation.prototype.fireAnimation = function()  {
 
 // Overridden to do the ServerFilesystemAnimation and analyser stuff
 HTTPAnimation.prototype.finishRequest = function() {
-		console.log("finishRequest()");
+        console.log("finishRequest()");
         var debugMgr = new DebugMgr("php/launcher.php",
                 { dbgMsgHandler: this.serverAnimation } );
 
@@ -39,26 +36,26 @@ HTTPAnimation.prototype.finishRequest = function() {
             repeat:2, 
             interval:500, 
             callback: ()=> {
-				if(this.message.isPHPScript()) {
-					this.message.retrieveSrc ( (data) => {
-						if(data.errors) {
-							alert("error(s):\n" + data.errors.join("\n"));
-						} else if (this.componentAnimator) { 
-							// should only start the debugmgr once
-							// the component animator has finished
-							this.componentAnimator.startForwardAnim(
-								this.showSrcAndLaunchDebug.bind
-									(this, data, debugMgr));
+                if(this.message.isPHPScript()) {
+                    this.message.retrieveSrc ( (data) => {
+                        if(data.errors) {
+                            alert("error(s):\n" + data.errors.join("\n"));
+                        } else if (this.componentAnimator) { 
+                            // should only start the debugmgr once
+                            // the component animator has finished
+                            this.componentAnimator.startForwardAnim(
+                                this.showSrcAndLaunchDebug.bind
+                                    (this, data, debugMgr));
 
-						} else {
-							this.showSrcAndLaunchDebug(data, debugMgr);
-						}
-					});
-				} else {
-                 	this.message.send(this.startResponse.bind(this));
-				}
-			}
-		});
+                        } else {
+                            this.showSrcAndLaunchDebug(data, debugMgr);
+                        }
+                    });
+                } else {
+                     this.message.send(this.startResponse.bind(this));
+                }
+            }
+        });
         sa.animate();
 }
 
@@ -70,11 +67,11 @@ HTTPAnimation.prototype.startResponse = function() {
 }
 
 HTTPAnimation.prototype.showSrcAndLaunchDebug = function(data, debugMgr) {
-	console.log("showSrcAndLaunchDebug()");
-	this.serverAnimation.showSrc(data);
-	debugMgr.launchDebugSession (this.message.url, this.message.method,
-									this.message.formData,
-										(xmlHTTP) => {
-							this.message.processResponse(xmlHTTP, true);
-									});
+    console.log("showSrcAndLaunchDebug()");
+    this.serverAnimation.showSrc(data);
+    debugMgr.launchDebugSession (this.message.url, this.message.method,
+                                    this.message.formData,
+                                        (xmlHTTP) => {
+                            this.message.processResponse(xmlHTTP, true);
+                                    });
 }

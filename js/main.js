@@ -6,10 +6,9 @@ function init() {
     var filenameDiv = document.getElementById("filename");
     var mode=0;
     var savedLoginHTML="", originalLoginDivContents = "";
-    var mq = window.matchMedia("screen and (max-device-height: 799px)");
-    var canvasHeight =  mq.matches? "472px": "592px";
+    var canvasHeight =  592; 
     var compAnim = new ComponentAnimator(1000, 5, 100, 
-                                            ['client', 'network', 'server']);
+                                            ['client', 'networkContainer', 'server']);
 
     var fileExplorer=new FileExplorer('serverContent', 
                             {http: 'fs/fs.php',
@@ -24,7 +23,7 @@ function init() {
                                                 fileInfo.dir.substr(1);
                                         browser.setWebDir(localPath);
                                         browser.setFile(fileInfo.file);
-										browser.markUnaltered();
+                                        browser.markUnaltered();
                                         newFileInfo = null;
                                         if(mode==0) {
                                             showFilename();
@@ -41,7 +40,7 @@ function init() {
                                     
                                  },
  
-						 	});
+                             });
 
     var phpAnimation = new PHPAnimation({divId:"serverContent",
                                         consoleElement: "console"});
@@ -319,7 +318,7 @@ function init() {
                 if(loggedin==null) {
                     alert("Not logged in!");
                 } else {
-                    askUploadFile();
+                       uploadContent(); 
                 }
 
             });
@@ -380,15 +379,63 @@ function init() {
     doTabs();
     doModeDisplay();
     ResizableWindowSet.addFullResize([document.getElementById('client'), 
-                                    document.getElementById('network'), 
+                                    document.getElementById('networkContainer'), 
                                     document.getElementById('server')]);
     var rw = new ResizableWindowSet([document.getElementById('client'), 
-                                    document.getElementById('network'), 
+                                    document.getElementById('networkContainer'),
                                     document.getElementById('server')]);
     rw.setOnFinishCallback(animation.calculateCanvasPos.bind(animation));
     rw.setup();
-}
 
-function msg(msg, bold=false) {
-}
+    var origWidth, netWidth = 400;
 
+    var networkShowDiv = document.createElement("div");
+    networkShowDiv.style.backgroundColor = '#ffffe0';
+    networkShowDiv.style.width='75px';
+    networkShowDiv.style.border='ridge';
+    var cloudImg = new Image();
+    cloudImg.src='assets/images/rgtaylor_csc_net_wan_cloud.small.png';
+    networkShowDiv.appendChild(cloudImg);
+    networkShowDiv.addEventListener('click', ()=> {
+            var netCont = document.getElementById('networkContainer'),
+                net = document.getElementById('network');
+            netCont.removeChild(networkShowDiv);
+            net.style.display='block';
+            netCont.style.width=netWidth+'px';
+            netCont.style.height='100%';
+            netCont.fullResizeWidth(netWidth);
+            var csWidth= ((origWidth-netWidth)/2)+'px';
+            console.log('csWidth=' + csWidth);
+            document.getElementById('server').style.width = csWidth;
+            document.getElementById('client').style.width = csWidth;
+            animation.setActive(true);
+            animation.clearCanvas();
+            compAnim.setIgnored(null);
+			rw.showResizer(netCont, true);
+        }
+    );
+
+    var img = document.createElement('img'); 
+    img.src='assets/images/cross.png';
+    img.style.position='absolute';
+    img.style.right='0px';
+    img.style.top='0px';
+    img.addEventListener('click', ()=> {
+            var netCont = document.getElementById('networkContainer'),
+                net = document.getElementById('network');
+            origWidth = document.getElementById('client').offsetWidth+
+                    netCont.offsetWidth+
+                    document.getElementById('server').offsetWidth;
+            console.log("origWidth="+origWidth);
+            netCont.style.width='75px';
+            netCont.style.height='40px';
+            document.getElementById('client').style.width='50%';
+            document.getElementById('server').style.width='50%';
+            net.style.display='none';
+            netCont.appendChild(networkShowDiv);
+            animation.setActive(false);
+            compAnim.setIgnored(net);
+			rw.showResizer(netCont, false);
+        });
+    document.getElementById('network').appendChild(img);
+}

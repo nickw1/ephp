@@ -22,9 +22,8 @@ body
     overflow: hidden;
 }
 
-#client, #network, #server {
+#client, #networkContainer, #server {
     display: inline-block;  
-    background-color: white;
     margin: 10px;
     height: 100%; 
     vertical-align: top; 
@@ -32,50 +31,29 @@ body
     /* white-space is inherited so get the contained elements 
     to treat whitespace normally */
     white-space: normal;
+	background-color: white;
 }
 
-@media screen and (max-device-height: 799px) {
-    body
-    {
-        font-size: 80%;
-    }
 
-    .component_header
-    {
-        height: 50px;    
-    }
-    
-    .component_header img
-    {
-        height: 32px;
-    }
-
-    #ephp_container {
-        height: 600px;
-    }
-
-    /* TODO - is there a better way? */
-    #src_ace {
-        height: 480px;
-    }
-
-    #content {
-        height: 480px; 
-    }
+#networkContainer {
+	width: 400px;
 }
 
-@media screen and (min-device-height: 800px) {
-    #ephp_container {
-        height: 800px;
-    }
+#network {
+	width: 100%;
+    background-color: white;
+}
 
-    #src_ace {
-        height: 600px;
-    }
+#ephp_container {
+	height: 800px;
+}
 
-    #content {
-        height: 600px; 
-    }
+#src_ace {
+	height: 600px;
+}
+
+#content {
+	height: 600px; 
 }
 
 
@@ -83,6 +61,7 @@ body
 {
     text-align: center;
     background-color: #ffffe0;
+	width: 100%;
 }
 
 #client 
@@ -137,10 +116,10 @@ body
     display: none;
 }
 
-#network
+#networkContainer
 {
     height: 100%;
-    width: 25%;
+/*    width: 25%; */
 }
 
 #dbconnect
