@@ -159,7 +159,8 @@ class EPHPXDClient extends XDClient\VarWatcher  {
 
         // TODO think we are executing sql queries twice (also during
         // regular debugging stepthrough( which we don't want to do
-        if($this->sqlqueries[$this->idekey]!==false) {
+        if(isset($this->sqlqueries[$this->idekey]) && 
+                $this->sqlqueries[$this->idekey]!==false) {
             foreach($this->sqlqueries[$this->idekey] as $sqlquery) {
                 if($sqlquery["startLine"]==$lineno) {
                     $executableQuery = $this->replaceQueryVariables 
