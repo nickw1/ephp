@@ -1,11 +1,10 @@
 <?php 
 
 // see Rady Cristescu's comment on getmypid() manual page
-define('TMPDIR','/var/www/tmp/');
-define('LOCKFILE', TMPDIR."xdclient.lock");
-
 require('EPHPXDClient.php');
 require('ZMQEmitter.php');
+define('LOCKFILE', TMPDIR."xdclient.lock");
+
 
 $xdupdateport = 9001;
 $launchport = 9002;
