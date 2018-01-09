@@ -50,7 +50,6 @@ ComponentAnimator.prototype.startReverseAnim = function(cb) {
 // correctly
 ComponentAnimator.prototype.doAnim = function (direction, cb) {
 
-    console.log("midSteps=" + this.midSteps[1]);
     var grower = direction==-1 ? this.elem[0] : this.elem[this.elem.length-1];
     var shrinker = direction==-1 ? this.elem[this.elem.length-1]: this.elem[0];
 
@@ -58,13 +57,8 @@ ComponentAnimator.prototype.doAnim = function (direction, cb) {
     var growerWidth = grower.offsetWidth + this.endsStep;
     for(var i=1; i<this.elem.length-1; i++) {
         if(this.elem[i] != this.ignored) {
-            console.log("ofset width="+ this.elem[i].offsetWidth);
-                console.log("Setting with to:     " + (this.elem[i].offsetWidth-
-                        (this.midSteps[i]*direction)));
             this.elem[i].fullResizeWidth
                 (this.elem[i].offsetWidth- (this.midSteps[i]*direction));
-            console.log("now ofset width="+ this.elem[i].offsetWidth +
-                " midsteps=" + this.midSteps[i] + " direction="+direction);
         }
     
         growerWidth += this.midSteps[i];

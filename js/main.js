@@ -405,7 +405,6 @@ function init() {
             netCont.style.height='100%';
             netCont.fullResizeWidth(netWidth);
             var csWidth= ((origWidth-netWidth)/2)+'px';
-            console.log('csWidth=' + csWidth);
             document.getElementById('server').style.width = csWidth;
             document.getElementById('client').style.width = csWidth;
             animation.setActive(true);
@@ -426,7 +425,6 @@ function init() {
             origWidth = document.getElementById('client').offsetWidth+
                     netCont.offsetWidth+
                     document.getElementById('server').offsetWidth;
-            console.log("origWidth="+origWidth);
             netCont.style.width='75px';
             netCont.style.height='40px';
             document.getElementById('client').style.width='50%';

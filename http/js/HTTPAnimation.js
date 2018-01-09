@@ -1,6 +1,5 @@
 
 function HTTPAnimation(options) {
-    console.log("HTTPAnimation constuctore");
     GenericAnimation.prototype.constructor.apply(this,[options]);
     this.fileExplorer = options.fileExplorer;
     if(options.componentAnimator) {

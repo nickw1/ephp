@@ -20,14 +20,15 @@ class EPHPXDClient extends XDClient\VarWatcher  {
         $this->curLine = [];
         $this->sqlqueries = [];
         $this->startTime = time();
-        echo "EPHPXDClient started: start time = {$this->startTime}\n";
+        fwrite($this->log, 
+            "EPHPXDClient started: start time = {$this->startTime}\n\n");
     }
 
     public function onInit($doc) {
         parent::onInit($doc);
         $ok = false;
         $idekey = (string)$doc["idekey"];
-        echo "onInit(): IDE key=$idekey\n";
+        fwrite($this->log,  "onInit(): IDE key=$idekey\n\n");
         if($doc["fileuri"]) {
             $this->lf[$idekey] = new DBLoopFinder((string)$doc["fileuri"]);
             if($this->lf[$idekey]) {
@@ -68,35 +69,42 @@ class EPHPXDClient extends XDClient\VarWatcher  {
                                 $this->vars[$this->idekey][$n] = 
                                     ["type"=>"query", "value"=>$sql];
                             }
-                            echo "vars index $n = \n";
-                            print_r($this->vars[$this->idekey][$n]);
+//                            fwrite($this->log,"vars index $n = \n\n");
+ //                           fwrite($this->log, print_r($this->vars[$this->idekey][$n], true));
                             // get the db results for this query if it's
                             // not already been done
                             if (!isset($this->vars
                                     [$this->idekey][$n]["dbresults"])) {
-                                echo "DBResults not set for {$this->idekey} n1...\n";
+                                fwrite($this->log,  
+                                    "DBResults not set for {$this->idekey} ".
+                                    "n1...\n\n");
                                 $loop=$this->lf[$this->idekey]->getLoops([$n1]);
                                 if($loop!==false) {
-                                    echo "Setting DBResults for {$this->idekey} variable $n1\n";
+                                    fwrite($this->log, 
+                                        "Setting DBResults for {$this->idekey}".
+                                        " variable $n1\n\n");
                                     $this->loops[$this->idekey]->addLoop($loop);
                                     $results = $this->executeSQL($sql); 
                                     if($results[0]!==false) {
                                         $this->loops[$this->idekey]->setResults
                                         ($n1, $results[0]);
-                                        $this->vars[$this->idekey][$n]["dbresults"]= $results;    
+                                        $this->vars[$this->idekey][$n]
+                                            ["dbresults"]= $results;    
                                         $this->emitter->emit
                                        (["cmd"=>"dbresults","data"=>
                                        ["varName"=>$n1,"results"=>$results[0]]]);
                                     } else {
-                                        echo "ERROR INFO: ";
-                                        print_r($results[1]);
+                                        fwrite($this->log, "ERROR INFO: ");
+                                        fwrite($this->log, print_r($results[1],
+                                             true));
                                     }
                                 }
                             } else {
                                 $results = $this->vars
                                     [$this->idekey][$n]["dbresults"];
-                                echo "Using previous results for {$this->idekey} $n1:\n";
-                                print_r($results);
+                                fwrite($this->log, 
+                                    "Using previous results for ".
+                                    "{$this->idekey} $n1:\n\n");
                             }
                         }
                     }

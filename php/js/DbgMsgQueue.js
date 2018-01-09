@@ -46,7 +46,6 @@ DbgMsgQueue.prototype.getInterval = function() {
 DbgMsgQueue.prototype.processNextMsg = function() {
     if(this.activeQueue.length > 0) {
         var msg = this.activeQueue.shift();
-		console.log("DbgMsgQueue: processing command: " + msg.cmd);
         switch(msg.cmd)    {
             case 'line':
                 this.dbgMsgHandler.handleLine(msg.data);

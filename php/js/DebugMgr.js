@@ -5,24 +5,25 @@ function DebugMgr(launcher, options) {
     this.completeCallback = options.completeCallback || null;
 }
 
-DebugMgr.prototype.runLauncher = function(method, scriptUrl, formData) {
+DebugMgr.prototype.runLauncher = function(method, scriptUrl, userFormData) {
     console.log("runLauncher(): scriptUrl="+scriptUrl);
-    var fd=new FormData();
-    fd.append('cmd', 'start');
-    http.send('POST', this.launcher,fd).
+    var launcherFormData=new FormData();
+    launcherFormData.append('cmd', 'start');
+    http.send('POST', this.launcher,launcherFormData).
         then( (xmlHTTP) => {
                     // startup the websocket stuff
+                    console.log("Response text=" + xmlHTTP.responseText);
                     var data = JSON.parse(xmlHTTP.responseText);
                     this.user = data.user;
                     console.log('USER: ' + this.user);
                     console.log("Launcher returned: "+ xmlHTTP.responseText);
-                    this.connect(method, scriptUrl, formData);
+                    this.connect(method, scriptUrl, userFormData);
                 } ).catch( (statusCode) => {
                     console.log('http error: ' + statusCode);
                     } );
 }
 
-DebugMgr.prototype.connect = function(method, scriptUrl, formData) {
+DebugMgr.prototype.connect = function(method, scriptUrl, userFormData) {
     //console.log("connect(): scriptUrl="+scriptUrl);
     console.log("create new websocket...");
     this.ws=new WebSocket('ws://localhost:8080');
@@ -50,15 +51,21 @@ DebugMgr.prototype.connect = function(method, scriptUrl, formData) {
                             break;
 
                         case 'POST':
-                            if(!formData) {
-                                formData = new FormData();
+                            var debugFormData = new FormData();
+                            debugFormData.append
+                                ('XDEBUG_SESSION_START', this.user);
+                            if(userFormData) {
+                                var entries = userFormData.entries();
+                                for (var entry of entries) {
+                                    debugFormData.append(entry[0], entry[1]);
+                                }
                             }
-                            formData.append('XDEBUG_SESSION_START', this.user);
                             break;
                     }
 
-                    //console.log("Debugging script: " + fullDebugUrl);
-                    http.send(method, fullDebugUrl, formData).then((xmlHTTP)=>
+                    console.log("Debugging script: " + fullDebugUrl);
+                    http.send(method, fullDebugUrl, debugFormData).then
+                        ((xmlHTTP)=>
                         {
                             if(this.completeCallback != null) {
 
@@ -86,7 +93,7 @@ DebugMgr.prototype.connect = function(method, scriptUrl, formData) {
                     break;
 
                 default:
-					console.log("adding command to queue: "+ data.cmd);
+                    console.log("adding command to queue: "+ data.cmd);
                     this.dbgMsgHandler.addToQueue(data);
                     break;
             }
@@ -116,8 +123,7 @@ DebugMgr.prototype.setCompleteCallback = function(cb) {
     this.completeCallback = cb;
 }
 
-DebugMgr.prototype.launchDebugSession = function(scriptUrl, method, formData, 
-        callback) {
+DebugMgr.prototype.launchDebugSession = function(scriptUrl, method, userFormData, callback) {
     // added new code from old version to retrieve the source code
     // Kill the cache - this caused no reload at times
     var killcache="?killcache="+new Date().getTime();
@@ -130,5 +136,5 @@ DebugMgr.prototype.launchDebugSession = function(scriptUrl, method, formData,
     }
     this.setCompleteCallback (callback);
     this.dbgMsgHandler.clearQueue();
-    this.runLauncher(method, scriptUrl, formData);
+    this.runLauncher(method, scriptUrl, userFormData);
 } 

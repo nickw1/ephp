@@ -17,23 +17,25 @@ $user = null;
 if(isset($_SESSION["ephpuser"]) &&
         preg_match("/^ephp\d{3}$/", $_SESSION["ephpuser"])) {
 
-	$cmd = isset($_POST["cmd"]) && ctype_alpha($_POST["cmd"]) ? $_POST["cmd"] : 
-		(isset($argv[1]) && ctype_alpha($argv[1])  ? $argv[1]: "start");
-	$data = isset($_POST["data"]) ? $_POST["data"] : 
-		(isset($argv[2])  ? $argv[2]: "");
+    $cmd = isset($_POST["cmd"]) && ctype_alpha($_POST["cmd"]) ? $_POST["cmd"] : 
+        (isset($argv[1]) && ctype_alpha($argv[1])  ? $argv[1]: "start");
+    $data = isset($_POST["data"]) ? $_POST["data"] : 
+        (isset($argv[2])  ? $argv[2]: "");
 
 
     $stopping = $cmd=="stop";
     $scripts = ["wsocksrv", "xdclient"];
 
-	$t = time() % 10000000;
+//    $t = time() % 10000000;
+    $t = (round(microtime(true)*1000)) % 1000000000;
     for($i=($stopping ? count($scripts)-1 : 0); 
         $i!=($stopping ?  -1: count($scripts));
         $i+=($stopping ? -1:1)) {
+        
         $cmd1="/usr/bin/php ".SCRIPTDIR."{$scripts[$i]}.php $cmd $data ".
-				"> ".TMPDIR."{$scripts[$i]}_{$cmd}_".$t."_out.txt ".
-				"2> ".TMPDIR."{$scripts[$i]}_{$cmd}_".$t."_err.txt ".
-				"&";
+                "> ".TMPDIR."{$scripts[$i]}_{$cmd}_".$t."_out.txt ".
+                "2> ".TMPDIR."{$scripts[$i]}_{$cmd}_".$t."_err.txt ".
+                "&";
         system($cmd1);
         usleep(500000);
     }
@@ -46,9 +48,9 @@ if(isset($_SESSION["ephpuser"]) &&
         }
     }
     $user = $_SESSION["ephpuser"];
-	echo json_encode(["user"=>$user]);
+    echo json_encode(["user"=>$user]);
 } else {
-	echo json_encode(["error"=>"Not logged in as an EPHP user"]);
+    echo json_encode(["error"=>"Not logged in as an EPHP user"]);
 }
 ?>
 
