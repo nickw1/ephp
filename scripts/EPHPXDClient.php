@@ -12,7 +12,7 @@ require_once('dbpass.php');
 // of database/source stuff for a given IDE key (user)
 class EPHPXDClient extends XDClient\VarWatcher  {
     protected  $lineno, $curLine, $loops, $dbconn, $lf, $user, $sqlqueries;
-    protected $startTime;
+    protected $startTime, $config;
 
     public function __construct(MultiUserEmitter $emitter) {
 
@@ -20,6 +20,7 @@ class EPHPXDClient extends XDClient\VarWatcher  {
         $this->curLine = [];
         $this->sqlqueries = [];
         $this->startTime = time();
+        $this->config = json_decode(file_get_contents("../config.json"));
         fwrite($this->log, 
             "EPHPXDClient started: start time = {$this->startTime}\n\n");
     }
@@ -29,7 +30,7 @@ class EPHPXDClient extends XDClient\VarWatcher  {
         $ok = false;
         $idekey = (string)$doc["idekey"];
         fwrite($this->log,  "onInit(): IDE key=$idekey\n\n");
-        if($doc["fileuri"]) {
+        if($doc["fileuri"] && $this->isUserDebugScript($doc["fileuri"])) {
             $this->lf[$idekey] = new DBLoopFinder((string)$doc["fileuri"]);
             if($this->lf[$idekey]) {
                 $loginCredentials = $this->lf[$idekey]->getLoginCredentials();
@@ -49,7 +50,10 @@ class EPHPXDClient extends XDClient\VarWatcher  {
                 } else {
                     unset($this->lf[$idekey]);
                 }
-               }
+           }
+        } else {
+            fwrite($this->log, "NOTICE: Not in a user web dir: ". 
+                (string)$doc["fileuri"]. " : not debugging\n");
         }
         return $ok;
     }
@@ -202,6 +206,16 @@ class EPHPXDClient extends XDClient\VarWatcher  {
         }
         return $executableQuery;
     }
+
+    public function isUserDebugScript($fileuri) {
+        $sfileuri=(string)$fileuri;
+        $expectedPath = $this->config->ftp == 1 ?
+            str_replace("/", "\/", HOME_DIR."/ephp\d{3}/".USER_WEB_DIR):
+            str_replace("/", "\/",WEBROOT."/".NOFTP_USER_ROOT."/ephp\d{3}");
+        $testRegexp = "/^file:\/\/$expectedPath\/.+\.php$/";
+        return preg_match($testRegexp, $sfileuri);
+    }
+
  
     // Must be run when a debug session finishes - we do not want
     // this stuff hanging around
