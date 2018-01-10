@@ -106,7 +106,6 @@ body
 #server
 {
     width:33%;
-    overflow: auto;
     height: 100%;
 }
 
@@ -183,7 +182,7 @@ tr,td,th
     border: 2px solid black;
     color: black;
 }
-#serverContent { height:100%; } 
+#serverContent { height:100%; overflow: auto; } 
 #serverContent code, #serverContent .code
 {
     font-size: 10pt;
