@@ -97,7 +97,8 @@ if(@symlink("/proc/".getmypid(),LOCKFILE)!==false) {
 
 	// 281217 api appears to have changed
 	// yes - see 8/1/17 commit
-    $reactSockServ = new React\Socket\Server('127.0.0.1:8080', $loop);
+    //$reactSockServ = new React\Socket\Server('193.63.200.53:8080', $loop);
+    $reactSockServ = new React\Socket\Server('0.0.0.0:8080', $loop);
     // ?? change ?? $reactSockServ->listen(8080, '0.0.0.0');
     
 

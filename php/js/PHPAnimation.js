@@ -215,8 +215,8 @@ PHPAnimation.prototype.handleNewRow = function(data) {
 PHPAnimation.prototype.handleStdout = function(data)  {
     // TODO handle stdout sent from the debugger
     if(this.outputWindow!==null) {
-        this.outputWindowInner.innerHTML += data.replace("<","&lt;").
-                replace(">","&gt;").replace("\n","<br />")+"<br />";
+        this.outputWindowInner.innerHTML += data.replace(/</g,"&lt;").
+                replace(/>/g,"&gt;").replace(/\\n/g,"<br />")+"<br />";
     }
 }
 
