@@ -23,7 +23,6 @@ HTTPAnimation.prototype.fireAnimation = function()  {
 
 // Overridden to do the ServerFilesystemAnimation and analyser stuff
 HTTPAnimation.prototype.finishRequest = function() {
-        console.log("finishRequest()");
         var debugMgr = new DebugMgr("php/launcher.php",
                 { dbgMsgHandler: this.serverAnimation } );
 
@@ -66,7 +65,6 @@ HTTPAnimation.prototype.startResponse = function() {
 }
 
 HTTPAnimation.prototype.showSrcAndLaunchDebug = function(data, debugMgr) {
-    console.log("showSrcAndLaunchDebug()");
     this.serverAnimation.showSrc(data);
     debugMgr.launchDebugSession (this.message.url, this.message.method,
                                     this.message.formData,

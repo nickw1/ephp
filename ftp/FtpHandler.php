@@ -72,7 +72,7 @@ class FtpHandler {
                     $contents =  file_get_contents($tmpname);
                     unlink($tmpname);
                     return (["content"=>$contents,"webdirUrl"=>
-                        "/~".$_SESSION["ephpuser"]."/"]);
+                        "/~".$_SESSION["ephpuser"]]);
                 } else {
                     return FtpHandler::CANT_TRANSFER_FILE;
                 }
@@ -83,7 +83,7 @@ class FtpHandler {
             $contents = file_get_contents(WEBROOT."/".NOFTP_USER_ROOT.
                 "/".$_SESSION["ephpuser"]."/".$filename);
             return (["content"=>$contents,"webdirUrl"=>
-                        "/".NOFTP_USER_ROOT."/".$_SESSION["ephpuser"]."/"]);
+                        "/".NOFTP_USER_ROOT."/".$_SESSION["ephpuser"]]);
         }
     }
 

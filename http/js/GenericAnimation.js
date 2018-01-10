@@ -216,7 +216,6 @@ GenericAnimation.prototype.finishRequest = function() {
 }
 
 GenericAnimation.prototype.startResponse = function() {
-	console.log("GenericAnimation.startResonse()");
 	this.calculateCanvasPos(); //eg ComponentAnimator might change this
     for(var i=0; i<this.onmessagestart.length; i++) {
         this.onmessagestart[i](this.messageTypes.RESPONSE);
