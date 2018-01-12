@@ -42,9 +42,9 @@ function Browser(options) {
     this.editor.getSession().setMode("ace/mode/php");
     this.editor.on("change", (e)=> {
         this.showContent('text/html', this.editor.getValue());
-		if(!this.alteredStatusFrozen) {
-        	this.altered=true;
-		}
+        if(!this.alteredStatusFrozen) {
+            this.altered=true;
+        }
             });
     this.addedCssRules = [];
     this.setRequestingState(false);
@@ -54,7 +54,7 @@ function Browser(options) {
     this.animation.addOnMessageEndListener
         (this.setRequestingState.bind(this,false));
 
-	this.doAnimation = true;
+    this.doAnimation = true;
 }
 
 Browser.prototype.sendRequest = function(method,url,formData) {
@@ -62,7 +62,7 @@ Browser.prototype.sendRequest = function(method,url,formData) {
     var regexp=/^(http:\/\/[^\/]+)?(\/.*)$/;    
     var parts = url.match(regexp);
     if(parts==null) {
-        alert("Invalid URL");
+        alert("Invalid URL: it must use HTTP");
     } else if(this.animation==null) {
         http.send(method, url, formData).then(
                 () =>{
@@ -82,13 +82,13 @@ Browser.prototype.sendRequest = function(method,url,formData) {
               }
             );
 
-		if(this.doAnimation) {
-        	this.animation.stop(); // stop any previous animations
-        	this.animation.setMessage(pXHR);
-        	this.animation.animate();
-		} else {
-			// kick off the php stepthrough 
-		}
+        if(this.doAnimation) {
+            this.animation.stop(); // stop any previous animations
+            this.animation.setMessage(pXHR);
+            this.animation.animate();
+        } else {
+            // kick off the php stepthrough 
+        }
     }
 }
 
@@ -307,7 +307,7 @@ Browser.prototype.setCode = function(code) {
 
 Browser.prototype.setContent = function(mime,code) {
     this.editor.setValue(code);
-//	this.refresh();
+//    this.refresh();
     this.showContent(mime, code);
     this.markUnaltered();
 }
@@ -350,7 +350,7 @@ Browser.prototype.loadDocumentOrImage = function(mimetype, url, responseText) {
 }
 
 Browser.prototype.setFreezeAlteredStatus = function(value) {
-	this.alteredStatusFrozen = value;
+    this.alteredStatusFrozen = value;
 }
 
 Browser.prototype.refresh = function() {
@@ -358,5 +358,5 @@ Browser.prototype.refresh = function() {
 }
 
 Browser.prototype.setAnimation = function(doAnimation) {
-	this.doAnimation = doAnimation;
+    this.doAnimation = doAnimation;
 }

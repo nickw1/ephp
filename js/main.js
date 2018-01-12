@@ -6,22 +6,24 @@ function init() {
     var filenameDiv = document.getElementById("filename");
     var mode=0;
     var savedLoginHTML="", originalLoginDivContents = "";
-    var canvasHeight =  592; 
+    var canvasHeight = 592; 
     var compAnim = new ComponentAnimator(1000, 5, 100, 
                                             ['client', 'networkContainer', 'server']);
 
     var fileExplorer=new FileExplorer('serverContent', 
                             {http: 'fs/fs.php',
                             ftp: 'ftp/ftp.php' } ,'client',
-                            { showContentCallback: (mime,src,webdirUrl)=> {
+                            { showContentCallback: (mime,src,webdirPath)=> {
                                     saveOld(()=> {
                                         browser.setContent(mime,src);
                                         browser.setFreezeAlteredStatus(false);
                                         fileInfo = newFileInfo;
                                         // remove the . from the current dir 
-                                        var localPath = webdirUrl + 
-                                                fileInfo.dir.substr(1);
-                                        browser.setWebDir(localPath);
+                                        //var localPath = webdirUrl + fileInfo.dir.substr(1);
+                                        console.log("filePath="+webdirPath+" fileInfo.dir="+fileInfo.dir+" fileInfo.file="+fileInfo.file);
+                                        var filePath='file://'+webdirPath+fileInfo.dir.substr(1);
+//                                        browser.setWebDir(localPath);
+                                        browser.setWebDir(filePath);        
                                         browser.setFile(fileInfo.file);
                                         browser.markUnaltered();
                                         newFileInfo = null;
@@ -410,7 +412,7 @@ function init() {
             animation.setActive(true);
             animation.clearCanvas();
             compAnim.setIgnored(null);
-			rw.showResizer(netCont, true);
+            rw.showResizer(netCont, true);
         }
     );
 
@@ -433,7 +435,7 @@ function init() {
             netCont.appendChild(networkShowDiv);
             animation.setActive(false);
             compAnim.setIgnored(net);
-			rw.showResizer(netCont, false);
+            rw.showResizer(netCont, false);
         });
     document.getElementById('network').appendChild(img);
 }

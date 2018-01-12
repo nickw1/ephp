@@ -72,7 +72,9 @@ class FtpHandler {
                     $contents =  file_get_contents($tmpname);
                     unlink($tmpname);
                     return (["content"=>$contents,"webdirUrl"=>
-                        "/~".$_SESSION["ephpuser"]]);
+                        "/~".$_SESSION["ephpuser"],
+                        "webdirPath"=> HOME_DIR."/".$_SESSION["ephpuser"].
+                        "/".USER_WEB_DIR]);
                 } else {
                     return FtpHandler::CANT_TRANSFER_FILE;
                 }
@@ -80,10 +82,11 @@ class FtpHandler {
                 return FtpHandler::INVALID_LOGIN;
             }
         } else {
-            $contents = file_get_contents(WEBROOT."/".NOFTP_USER_ROOT.
-                "/".$_SESSION["ephpuser"]."/".$filename);
-            return (["content"=>$contents,"webdirUrl"=>
-                        "/".NOFTP_USER_ROOT."/".$_SESSION["ephpuser"]]);
+            $webdirPath=WEBROOT."/".NOFTP_USER_ROOT."/".$_SESSION["ephpuser"];
+            return (["content"=>file_get_contents("$webdirPath/$filename"),
+                        "webdirUrl"=>
+                        "/".NOFTP_USER_ROOT."/".$_SESSION["ephpuser"],
+                    "webdirPath"=>$webdirPath]);
         }
     }
 

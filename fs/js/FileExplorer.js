@@ -7,13 +7,13 @@ function FileExplorer(divId, urls, dropId, callbacks)
     trash.src = "assets/images/trash.png";
     trash.alt = "Delete selected file(s)";
     trash.addEventListener("click", (e)=> {
-	this.sendAjaxDelete(); 
-	});
+    this.sendAjaxDelete(); 
+    });
     toolbar.appendChild(trash);
-  container.appendChild(toolbar);
+   container.appendChild(toolbar);
  
     this.div = document.createElement("div");
-   container.appendChild(this.div);
+    container.appendChild(this.div);
 
 
     this.dir = ".";
@@ -28,19 +28,19 @@ function FileExplorer(divId, urls, dropId, callbacks)
 
     this.dropDiv.addEventListener("drop",
         (e)=> {
-		// 020118 it appears that the text/plain type of data always gets the
-		// right data (on Firefox). text/uri-list gives the image URL instead
-		// if you try to drag an image which is a child of the draggable span.
-		// so always send the contents of the text/plain data type.
-		// NOW TESTED Chrome!
+        // 020118 it appears that the text/plain type of data always gets the
+        // right data (on Firefox). text/uri-list gives the image URL instead
+        // if you try to drag an image which is a child of the draggable span.
+        // so always send the contents of the text/plain data type.
+        // NOW TESTED Chrome!
                 e.preventDefault();
-				var dataTextPlain = e.dataTransfer.getData("text/plain");
+                var dataTextPlain = e.dataTransfer.getData("text/plain");
                 this.curFile = dataTextPlain;
                 if(this.callbacks.fileInfoCallback) {
                     this.callbacks.fileInfoCallback(this.getFileInfo());
                 }
                 this.sendAjax({name: dataTextPlain});
-		});
+        });
     
     
     
@@ -111,12 +111,12 @@ FileExplorer.prototype.sendAjaxDelete = function() {
     var fd = new FormData();
     fd.append("action","delete");    
     fd.append("files", JSON.stringify(Object.keys(this.selectedFiles)));
-	http.post(this.ftpUrl, fd).then( (xmlHTTP)=> {
+    http.post(this.ftpUrl, fd).then( (xmlHTTP)=> {
             data = JSON.parse(xmlHTTP.responseText);
             if(data.status==0) {
                 alert('Deleted successfully');
-				this.selectedFiles={};
-        		this.sendAjax();
+                this.selectedFiles={};
+                this.sendAjax();
             } else {
                 alert('Error deleting: code ' + data.status);
             }
@@ -167,21 +167,21 @@ FileExplorer.prototype.onAjaxDirResponse = function(xmlHTTP)
                     ev.preventDefault();
                 });
             } else {    
-				
-				img.draggable = true;
+                
+                img.draggable = true;
                 span.addEventListener
                 ("dragstart", (function(i,ev)
                     {
-						// to allow prevention of annoying behaviour in which 
-						// drag data is dumped in the ace editor (see above) 
-						if(this.callbacks.onDragStart) {
-							this.callbacks.onDragStart();
-						}
-						ev.stopPropagation();
+                        // to allow prevention of annoying behaviour in which 
+                        // drag data is dumped in the ace editor (see above) 
+                        if(this.callbacks.onDragStart) {
+                            this.callbacks.onDragStart();
+                        }
+                        ev.stopPropagation();
                         // stops the url of the image being dragged across
 
-					// 020118 will this work now on both firefox and chrome?-yes
-					ev.dataTransfer.setData('text/plain', json.content[i].name);
+                    // 020118 will this work now on both firefox and chrome?-yes
+                    ev.dataTransfer.setData('text/plain', json.content[i].name);
                     }).bind(this,i));
 
         span.addEventListener
@@ -213,7 +213,7 @@ FileExplorer.prototype.onAjaxDirResponse = function(xmlHTTP)
             span.appendChild(img);
             span.appendChild(document.createTextNode(json.content[i].name));
             span.draggable = true;
-			img.draggable = true;
+            img.draggable = true;
             this.div.appendChild(span);
             this.div.appendChild(document.createElement("br"));
 
@@ -224,9 +224,9 @@ FileExplorer.prototype.onAjaxDirResponse = function(xmlHTTP)
 FileExplorer.prototype.onAjaxFileResponse = function(xmlHTTP)
 {
     if(this.callbacks.showContentCallback) {
-		var data = JSON.parse(xmlHTTP.responseText);
+        var data = JSON.parse(xmlHTTP.responseText);
         this.callbacks.showContentCallback
-            (data.contentType, data.content, data.webdirUrl);
+            (data.contentType, data.content, data.webdirPath);
     }
 }
 
@@ -236,7 +236,7 @@ FileExplorer.prototype.onAjaxFileResponseFtp = function(xmlHTTP)
         var data = JSON.parse(xmlHTTP.responseText);
         if(data.status==0) {
             this.callbacks.showContentCallback
-                (data.contentType, data.content, data.webdirUrl);
+                (data.contentType, data.content, data.webdirPath);
         } else {
             alert("Error: " + data.status);
         }
