@@ -31,21 +31,25 @@ PendingHttpRequest.prototype.isPHPScript = function() {
 }
 
 // immadiateCallback() runs as soon as we have sent
-// it might for example run the http respojse part of an animation, to ensure
+// it might for example run the http response part of an animation, to ensure
 // we have the response available
 PendingHttpRequest.prototype.send = function(immediateCallback) {
 
     var actualUrl = (this.url.indexOf("?")==-1 ? this.url: 
 			this.url.split("?")[0]) + "?killcache=" + new Date().getTime();
+		console.log("sending to: " + actualUrl);
     	http.send (this.method, actualUrl, this.formData).then
        	 ( (xmlHTTP) => { 
 			this.processResponse(xmlHTTP,false,immediateCallback);
-            } );
+            } ).catch((error)=> {
+				this.setErrorResponse(error);
+				immediateCallback();
+			 } );
 }
 
 // to be called in debug mode as the first step: 
 // retireves the source code using the source retriever
-PendingHttpRequest.prototype.retrieveSrc = function(callback) {
+PendingHttpRequest.prototype.retrieveSrc = function(callbacks) {
 	var sourceRetrieverUrl = this.sourceRetriever;
 	if(this.method=='GET') {
 		sourceRetrieverUrl += '?killcache='+new Date().getTime()+'&target=';
@@ -62,8 +66,8 @@ PendingHttpRequest.prototype.retrieveSrc = function(callback) {
                 // if in debug mode we will get PHP source back, so send that
                 // back to be displayed (subsequently, a debug session will
                 // begin)
-				callback(JSON.parse(xmlHTTP.responseText));
-            });
+				callbacks.onSuccess(JSON.parse(xmlHTTP.responseText));
+            }).catch((error)=>{callbacks.onError(error);});
 }
 
 PendingHttpRequest.prototype.getRequest = function() {
@@ -96,7 +100,7 @@ PendingHttpRequest.prototype.getResponse = function() {
 }
 
 PendingHttpRequest.prototype.processResponse = function( xmlHTTP,
-		debugPHP, callback)
+		debugPHP, immediateCallback)
 {
 		console.log("response headers: " + xmlHTTP.getAllResponseHeaders());
             var responseHeaders = xmlHTTP.getAllResponseHeaders().split("\r\n");
@@ -129,8 +133,8 @@ PendingHttpRequest.prototype.processResponse = function( xmlHTTP,
                 this.editableResponse.url = xmlHTTP.responseURL;
                 this.editableResponse.status = xmlHTTP.status;
                 this.editableResponse.statusText = xmlHTTP.statusText;
-                if(callback) {
-                    callback(); 
+                if(immediateCallback) {
+                    immediateCallback(); 
                 }
             }
             //Note:
@@ -148,6 +152,12 @@ PendingHttpRequest.prototype.setAlteredResponseHeader = function(name, value ) {
 }
 PendingHttpRequest.prototype.setContent = function(content) {
     this.editableResponse.content = content;
+}
+
+PendingHttpRequest.prototype.setErrorResponse = function(httpcode) {
+	this.setAlteredStatus(httpcode, '');
+	this.setAlteredResponseHeader('content-type', 'text/html');
+	this.setContent('<p>There was an error retrieving the URL.</p>');
 }
 
 PendingHttpRequest.prototype.finish = function() {

@@ -15,7 +15,7 @@ $errors = array();
 
 $target = $_SERVER["REQUEST_METHOD"]=="POST" ? $_POST["target"]:$_GET["target"];
 
-$httpCode = 500;
+$httpCode = 200;
 
 
 if(!isset($_SESSION["ephpuser"])) {
@@ -24,12 +24,10 @@ if(!isset($_SESSION["ephpuser"])) {
 elseif(($fileinfo=get_php_filename($target,$config["ephproot"],$config["ftp"]))
 		==null) {
     $errors[] = "Can only read from ephp-designated directories.";
-	$httpCode = 400;
 } else {
     list($expectedUsername, $targetfile) = $fileinfo;
     if($expectedUsername != $_SESSION["ephpuser"]) {
         $errors[] = "Cannot read another user's files.";
-        $httpCode = 400;
     } else {
 		if(($target_contents = @file_get_contents($targetfile))===false) {
 			$errors[] = "Cannot open specified PHP file on server $targetfile.";

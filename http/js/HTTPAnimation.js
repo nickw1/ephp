@@ -35,20 +35,26 @@ HTTPAnimation.prototype.finishRequest = function() {
             interval:500, 
             callback: ()=> {
                 if(this.message.isPHPScript()) {
-                    this.message.retrieveSrc ( (data) => {
-                        if(data.errors) {
-                            alert("error(s):\n" + data.errors.join("\n"));
-                        } else if (this.componentAnimator) { 
-                            // should only start the debugmgr once
-                            // the component animator has finished
-                            this.componentAnimator.startForwardAnim(
-                                this.showSrcAndLaunchDebug.bind
-                                    (this, data, debugMgr));
+                    this.message.retrieveSrc ( { 
+						onSuccess: (data) => {
+                        	if(data.errors) {
+                            	alert("error(s):\n" + data.errors.join("\n"));
+                        	} else if (this.componentAnimator) { 
+                            	// should only start the debugmgr once
+                            	// the component animator has finished
+                            	this.componentAnimator.startForwardAnim(
+                                	this.showSrcAndLaunchDebug.bind
+                                    	(this, data, debugMgr));
 
-                        } else {
+                        	} else {
                             this.showSrcAndLaunchDebug(data, debugMgr);
-                        }
-                    });
+                        	}
+                    	},
+						onError: (code) => {
+							this.message.setErrorResponse(code);
+							this.startResponse();
+						}
+					});
                 } else {
                      this.message.send(this.startResponse.bind(this));
                 }
