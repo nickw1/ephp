@@ -49,7 +49,8 @@ class EPHPPage extends Page {
                 <img id='file_new' src='assets/images/page_add.2.png' 
                     alt='New file' title='New file' />
                 <img id='file_save' src='assets/images/script_save.2.png'
-                    alt='Save current file' title='Save current file' />
+                    alt='Save current file (to Downloads)' 
+					title='Save current file (to Downloads)' />
                 <img id='file_upload' src='assets/images/arrow_right.2.png'
                     alt='Upload current file' title='Upload current file' />
             </div>
@@ -127,8 +128,8 @@ $scripts = [ 'js/main.js',
             'php/js/DbgMsgQueue.js',
             'php/js/VarsBox.js',
             'ui/js/Slider.js',
-            'jslib/PromiseAjax.js',
-            'jslib/Dialog.js',
+            'http://www.free-map.org.uk/jslib/PromiseAjax.js',
+            'http://www.free-map.org.uk/jslib/Dialog.js',
             'ace-builds/src/ace.js'
         ];
 

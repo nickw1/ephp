@@ -26,8 +26,8 @@ DebugMgr.prototype.runLauncher = function(method, scriptUrl, userFormData) {
 DebugMgr.prototype.connect = function(method, scriptUrl, userFormData) {
     //console.log("connect(): scriptUrl="+scriptUrl);
     console.log("create new websocket...");
-    //this.ws=new WebSocket('ws://ephp.solent.ac.uk:8080');
-    this.ws=new WebSocket('ws://localhost:8080');
+    this.ws=new WebSocket('ws://ephp.solent.ac.uk:8080');
+    //this.ws=new WebSocket('ws://localhost:8080');
     console.log('readystate=' + this.ws.readyState);
 
     this.ws.onopen = (e) => {

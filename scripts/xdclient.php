@@ -24,6 +24,7 @@ if(count($argv) > 1 && $argv[1]!="start") {
         fclose($client);
     } else {
         echo json_encode(["status"=>"error","error"=>$errmsg]);
+		exit;
     }
 } else {
     register_shutdown_function('unlink_with_test', LOCKFILE);
