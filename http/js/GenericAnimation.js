@@ -16,8 +16,6 @@ function GenericAnimation(options) {
     this.parentElement = document.getElementById(options.parentId);
     this.canvas.setAttribute("height", options.height);
 	this.canvas.setAttribute("width", this.parentElement.offsetWidth); 
-	console.log("setting canvas properties to: " + (this.canvas.width) +" " 
-		+this.canvas.height);
 
     this.parentElement.appendChild(this.canvas);
     
@@ -126,6 +124,7 @@ GenericAnimation.prototype.animate = function() {
 
 GenericAnimation.prototype.fireAnimation = function(){
 	if(this.active) {
+    	this.calculateCanvasPos();
     	this.timer = setTimeout
           (this.doAnimate.bind(this,this.messageTypes.REQUEST), this.interval);
 	} else {

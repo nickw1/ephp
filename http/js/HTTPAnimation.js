@@ -36,25 +36,25 @@ HTTPAnimation.prototype.finishRequest = function() {
             callback: ()=> {
                 if(this.message.isPHPScript()) {
                     this.message.retrieveSrc ( { 
-						onSuccess: (data) => {
-                        	if(data.errors) {
-                            	alert("error(s):\n" + data.errors.join("\n"));
-                        	} else if (this.componentAnimator) { 
-                            	// should only start the debugmgr once
-                            	// the component animator has finished
-                            	this.componentAnimator.startForwardAnim(
-                                	this.showSrcAndLaunchDebug.bind
-                                    	(this, data, debugMgr));
+                        onSuccess: (data) => {
+                            if(data.errors) {
+                                alert("error(s):\n" + data.errors.join("\n"));
+                            } else if (this.componentAnimator) { 
+                                // should only start the debugmgr once
+                                // the component animator has finished
+                                this.componentAnimator.startForwardAnim(
+                                    this.showSrcAndLaunchDebug.bind
+                                        (this, data, debugMgr));
 
-                        	} else {
+                            } else {
                             this.showSrcAndLaunchDebug(data, debugMgr);
-                        	}
-                    	},
-						onError: (code) => {
-							this.message.setErrorResponse(code);
-							this.startResponse();
-						}
-					});
+                            }
+                        },
+                        onError: (code) => {
+                            this.message.setErrorResponse(code);
+                            this.startResponse();
+                        }
+                    });
                 } else {
                      this.message.send(this.startResponse.bind(this));
                 }
@@ -64,10 +64,14 @@ HTTPAnimation.prototype.finishRequest = function() {
 }
 
 HTTPAnimation.prototype.startResponse = function() {
-    if(this.componentAnimator) {
+    if(this.componentAnimator && this.message.isPHPScript()) {
+        // If it's a PHP script, animate the components first, otherwise
+        // just get straight on with the reverse animation
         this.componentAnimator.startReverseAnim
             (GenericAnimation.prototype.startResponse.bind(this));
-    }    
+    } else {
+        GenericAnimation.prototype.startResponse.apply(this);
+    }
 }
 
 HTTPAnimation.prototype.showSrcAndLaunchDebug = function(data, debugMgr) {

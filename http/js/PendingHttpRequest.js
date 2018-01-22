@@ -37,7 +37,6 @@ PendingHttpRequest.prototype.send = function(immediateCallback) {
 
     var actualUrl = (this.url.indexOf("?")==-1 ? this.url: 
 			this.url.split("?")[0]) + "?killcache=" + new Date().getTime();
-		console.log("sending to: " + actualUrl);
     	http.send (this.method, actualUrl, this.formData).then
        	 ( (xmlHTTP) => { 
 			this.processResponse(xmlHTTP,false,immediateCallback);
