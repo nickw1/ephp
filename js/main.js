@@ -240,7 +240,6 @@ function init() {
                                         showFilename();
                                     }
                                 });
-				console.log("setting backup...");
                 setInterval(backup, 10000);
 		
     };
@@ -250,7 +249,6 @@ function init() {
         data.append("src", browser.getCode());
         data.append("filename", fileInfo.file==null ? "":
                         fileInfo.file);
-        console.log("Backing up... src="+browser.getCode()+" filename="+fileInfo.file);
         http.post('ftp/backup.php', data).then((xmlHTTP)=> {
             setTimeout ( showFilename, 2000);
             });

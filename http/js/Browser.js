@@ -1,4 +1,3 @@
-// window.location.hostname
 // window.location.protocol http:
 
 function Browser(options) {
@@ -25,7 +24,9 @@ function Browser(options) {
                     });
     this.addressDiv.appendChild(this.addressButton);
     this.div.appendChild(this.addressDiv);
+    this.nonHTMLContainer = document.createElement("div");
     this.content = document.createElement("div");
+    this.div.appendChild(this.nonHTMLContainer);
     this.div.appendChild(this.content);
     if(this.animation!=null) {
         if(this.animation.serverAnimation != null) {
@@ -149,14 +150,28 @@ Browser.prototype.loadResponse = function(o) {
     } 
 }
 
-
+Browser.prototype.showHTMLMsg = function(msg) {
+    this.nonHTMLContainer.innerHTML = "";
+        if(this.shadow) {
+            this.shadow.innerHTML = msg;
+        } else {
+            this.content.innerHTML = msg;
+        }
+}
+    
 Browser.prototype.showContent = function(mimetype, responseText) {
+    this.nonHTMLContainer.innerHTML = "";
     if (mimetype=='text/plain') {
-        this.content.innerHTML = "";
+        if(this.shadow) {
+            this.shadow.innerHTML = "";
+        } else {
+            this.content.innerHTML = "";
+        }
+        
         var pre = document.createElement("pre");
         pre.appendChild
                 (document.createTextNode(responseText));
-        this.content.appendChild(pre);
+        this.nonHTMLContainer.appendChild(pre);
     } else {
         // remove any old added css rules
         // we added them to the beginning of styleshset 0, so this should work
@@ -170,21 +185,21 @@ Browser.prototype.showContent = function(mimetype, responseText) {
         // developer.mozilla.org/en-US/Add-ons/Code_snippets/
         // HTML_to_DOM#Parsing_Complete_HTML_to_DOM
 
-		this.div.style.position="relative";
-		this.content.innerHTML = "";
-		if(this.content.attachShadow) { // shadow DOM in Chrome
-			console.log("this has shadow");
-			if(!this.shadow) {
-				this.shadow = this.content.attachShadow({mode:'open'});
-			}
-			this.shadow.innerHTML = responseText;
-			console.log("get forms " + this.shadow.querySelectorAll("form").length);
-			console.log("get bodies " + this.shadow.querySelectorAll("body").length);
-		} else { // no shadow - below works in Firefox
+        this.div.style.position="relative";
+        this.content.innerHTML = "";
+        if(this.content.attachShadow) { // shadow DOM in Chrome
+//        if(false) {
+            if(!this.shadow) {
+                this.shadow = this.content.attachShadow({mode:'open'});
+            }
+            this.shadow.innerHTML = responseText;
+            console.log("get forms " + this.shadow.querySelectorAll("form").length);
+            console.log("get bodies " + this.shadow.querySelectorAll("body").length);
+        } else { // no shadow - below works in Firefox
         var tmpDoc = document.implementation.createHTMLDocument("tmpDoc");
         tmpDoc.documentElement.innerHTML = responseText;    
-		console.log('styleSheets length=' + tmpDoc.styleSheets.length +
-				' document.styleSheets.length=' + document.styleSheets.length);
+        console.log('styleSheets length=' + tmpDoc.styleSheets.length +
+                ' document.styleSheets.length=' + document.styleSheets.length);
         for(var i=0; i<tmpDoc.styleSheets.length; i++) {
             for(var j=0; j<tmpDoc.styleSheets[i].cssRules.length; j++) {
                 //console.log(tmpDoc.styleSheets[i].cssRules[j].selectorText);
@@ -212,10 +227,10 @@ Browser.prototype.showContent = function(mimetype, responseText) {
         //this.div.style.position="relative";
         //this.content.innerHTML = "";
         this.content.appendChild(virtualBody);
-		}
+        }
         var forms = this.shadow ? 
-			this.shadow.querySelectorAll("form"):
-			this.content.getElementsByTagName("form");
+            this.shadow.querySelectorAll("form"):
+            this.content.getElementsByTagName("form");
         for(var i=0; i<forms.length; i++) {    
             forms[i].addEventListener("submit", (function(form,e){
                 e.preventDefault();
@@ -250,7 +265,9 @@ Browser.prototype.showContent = function(mimetype, responseText) {
             }).bind(this,forms[i]));    
         }
 
-        var links = this.content.getElementsByTagName("a"); 
+        var links = this.shadow ?
+                this.shadow.querySelectorAll("a"):
+                this.content.getElementsByTagName("a"); 
         for(var i=0; i<links.length; i++) {
             links[i].addEventListener("click", (e)=> {
                 e.preventDefault();
@@ -266,8 +283,8 @@ Browser.prototype.showContent = function(mimetype, responseText) {
 Browser.prototype.showImage = function(url) {
     var img = new Image();
     img.onerror = ()=> {
-        this.content.innerHTML = url + 
-            " could not be loaded as it is an invalid image.";
+        this.showHTMLMsg( url + 
+            " could not be loaded as it is an invalid image.");
         };
     img.src = url; 
     img.onload = ()=> {
@@ -325,6 +342,7 @@ Browser.prototype.setFile = function(file) {
 }
 
 Browser.prototype.loadDocumentOrImage = function(mimetype, url, responseText) {
+    console.log(`loadDocumentOrImage() ${mimetype} ${url}`);
     if(mimetype=='image/jpeg' || mimetype=='image/png' ||
                 mimetype=='image/jpg') { 
         this.showImage(url);
