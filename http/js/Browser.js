@@ -136,7 +136,19 @@ Browser.prototype.loadResponse = function(o) {
         // Use either supplied parameters (e.g. changed in the animation)
         // or oriignal parameters from original ajax request
         this.webDir = url.substr (0,url.lastIndexOf("/"));
-        this.addressBox.value =  url;
+		var urlComponents = url.indexOf('?')==-1 ? [url]:
+			url.split('?');
+		if(urlComponents.length>1) {
+			var keyvals = urlComponents[1].split('&');
+			var counted=0;
+			for(var i=0; i<keyvals.length; i++) {
+				if(keyvals[i].substr(0,10)!='killcache=') {
+					urlComponents[0] += (counted==0 ? '?' : '&') + keyvals[i];
+					counted++;
+				}
+			}
+		}
+        this.addressBox.value = urlComponents[0];
         if(this.saveOldCallback) {
             this.saveOldCallback 
                 (this.loadDocumentOrImage.bind(this,mimetype,url,responseText));
