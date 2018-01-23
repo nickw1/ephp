@@ -169,37 +169,22 @@ Browser.prototype.showContent = function(mimetype, responseText) {
         // create a temporary HTML DOM document and read the rules from that.
         // developer.mozilla.org/en-US/Add-ons/Code_snippets/
         // HTML_to_DOM#Parsing_Complete_HTML_to_DOM
+
+		this.div.style.position="relative";
+		this.content.innerHTML = "";
+		if(this.content.attachShadow) { // shadow DOM in Chrome
+			console.log("this has shadow");
+			if(!this.shadow) {
+				this.shadow = this.content.attachShadow({mode:'open'});
+			}
+			this.shadow.innerHTML = responseText;
+			console.log("get forms " + this.shadow.querySelectorAll("form").length);
+			console.log("get bodies " + this.shadow.querySelectorAll("body").length);
+		} else { // no shadow - below works in Firefox
         var tmpDoc = document.implementation.createHTMLDocument("tmpDoc");
-        // none of these work
-        /*
-        tmpDoc.addEventListener("DOMContentLoaded", function(e) {
-                alert("ready"); 
-                });
-        tmpDoc.addEventListener("load", function(e) {
-                alert("load event"); 
-                });
-        tmpDoc.documentElement.addEventListener("DOMContentLoaded", function(e){
-                alert("ready document elemnet"); 
-                });
-        tmpDoc.documentElement.addEventListener("load", function(e) {
-                alert("load event dccument element"); 
-                });
-        tmpDoc.addEventListener("readystatechange", function(e){
-                alert("readystatechange"); 
-                });
-        tmpDoc.documentElement.addEventListener("readystatechange",function(e){
-                alert("readystatechange dccument element"); 
-                });
-        */  
-
         tmpDoc.documentElement.innerHTML = responseText;    
-        //var parser = new DOMParser();
-        //var tmpDoc = parser.parseFromString(responseText, "text/html");
-        //console.log("created HTML using DOMParser");
-
-
-        // Note getting the styleSheets fails in Chrome
-        // It works on Firefox and IE
+		console.log('styleSheets length=' + tmpDoc.styleSheets.length +
+				' document.styleSheets.length=' + document.styleSheets.length);
         for(var i=0; i<tmpDoc.styleSheets.length; i++) {
             for(var j=0; j<tmpDoc.styleSheets[i].cssRules.length; j++) {
                 //console.log(tmpDoc.styleSheets[i].cssRules[j].selectorText);
@@ -224,10 +209,13 @@ Browser.prototype.showContent = function(mimetype, responseText) {
         virtualBody.style.width="100%";
         virtualBody.style.height="90%";
         virtualBody.style.position="absolute";
-        this.div.style.position="relative";
-        this.content.innerHTML = "";
+        //this.div.style.position="relative";
+        //this.content.innerHTML = "";
         this.content.appendChild(virtualBody);
-        var forms = this.content.getElementsByTagName("form");
+		}
+        var forms = this.shadow ? 
+			this.shadow.querySelectorAll("form"):
+			this.content.getElementsByTagName("form");
         for(var i=0; i<forms.length; i++) {    
             forms[i].addEventListener("submit", (function(form,e){
                 e.preventDefault();
