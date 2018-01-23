@@ -240,14 +240,12 @@ function init() {
                                         showFilename();
                                     }
                                 });
-			if(loggedin=='ephp001') {
 				console.log("setting backup...");
-                           setInterval(backup, 10000);
-		}
+                setInterval(backup, 10000);
+		
     };
 
     var backup = ()=> {
-		console.log("BACKUP!!BACKUP!!");
         var data = new FormData();
         data.append("src", browser.getCode());
         data.append("filename", fileInfo.file==null ? "":
