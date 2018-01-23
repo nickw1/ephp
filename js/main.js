@@ -240,15 +240,19 @@ function init() {
                                         showFilename();
                                     }
                                 });
-// TODO dealwith                            setInterval(backup, 10000);
+			if(loggedin=='ephp001') {
+				console.log("setting backup...");
+                           setInterval(backup, 10000);
+		}
     };
 
     var backup = ()=> {
+		console.log("BACKUP!!BACKUP!!");
         var data = new FormData();
         data.append("src", browser.getCode());
         data.append("filename", fileInfo.file==null ? "":
                         fileInfo.file);
-        msgDiv.innerHTML = "Backing up...";
+        console.log("Backing up... src="+browser.getCode()+" filename="+fileInfo.file);
         http.post('ftp/backup.php', data).then((xmlHTTP)=> {
             setTimeout ( showFilename, 2000);
             });

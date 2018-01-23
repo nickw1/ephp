@@ -12,6 +12,7 @@ class Backup {
 	}
 
 	public function save($src, $filename) {
+		$filename = ($filename=="" ? "unnamed": basename($filename));
 		if(!is_dir(EPHP_BACKUP."/".$this->user)) {
 			mkdir(EPHP_BACKUP."/".$this->user);
 		}	
@@ -22,8 +23,7 @@ class Backup {
 				unlink($matches[0]);
 			}
 		}
-		file_put_contents(EPHP_BACKUP."/".$this->user."/".
-					($filename=="" ? "unnamed" : $filename), $src);
+		file_put_contents(EPHP_BACKUP."/".$this->user."/".$filename, $src);
 	}
 
 	public function load() {
@@ -53,9 +53,7 @@ if(!isset($_SESSION["ephpuser"])) {
 			break;
 
 		case "POST":
-			if(isset($_POST["src"]) &&
-					($_POST["filename"]=="" || 
-					preg_match("/^[\w\.]+$/",$_POST["filename"]))) {
+			if(isset($_POST["src"])) {
 				$bkp->save($_POST["src"], $_POST["filename"]);
 			} elseif(isset($_POST["delete"])) {
 				$bkp->clear();
