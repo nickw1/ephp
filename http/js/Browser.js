@@ -136,18 +136,18 @@ Browser.prototype.loadResponse = function(o) {
         // Use either supplied parameters (e.g. changed in the animation)
         // or oriignal parameters from original ajax request
         this.webDir = url.substr (0,url.lastIndexOf("/"));
-		var urlComponents = url.indexOf('?')==-1 ? [url]:
-			url.split('?');
-		if(urlComponents.length>1) {
-			var keyvals = urlComponents[1].split('&');
-			var counted=0;
-			for(var i=0; i<keyvals.length; i++) {
-				if(keyvals[i].substr(0,10)!='killcache=') {
-					urlComponents[0] += (counted==0 ? '?' : '&') + keyvals[i];
-					counted++;
-				}
-			}
-		}
+        var urlComponents = url.indexOf('?')==-1 ? [url]:
+            url.split('?');
+        if(urlComponents.length>1) {
+            var keyvals = urlComponents[1].split('&');
+            var counted=0;
+            for(var i=0; i<keyvals.length; i++) {
+                if(keyvals[i].substr(0,10)!='killcache=') {
+                    urlComponents[0] += (counted==0 ? '?' : '&') + keyvals[i];
+                    counted++;
+                }
+            }
+        }
         this.addressBox.value = urlComponents[0];
         if(this.saveOldCallback) {
             this.saveOldCallback 
@@ -157,8 +157,7 @@ Browser.prototype.loadResponse = function(o) {
         }
             
     } else {
-        this.content.innerHTML = 'HTTP error: ' + status + 
-                ' ' + statusText;
+        this.showHTMLMsg('HTTP error: ' + status + ' ' + statusText);
     } 
 }
 
@@ -205,8 +204,6 @@ Browser.prototype.showContent = function(mimetype, responseText) {
                 this.shadow = this.content.attachShadow({mode:'open'});
             }
             this.shadow.innerHTML = responseText;
-            console.log("get forms " + this.shadow.querySelectorAll("form").length);
-            console.log("get bodies " + this.shadow.querySelectorAll("body").length);
         } else { // no shadow - below works in Firefox
         var tmpDoc = document.implementation.createHTMLDocument("tmpDoc");
         tmpDoc.documentElement.innerHTML = responseText;    
@@ -300,8 +297,9 @@ Browser.prototype.showImage = function(url) {
         };
     img.src = url; 
     img.onload = ()=> {
-        this.content.innerHTML = "";
-        this.content.appendChild(img);
+        this.showHTMLMsg("");
+        this.nonHTMLContainer.innerHTML = "";
+        this.nonHTMLContainer.appendChild(img);
     };
 }
 
