@@ -15,6 +15,7 @@ class DBLoopFinder {
         $this->stmts = $parser->parse($code);
         $this->rec = new Recurser($this, "doGetLoginCredentials");
         $this->sqlRec = new Recurser($this, "doGetSQLQueries");
+        $this->httpRec = new Recurser($this, "doGetHTTPData");
         $this->loopsRec = new LoopsRecurser
             ($this, "recurse", $this, "doGetLoops");
         $this->depth=-1;
@@ -28,6 +29,10 @@ class DBLoopFinder {
     public function getSQLQueries($pdovar) {
         $q=$this->doGetSQLQueries($this->stmts, $pdovar);
         return $q;
+    }
+
+    public function getHTTPData() {
+        return $this->doGetHTTPData($this->stmts);
     }
 
     public function doGetLoginCredentials($node) {
@@ -72,13 +77,13 @@ class DBLoopFinder {
                             if($queries===false) {
                                 $queries = [];
                             }
-							if(!$this->pp) {
-								$this->pp=new PhpParser\PrettyPrinter\Standard;
-							}
+                            if(!$this->pp) {
+                                $this->pp=new PhpParser\PrettyPrinter\Standard;
+                            }
                             $queries[] = ["query"=>
-									DBLoopFinder::makeUsableQuery
-									($this->pp->prettyPrintExpr($node[$i]->expr
-										->args[0]->value)),
+                                    DBLoopFinder::makeUsableQuery
+                                    ($this->pp->prettyPrintExpr($node[$i]->expr
+                                        ->args[0]->value)),
                                             "startLine"=>
                                     $node[$i]->expr->var->getAttributes()
                                         ["startLine"],
@@ -97,6 +102,32 @@ class DBLoopFinder {
             }
         }
         return $queries;
+    }
+
+    public function doGetHTTPData($node) {
+        $httpdata = false;
+        for($i=0; $i<count($node); $i++) {
+            switch($node[$i]->getType()) {
+                case "Expr_Assign":
+                    if($node[$i]->expr->getType()=="Expr_ArrayDimFetch" &&
+                        ($node[$i]->expr->var->name=="_POST" ||
+                        $node[$i]->expr->var->name=="_GET") ) {
+                        if($httpdata===false) {
+                            $httpdata = [];
+                        }
+                        $httpdata[$node[$i]->var->name] = $node[$i]->expr->dim->value;    
+                    }
+                    break;
+
+                default:
+                    if(($result=$this->httpRec->recursiveTraversal
+                        ($node[$i]))!==false) {
+                        $httpdata = $httpdata===false ? $result:
+                            array_merge($httpdata, $result);
+                }
+            }
+        }
+        return $httpdata;
     }
 
     public function getLoops($resultvars) {
@@ -181,20 +212,20 @@ class DBLoopFinder {
         return $loops;
     } // function
 
-	protected static function makeUsableQuery($q) {
-		$inQuotes = false;
-		$usableQuery = "";
-		for($i=0; $i<strlen($q); $i++) {
-			if($q[$i]=="\"" && ($i==0 ||  $q[$i-1]!="\\")) {
-				$inQuotes = !$inQuotes;
-			} elseif(($inQuotes==false && $q[$i]!="." && !ctype_space($q[$i])) 
-					||
-					($inQuotes==true && $q[$i]!="{" && $q[$i]!="}")) {
-				$usableQuery .= $q[$i];
-			}	
-		}
-		return $usableQuery;
-	}
+    protected static function makeUsableQuery($q) {
+        $inQuotes = false;
+        $usableQuery = "";
+        for($i=0; $i<strlen($q); $i++) {
+            if($q[$i]=="\"" && ($i==0 ||  $q[$i-1]!="\\")) {
+                $inQuotes = !$inQuotes;
+            } elseif(($inQuotes==false && $q[$i]!="." && !ctype_space($q[$i])) 
+                    ||
+                    ($inQuotes==true && $q[$i]!="{" && $q[$i]!="}")) {
+                $usableQuery .= $q[$i];
+            }    
+        }
+        return $usableQuery;
+    }
 }
 
 ?>

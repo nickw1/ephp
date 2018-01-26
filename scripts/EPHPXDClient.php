@@ -19,6 +19,7 @@ class EPHPXDClient extends XDClient\VarWatcher  {
         parent::__construct($emitter);
         $this->curLine = [];
         $this->sqlqueries = [];
+		$this->httpData = [];
         $this->startTime = time();
         $this->config = json_decode(file_get_contents("../config.json"));
         fwrite($this->log, 
@@ -47,6 +48,7 @@ class EPHPXDClient extends XDClient\VarWatcher  {
                 }
                 if($ok) {
                     $this->loops[$idekey] = new DBLoops();
+					$this->httpData[$idekey]=$this->lf[$idekey]->getHTTPData();
                 } else {
                     unset($this->lf[$idekey]);
                 }
@@ -57,6 +59,17 @@ class EPHPXDClient extends XDClient\VarWatcher  {
         }
         return $ok;
     }
+
+	public function processVar($doc, $i) {
+		parent::processVar($doc, $i);
+		$n = (string)$doc->property[$i]["name"];
+		$n1 = str_replace('$','',$n);
+		if(isset($this->httpData[$this->idekey][$n1])) {
+			echo "IS SET!\n";
+			$this->vars[$this->idekey][$n]['httpvar'] =
+				$this->httpData[$this->idekey][$n1];
+		}
+	}
 
     public function handleObject($n, $prop) {
         parent::handleObject($n, $prop);
@@ -222,6 +235,7 @@ class EPHPXDClient extends XDClient\VarWatcher  {
     public function onStop($idekey) {
         parent::onStop($idekey);
         $this->dbconn[$idekey] = null;
+		$this->httpData[$idekey] = null;
         $this->loops[$idekey] = null;
         $this->lf[$idekey] = null;
         unset($this->sqlqueries[$idekey]);
