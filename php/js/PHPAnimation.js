@@ -84,6 +84,8 @@ function PHPAnimation(options) {
 
     this.codeLines = [];
 
+    this.colourCount = 0;
+
     this.setupGUI();
 }
 
@@ -158,6 +160,8 @@ PHPAnimation.prototype.showSrc = function(data) {
 
         this.codeLines = [];
         this.varComments = [];
+        this.colourCount = 0;
+
         var curVar=0, curLoopVar=0, line;
         if(true) {
             var lineNoText, lineNoSpan;
@@ -199,6 +203,11 @@ PHPAnimation.prototype.handleLine = function(data) {
             case 'float':
             case 'bool':
                 this.varsBox.setVar(varName, data.vars[varName].value);
+                if(data.vars[varName].httpvar) {
+                    this.addVarComment(data.vars[varName].httpvar.lineno,
+                        data.vars[varName].value,     
+                        data.vars[varName].httpvar.name);
+                }
                 break;
         }
     }
@@ -282,4 +291,19 @@ PHPAnimation.prototype.addToQueue = function(msg) {
 
 PHPAnimation.prototype.clearQueue = function() {
     this.dbgMsgQueue.clear();
+}
+
+PHPAnimation.prototype.addVarComment = function(lineno,value,httpvar){
+    if(!this.varComments[lineno]) {
+		this.audio.play();
+        console.log(`addVarComment: ${lineno} ${value} ${httpvar}`);
+        var comment = document.createElement("code");
+        comment.appendChild(document.createTextNode("//"+value));
+        comment.style.backgroundColor = this.colours[this.varComments.length%
+                this.colours.length];
+        this.codeLines[lineno-1].appendChild(comment);
+        this.browserCallback(httpvar, this.colours[this.varComments.length 
+            %this.colours.length]);
+        this.varComments[lineno]=value;
+    }
 }

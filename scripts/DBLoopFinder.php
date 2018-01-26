@@ -115,7 +115,7 @@ class DBLoopFinder {
                         if($httpdata===false) {
                             $httpdata = [];
                         }
-                        $httpdata[$node[$i]->var->name] = $node[$i]->expr->dim->value;    
+                        $httpdata[$node[$i]->var->name] = ['name'=>$node[$i]->expr->dim->value,'lineno'=>$node[$i]->getAttributes()['startLine']];    
                     }
                     break;
 

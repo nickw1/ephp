@@ -305,8 +305,10 @@ Browser.prototype.showImage = function(url) {
 }
 
 Browser.prototype.highlightFormField = function(fieldName, colour) {
-
-    var forms = this.content.getElementsByTagName("form");
+	console.log(`****highlightFormField() : ${fieldName} ${colour}`);
+    var forms = this.shadow ? 
+			this.shadow.querySelectorAll("form"):
+			this.content.getElementsByTagName("form");
     for(var i=0; i<forms.length; i++) {
         for(var j=0; j<forms[i].elements.length; j++) {
             if(forms[i].elements[j].name==fieldName) {
