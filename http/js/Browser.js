@@ -86,6 +86,7 @@ Browser.prototype.sendRequest = function(method,url,formData) {
         if(this.doAnimation) {
             this.animation.stop(); // stop any previous animations
             this.animation.setMessage(pXHR);
+			this.animation.paused = false;
             this.animation.animate();
         } else {
             // kick off the php stepthrough 

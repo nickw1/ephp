@@ -106,6 +106,7 @@ GenericAnimation.prototype.setMessage = function(message) {
 // Now can pass an onmessageend event handler - e.g. if we want to tell the
 // parent, typically the browser, that the animation has finished
 GenericAnimation.prototype.animate = function() {
+	console.log("animate()...");
     for(var i=0; i<this.onmessagestart.length; i++) {
         this.onmessagestart[i](this.messageTypes.REQUEST);
     }
@@ -123,6 +124,7 @@ GenericAnimation.prototype.animate = function() {
 }
 
 GenericAnimation.prototype.fireAnimation = function(){
+	console.log("are we active? "+ this.active);
 	if(this.active) {
     	this.calculateCanvasPos();
     	this.timer = setTimeout
@@ -134,6 +136,7 @@ GenericAnimation.prototype.fireAnimation = function(){
 
 GenericAnimation.prototype.doAnimate = function(messageType) {
     this.animationState = messageType || this.animationState;
+//	console.log("doAnuimate(): animatrionStare()="+this.animationState);
     var direction = (this.animationState==this.messageTypes.RESPONSE) ? -1 : 1;
 //	console.log("direction="+direction+" x="+ this.x+ " canvas width=" + this.canvas.width);
     if((direction==1 && this.x < this.canvas.width) || 
@@ -180,7 +183,9 @@ GenericAnimation.prototype.doAnimate = function(messageType) {
         if(!this.paused) {
             this.timer = setTimeout
                 (this.doAnimate.bind(this), this.interval);
-        }
+        } else {
+			console.log("WE ARE PAUISHED");
+		}
     } else {
         this.timer=null;
 
