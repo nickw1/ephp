@@ -226,7 +226,7 @@ FileExplorer.prototype.onAjaxFileResponse = function(xmlHTTP)
     if(this.callbacks.showContentCallback) {
         var data = JSON.parse(xmlHTTP.responseText);
         this.callbacks.showContentCallback
-            (data.contentType, data.content, data.webdirPath);
+            (data.contentType, data.content, data.webdirPath, data.webdirUrl);
     }
 }
 
@@ -236,7 +236,7 @@ FileExplorer.prototype.onAjaxFileResponseFtp = function(xmlHTTP)
         var data = JSON.parse(xmlHTTP.responseText);
         if(data.status==0) {
             this.callbacks.showContentCallback
-                (data.contentType, data.content, data.webdirPath);
+              (data.contentType, data.content, data.webdirPath, data.webdirUrl);
         } else {
             alert("Error: " + data.status);
         }

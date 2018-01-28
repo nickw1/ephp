@@ -13,15 +13,19 @@ function init() {
     var fileExplorer=new FileExplorer('serverContent', 
                             {http: 'fs/fs.php',
                             ftp: 'ftp/ftp.php' } ,'client',
-                            { showContentCallback: (mime,src,webdirPath)=> {
+                            { showContentCallback: (mime,src,webdirPath,
+								webdirUrl)=> {
                                     saveOld(()=> {
                                         browser.setContent(mime,src);
                                         browser.setFreezeAlteredStatus(false);
                                         fileInfo = newFileInfo;
                                         // remove the . from the current dir 
-                                        //var localPath = webdirUrl + fileInfo.dir.substr(1);
-                                        console.log("filePath="+webdirPath+" fileInfo.dir="+fileInfo.dir+" fileInfo.file="+fileInfo.file);
-                                        var filePath='file://'+webdirPath+fileInfo.dir.substr(1);
+                                        var localPath = webdirPath + fileInfo.dir.substr(1);
+                                        console.log("webdirPath="+webdirPath+" webdirUrl="+webdirUrl+" fileInfo.dir="+fileInfo.dir+" fileInfo.file="+fileInfo.file + " localPath="+
+		localPath);
+                                        //var filePath='file://'+webdirPath+fileInfo.dir.substr(1);
+                                     //   var filePath='file://'+webdirPath+fileInfo.dir.substr(1);
+										var filePath = webdirUrl+fileInfo.dir.substr(1);
 //                                        browser.setWebDir(localPath);
                                         browser.setWebDir(filePath);        
                                         browser.setFile(fileInfo.file);
