@@ -45,7 +45,6 @@ body
 }
 
 #ephp_container {
-	width: 1600px;
 	height: 800px;
 }
 
@@ -235,7 +234,7 @@ tr,td,th
     color: yellow;
     font-family: courier, monospace;
     position: absolute;
-    right:0px;    
+    right:100px;    
     width:200px;
     height:200px;
     top: 0px; 

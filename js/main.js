@@ -7,7 +7,7 @@ function init() {
     var mode=0;
     var savedLoginHTML="", originalLoginDivContents = "";
     var canvasHeight = 592; 
-    var compAnim = new ComponentAnimator(1000, 5, 100, 
+    var compAnim = new ComponentAnimator(1000, 5, 200, 
                                             ['client', 'networkContainer', 'server']);
 
     var fileExplorer=new FileExplorer('serverContent', 

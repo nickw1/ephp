@@ -36,7 +36,8 @@ class FSController
                     if(isset($httpdata["file"]) &&
                         preg_match("/^[\w-\.]+$/", $httpdata["file"]))
                     {
-                        $file="$webdir/$httpdata[dir]/$httpdata[file]";
+                        $file=$webdir."/".$httpdata["dir"].
+							"/".$httpdata["file"];
                         if(file_exists($file))
                         {
                             $ext = pathinfo($file,PATHINFO_EXTENSION);

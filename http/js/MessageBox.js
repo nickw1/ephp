@@ -26,7 +26,8 @@ function MessageBox(msg, options) {
 	btn.addEventListener("click", (e)=> {
 				if(this.messageType == this.messageTypes.REQUEST) {
 					var lines = this.textarea.value.split("\n");
-					var components = lines[0].split(" ");
+					var components = lines[0].split(/ (.+) HTTP/);
+					//var components = lines[0].split(" ");
 					this.message.setMethod(components[0]);
 					this.message.setUrl(components[1]);
 					if(components[0].toUpperCase()=="POST") {
