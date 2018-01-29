@@ -264,6 +264,7 @@ GenericAnimation.prototype.fastForward = function() {
     this.clearTimer();
     this.x=(this.animationState==this.messageTypes.RESPONSE ? 20: 
             this.canvas.width-20);
+	this.paused = false;
     this.doAnimate();
 }
 
@@ -271,6 +272,7 @@ GenericAnimation.prototype.rewind = function() {
     this.clearTimer();
     this.x=(this.animationState==this.messageTypes.RESPONSE ? 
             this.canvas.width: 0);
+	this.paused = false;
     this.doAnimate();
 }
 
