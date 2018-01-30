@@ -299,11 +299,10 @@ PHPAnimation.prototype.addVarComment = function(lineno,value,httpvar){
         console.log(`addVarComment: ${lineno} ${value} ${httpvar}`);
         var comment = document.createElement("code");
         comment.appendChild(document.createTextNode("//"+value));
-        comment.style.backgroundColor = this.colours[this.varComments.length%
-                this.colours.length];
+        comment.style.backgroundColor = this.colours[this.colourCount%this.colours.length];
         this.codeLines[lineno-1].appendChild(comment);
-        this.browserCallback(httpvar, this.colours[this.varComments.length 
-            %this.colours.length]);
+        this.browserCallback(httpvar, this.colours[this.colourCount%this.colours.length]);
         this.varComments[lineno]=value;
+		this.colourCount++;
     }
 }

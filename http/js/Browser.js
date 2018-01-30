@@ -151,7 +151,6 @@ Browser.prototype.loadResponse = function(o) {
             }
         }
         this.addressBox.value = urlComponents[0];
-		this.loadExternalCSS();
         if(this.saveOldCallback) {
             this.saveOldCallback 
                 (this.loadDocumentOrImage.bind(this,mimetype,url,responseText));
@@ -386,6 +385,7 @@ Browser.prototype.loadDocumentOrImage = function(mimetype, url, responseText) {
         this.markUnaltered();
     } else if (mimetype=='text/html' || mimetype=='text/plain') {
         this.setContent(mimetype, responseText);
+		this.loadExternalCSS();
     } else {
         this.setContent('text/html', 
             'This browser does not recognise the content type '+ mimetype);
