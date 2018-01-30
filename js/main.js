@@ -29,6 +29,7 @@ function init() {
 //                                        browser.setWebDir(localPath);
                                         browser.setWebDir(filePath);        
                                         browser.setFile(fileInfo.file);
+										browser.loadExternalCSS();
                                         browser.markUnaltered();
                                         newFileInfo = null;
                                         if(mode==0) {

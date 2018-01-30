@@ -86,7 +86,7 @@ Browser.prototype.sendRequest = function(method,url,formData) {
         if(this.doAnimation) {
             this.animation.stop(); // stop any previous animations
             this.animation.setMessage(pXHR);
-			this.animation.paused = false;
+            this.animation.paused = false;
             this.animation.animate();
         } else {
             // kick off the php stepthrough 
@@ -136,6 +136,7 @@ Browser.prototype.loadResponse = function(o) {
 
         // Use either supplied parameters (e.g. changed in the animation)
         // or oriignal parameters from original ajax request
+        console.log("got a response...");
         this.webDir = url.substr (0,url.lastIndexOf("/"));
         var urlComponents = url.indexOf('?')==-1 ? [url]:
             url.split('?');
@@ -150,6 +151,7 @@ Browser.prototype.loadResponse = function(o) {
             }
         }
         this.addressBox.value = urlComponents[0];
+		this.loadExternalCSS();
         if(this.saveOldCallback) {
             this.saveOldCallback 
                 (this.loadDocumentOrImage.bind(this,mimetype,url,responseText));
@@ -200,11 +202,17 @@ Browser.prototype.showContent = function(mimetype, responseText) {
         this.div.style.position="relative";
         this.content.innerHTML = "";
         if(this.content.attachShadow) { // shadow DOM in Chrome
+        console.log("is shadow");
 //        if(false) {
             if(!this.shadow) {
+                    
+            console.log("create shadow");
                 this.shadow = this.content.attachShadow({mode:'open'});
+//                console.log("link? " + this.shadow.querySelector('link'));
             }
             this.shadow.innerHTML = responseText;
+//            var match=this.shadow.innerHTML.match(/link/);
+                
         } else { // no shadow - below works in Firefox
         var tmpDoc = document.implementation.createHTMLDocument("tmpDoc");
         tmpDoc.documentElement.innerHTML = responseText;    
@@ -305,10 +313,10 @@ Browser.prototype.showImage = function(url) {
 }
 
 Browser.prototype.highlightFormField = function(fieldName, colour) {
-	console.log(`****highlightFormField() : ${fieldName} ${colour}`);
+    console.log(`****highlightFormField() : ${fieldName} ${colour}`);
     var forms = this.shadow ? 
-			this.shadow.querySelectorAll("form"):
-			this.content.getElementsByTagName("form");
+            this.shadow.querySelectorAll("form"):
+            this.content.getElementsByTagName("form");
     for(var i=0; i<forms.length; i++) {
         for(var j=0; j<forms[i].elements.length; j++) {
             if(forms[i].elements[j].name==fieldName) {
@@ -352,6 +360,22 @@ Browser.prototype.setWebDir = function(dir){
 
 Browser.prototype.setFile = function(file) {
     this.addressBox.value = this.webDir + "/" +file;
+}
+
+Browser.prototype.loadExternalCSS = function() {
+        var match =this.shadow.innerHTML.match(/<link[^>]+href="([A-Za-z0-9_\-]+.css)"[^>]*>/);
+        if(match && match[1])  {
+            console.log("sending css to: " + this.webDir+"/"+match[1]);
+            http.send('GET', this.webDir+"/"+match[1]).then(
+                    (xmlhttp) =>{
+                    console.log("done: " + xmlhttp.responseText.replace("body",":host"));
+                    this.shadow.innerHTML += '<style>'+
+                            xmlhttp.responseText.replace("body",":host")+ 
+                            '</style>';
+//                        alert(xmlhttp.responseText);        
+                    } ).catch((code)=>{ 
+						console.log("Warning - could not load external css: " + code);});
+        }
 }
 
 Browser.prototype.loadDocumentOrImage = function(mimetype, url, responseText) {
