@@ -38,11 +38,17 @@ function Browser(options) {
     this.altered=false;
     this.alteredStatusFrozen = false;
     this.webDir="";
+    this.lock = false;
     this.editor = ace.edit(options.sourceElement);
     this.editor.setOptions({fontSize:"12pt"});
     this.editor.getSession().setMode("ace/mode/php");
     this.editor.on("change", (e)=> {
-        this.showContent('text/html', this.editor.getValue());
+        console.log("EDITOR ONCHANGE...");
+        if(!this.lock) {
+            this.showContent('text/html', this.editor.getValue());
+        } else {
+            console.log("LOCK IS TRUE");
+        }
         if(!this.alteredStatusFrozen) {
             this.altered=true;
         }
@@ -173,6 +179,7 @@ Browser.prototype.showHTMLMsg = function(msg) {
 }
     
 Browser.prototype.showContent = function(mimetype, responseText) {
+    console.log("showContent()");
     this.nonHTMLContainer.innerHTML = "";
     if (mimetype=='text/plain') {
         if(this.shadow) {
@@ -209,8 +216,9 @@ Browser.prototype.showContent = function(mimetype, responseText) {
                 this.shadow = this.content.attachShadow({mode:'open'});
 //                console.log("link? " + this.shadow.querySelector('link'));
             }
-            this.shadow.innerHTML = responseText;
 //            var match=this.shadow.innerHTML.match(/link/);
+            this.shadow.innerHTML = responseText;
+            console.log("HERE");
                 
         } else { // no shadow - below works in Firefox
         var tmpDoc = document.implementation.createHTMLDocument("tmpDoc");
@@ -245,55 +253,10 @@ Browser.prototype.showContent = function(mimetype, responseText) {
         //this.content.innerHTML = "";
         this.content.appendChild(virtualBody);
         }
-        var forms = this.shadow ? 
-            this.shadow.querySelectorAll("form"):
-            this.content.getElementsByTagName("form");
-        for(var i=0; i<forms.length; i++) {    
-            forms[i].addEventListener("submit", (function(form,e){
-                e.preventDefault();
-                var actionLocalUrl = form.action.substring
-                        (form.action.lastIndexOf("/")+1);
-                var formData = new FormData();
-                var qs="";
-                switch(form.method.toUpperCase()) {
-                    case 'POST':
-                        for(var j=0; j<form.elements.length; j++) {
-                            if(form.elements[j].type!="submit") {
-                                formData.append(form.elements[j].name, 
-                                    form.elements[j].value);    
-                            }
-                        }
-                        break;
 
-                    case 'GET':
-                        for(var j=0; j<form.elements.length; j++) {
-                            var el = form.elements[j];
-                            if(form.elements[j].type!="submit") {
-                                qs+= (qs=="" ? "?":"&");
-                                qs += form.elements[j].name+ 
-                                        "="+form.elements[j].value;
-                            }
-                        }
-                        break;
-                }
-                actionLocalUrl+=qs;
-                this.sendRequest(form.method,
-                        this.webDir+"/"+actionLocalUrl,formData);
-            }).bind(this,forms[i]));    
-        }
+        this.doFormEventListeners();
+		this.doLinkEventListeners();
 
-        var links = this.shadow ?
-                this.shadow.querySelectorAll("a"):
-                this.content.getElementsByTagName("a"); 
-        for(var i=0; i<links.length; i++) {
-            links[i].addEventListener("click", (e)=> {
-                e.preventDefault();
-                var href=e.target.getAttribute("href");
-                this.sendRequest('GET',
-                    href.substr(0,7)=="http://" ? href:
-                        this.webDir+"/"+href);
-            });
-        }
     }
 }
 
@@ -362,19 +325,28 @@ Browser.prototype.setFile = function(file) {
 }
 
 Browser.prototype.loadExternalCSS = function() {
-        var match =this.shadow.innerHTML.match(/<link[^>]+href="([A-Za-z0-9_\-]+.css)"[^>]*>/);
-        if(match && match[1])  {
-            console.log("sending css to: " + this.webDir+"/"+match[1]);
-            http.send('GET', this.webDir+"/"+match[1]).then(
+    
+    var match =this.shadow.innerHTML.match
+        (/<link[^>]+href="([A-Za-z0-9_\-]+.css)"[^>]*>/);
+    if(match)  {
+        http.send('GET', this.webDir+"/"+match[1]).then(
                     (xmlhttp) =>{
-                    console.log("done: " + xmlhttp.responseText.replace("body",":host"));
-                    this.shadow.innerHTML += '<style>'+
-                            xmlhttp.responseText.replace("body",":host")+ 
-                            '</style>';
-//                        alert(xmlhttp.responseText);        
-                    } ).catch((code)=>{ 
-						console.log("Warning - could not load external css: " + code);});
-        }
+                console.log("done: " + xmlhttp.responseText.replace("body",":host"));
+                this.lock = true;
+                this.shadow.innerHTML += '<style>'+ 
+                    xmlhttp.responseText.replace("body",":host")+ 
+                        '</style>';
+                this.lock = false;
+				// Adding the CSS to the innerHTML of shadow seems to screw up
+				// the event listeners we added to our form submit buttons.
+				// So add them again.
+                this.doFormEventListeners();
+				this.doLinkEventListeners();
+
+        } ).catch((code)=>{ 
+                        console.log("Warning - could not load external css: " +
+                 code);});
+    }
 }
 
 Browser.prototype.loadDocumentOrImage = function(mimetype, url, responseText) {
@@ -385,7 +357,7 @@ Browser.prototype.loadDocumentOrImage = function(mimetype, url, responseText) {
         this.markUnaltered();
     } else if (mimetype=='text/html' || mimetype=='text/plain') {
         this.setContent(mimetype, responseText);
-		this.loadExternalCSS();
+        this.loadExternalCSS();
     } else {
         this.setContent('text/html', 
             'This browser does not recognise the content type '+ mimetype);
@@ -402,4 +374,59 @@ Browser.prototype.refresh = function() {
 
 Browser.prototype.setAnimation = function(doAnimation) {
     this.doAnimation = doAnimation;
+}
+Browser.prototype.doFormEventListeners = function() {
+        var forms = this.shadow ? 
+            this.shadow.querySelectorAll("form"):
+            this.content.getElementsByTagName("form");
+        console.log("forms.length="+forms.length);
+
+        for(var i=0; i<forms.length; i++) {    
+            console.log("Doing form " + i);
+            forms[i].addEventListener("submit", (function(form,e){
+                e.preventDefault();
+                var actionLocalUrl = form.action.substring
+                        (form.action.lastIndexOf("/")+1);
+                var formData = new FormData();
+                var qs="";
+                switch(form.method.toUpperCase()) {
+                    case 'POST':
+                        for(var j=0; j<form.elements.length; j++) {
+                            if(form.elements[j].type!="submit") {
+                                formData.append(form.elements[j].name, 
+                                    form.elements[j].value);    
+                            }
+                        }
+                        break;
+
+                    case 'GET':
+                        for(var j=0; j<form.elements.length; j++) {
+                            var el = form.elements[j];
+                            if(form.elements[j].type!="submit") {
+                                qs+= (qs=="" ? "?":"&");
+                                qs += form.elements[j].name+ 
+                                        "="+form.elements[j].value;
+                            }
+                        }
+                        break;
+                }
+                actionLocalUrl+=qs;
+                this.sendRequest(form.method,
+                        this.webDir+"/"+actionLocalUrl,formData);
+            }).bind(this,forms[i]));    
+        }
+}
+Browser.prototype.doLinkEventListeners = function() {
+        var links = this.shadow ?
+                this.shadow.querySelectorAll("a"):
+                this.content.getElementsByTagName("a"); 
+        for(var i=0; i<links.length; i++) {
+            links[i].addEventListener("click", (e)=> {
+                e.preventDefault();
+                var href=e.target.getAttribute("href");
+                this.sendRequest('GET',
+                    href.substr(0,7)=="http://" ? href:
+                        this.webDir+"/"+href);
+            });
+        }
 }
