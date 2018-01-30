@@ -14,7 +14,7 @@ function init() {
                             {http: 'fs/fs.php',
                             ftp: 'ftp/ftp.php' } ,'client',
                             { showContentCallback: (mime,src,webdirPath,
-								webdirUrl)=> {
+                                webdirUrl)=> {
                                     saveOld(()=> {
                                         browser.setContent(mime,src);
                                         browser.setFreezeAlteredStatus(false);
@@ -22,14 +22,14 @@ function init() {
                                         // remove the . from the current dir 
                                         var localPath = webdirPath + fileInfo.dir.substr(1);
                                         console.log("webdirPath="+webdirPath+" webdirUrl="+webdirUrl+" fileInfo.dir="+fileInfo.dir+" fileInfo.file="+fileInfo.file + " localPath="+
-		localPath);
+        localPath);
                                         //var filePath='file://'+webdirPath+fileInfo.dir.substr(1);
                                      //   var filePath='file://'+webdirPath+fileInfo.dir.substr(1);
-										var filePath = webdirUrl+fileInfo.dir.substr(1);
+                                        var filePath = webdirUrl+fileInfo.dir.substr(1);
 //                                        browser.setWebDir(localPath);
                                         browser.setWebDir(filePath);        
                                         browser.setFile(fileInfo.file);
-										browser.loadExternalCSS();
+                                        browser.loadExternalCSS();
                                         browser.markUnaltered();
                                         newFileInfo = null;
                                         if(mode==0) {
@@ -242,11 +242,20 @@ function init() {
                                         // as unaltered if already saved
                                         browser.markUnaltered();
                                         fileInfo.file=json.filename;
+                                        // TODO this is a quick and dirty
+                                        // HACK. It does not account for
+                                        // FTP vs non-FTP mode and will not
+                                        // work if the backedup file was not
+                                        // in the user's web root directory.
+                                        if(loggedin!=null) {
+                                            browser.setWebDir('/~' + loggedin);
+                                            browser.setFile(json.filename);
+                                        }
                                         showFilename();
                                     }
                                 });
                 setInterval(backup, 10000);
-		
+        
     };
 
     var backup = ()=> {
