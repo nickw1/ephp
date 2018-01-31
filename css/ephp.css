@@ -234,11 +234,12 @@ tr,td,th
     color: yellow;
     font-family: courier, monospace;
     position: absolute;
-    right:100px;    
-    width:200px;
+    right:200px;    
+    width:300px;
     height:200px;
     top: 0px; 
     border: 2px solid yellow;
+	overflow: auto;
 }
 
 .srcconsole >  div {

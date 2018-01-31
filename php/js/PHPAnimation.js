@@ -209,6 +209,11 @@ PHPAnimation.prototype.handleLine = function(data) {
                         data.vars[varName].httpvar.name);
                 }
                 break;
+
+            case 'array':
+                this.varsBox.setVar(varName,
+                     JSON.stringify(data.vars[varName].value));
+                break;
         }
     }
     if(this.varsBox) {
@@ -295,7 +300,7 @@ PHPAnimation.prototype.clearQueue = function() {
 
 PHPAnimation.prototype.addVarComment = function(lineno,value,httpvar){
     if(!this.varComments[lineno]) {
-		this.audio.play();
+        this.audio.play();
         console.log(`addVarComment: ${lineno} ${value} ${httpvar}`);
         var comment = document.createElement("code");
         comment.appendChild(document.createTextNode("//"+value));
@@ -303,6 +308,6 @@ PHPAnimation.prototype.addVarComment = function(lineno,value,httpvar){
         this.codeLines[lineno-1].appendChild(comment);
         this.browserCallback(httpvar, this.colours[this.colourCount%this.colours.length]);
         this.varComments[lineno]=value;
-		this.colourCount++;
+        this.colourCount++;
     }
 }
