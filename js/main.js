@@ -73,10 +73,7 @@ function init() {
                                     } )
                                 }});
 
-    window.addEventListener("resize",  () => {
-            animation.calculateCanvasPos();
-            compAnim.recalculateDimensions();
-            } );
+    // Resize event was here
 
     var errors = { 
                     256: 'Unable to move temporary file on server',
@@ -403,6 +400,15 @@ function init() {
     rw.setOnFinishCallback(animation.calculateCanvasPos.bind(animation));
     rw.setup();
 
+    window.addEventListener("resize",  () => {
+            var serverWidth = document.body.offsetWidth-
+                (document.getElementById('client').offsetWidth+
+                    document.getElementById('network').offsetWidth);
+            document.getElementById('server').style.width=serverWidth+'px';
+            animation.calculateCanvasPos();
+            compAnim.recalculateDimensions();
+            rw.recalculateTotalSpan();
+            } );
     var origWidth, netWidth = 400;
 
     var networkShowDiv = document.createElement("div");

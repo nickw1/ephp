@@ -36,7 +36,6 @@ ResizableWindowSet.prototype.setup = function() {
             resizer.style.top = '50%';
         }
         resizer.id = "r_"+(setupTime+i);
-        console.log("appending to : " + this.elem[i].id);
         this.elem[i].appendChild(resizer);
         resizer.addEventListener("mouseover", e =>  
             { document.body.style.cursor=this.vert? 'ns-resize':'ew-resize';} );
@@ -64,26 +63,13 @@ ResizableWindowSet.prototype.setup = function() {
 }
 
 ResizableWindowSet.prototype.drag = function(index, origClientPos, e) {
-//        var canvas = this.elem[index].querySelector("canvas");
         if(this.vert) {
             var newHeight = (this.elem[index].dragStartPos + 
                     (e.clientY - origClientPos));
-            /*
-            this.elem[index].style.height =  newHeight + "px";
-            if(canvas) {
-                canvas.height = newHeight;
-            }
-            */
             this.elem[index].fullResizeHeight(newHeight);
         } else {
             var newWidth = (this.elem[index].dragStartPos + 
                     (e.clientX - origClientPos));
-            /*
-            this.elem[index].style.width = newWidth + "px";
-            if(canvas) {    
-                canvas.width = newWidth;
-            }
-            */
             this.elem[index].fullResizeWidth(newWidth);
         }
 
@@ -96,28 +82,15 @@ ResizableWindowSet.prototype.drag = function(index, origClientPos, e) {
         
         // resize remaining elements to fit into available space
         for(var j=index+1; j<this.elem.length; j++) { 
-            var canvas = this.elem[j].querySelector("canvas");
             if(this.vert) {
                 var newHeight = this.elem[j].offsetHeight - 
                         ((actualTotalSpan-this.totalSpan)/
                             (this.elem.length-(index+1)));
-                /*
-                this.elem[j].style.height = newHeight + "px";
-                if(canvas) {
-                    canvas.height = newHeight;
-                }
-                */
                 this.elem[j].fullResizeHeight(newHeight);
             } else {
                 var newWidth = this.elem[j].offsetWidth - 
                         ((actualTotalSpan-this.totalSpan)/
                             (this.elem.length-(index+1)));
-                /*
-                this.elem[j].style.width = newWidth + "px";
-                if(canvas) {
-                    canvas.width = newWidth;
-                }
-                */
                 this.elem[j].fullResizeWidth(newWidth);
             }
         }
@@ -167,3 +140,10 @@ ResizableWindowSet.addFullResize = function(elems) {
     }
 }
 
+ResizableWindowSet.prototype.recalculateTotalSpan = function() {
+    this.totalSpan = 0;
+    for(var i=0; i<this.elem.length; i++) {
+        this.totalSpan += this.vert? this.elem[i].offsetHeight: 
+                    this.elem[i].offsetWidth;
+    }
+}
