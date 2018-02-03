@@ -43,12 +43,9 @@ function Browser(options) {
     this.editor.setOptions({fontSize:"12pt"});
     this.editor.getSession().setMode("ace/mode/php");
     this.editor.on("change", (e)=> {
-        console.log("EDITOR ONCHANGE...");
         if(!this.lock) {
             this.showContent('text/html', this.editor.getValue());
-        } else {
-            console.log("LOCK IS TRUE");
-        }
+        } 
         if(!this.alteredStatusFrozen) {
             this.altered=true;
         }
@@ -142,7 +139,6 @@ Browser.prototype.loadResponse = function(o) {
 
         // Use either supplied parameters (e.g. changed in the animation)
         // or oriignal parameters from original ajax request
-        console.log("got a response...");
         this.webDir = url.substr (0,url.lastIndexOf("/"));
         var urlComponents = url.indexOf('?')==-1 ? [url]:
             url.split('?');
@@ -179,7 +175,6 @@ Browser.prototype.showHTMLMsg = function(msg) {
 }
     
 Browser.prototype.showContent = function(mimetype, responseText) {
-    console.log("showContent()");
     this.nonHTMLContainer.innerHTML = "";
     if (mimetype=='text/plain') {
         if(this.shadow) {
@@ -208,23 +203,18 @@ Browser.prototype.showContent = function(mimetype, responseText) {
         this.div.style.position="relative";
         this.content.innerHTML = "";
         if(this.content.attachShadow) { // shadow DOM in Chrome
-        console.log("is shadow");
 //        if(false) {
             if(!this.shadow) {
                     
-            console.log("create shadow");
                 this.shadow = this.content.attachShadow({mode:'open'});
 //                console.log("link? " + this.shadow.querySelector('link'));
             }
 //            var match=this.shadow.innerHTML.match(/link/);
             this.shadow.innerHTML = responseText;
-            console.log("HERE");
                 
         } else { // no shadow - below works in Firefox
         var tmpDoc = document.implementation.createHTMLDocument("tmpDoc");
         tmpDoc.documentElement.innerHTML = responseText;    
-        console.log('styleSheets length=' + tmpDoc.styleSheets.length +
-                ' document.styleSheets.length=' + document.styleSheets.length);
         for(var i=0; i<tmpDoc.styleSheets.length; i++) {
             for(var j=0; j<tmpDoc.styleSheets[i].cssRules.length; j++) {
                 //console.log(tmpDoc.styleSheets[i].cssRules[j].selectorText);
@@ -331,7 +321,6 @@ Browser.prototype.loadExternalCSS = function() {
     if(match)  {
         http.send('GET', this.webDir+"/"+match[1]).then(
                     (xmlhttp) =>{
-                console.log("done: " + xmlhttp.responseText.replace("body",":host"));
                 this.lock = true;
                 this.shadow.innerHTML += '<style>'+ 
                     xmlhttp.responseText.replace("body",":host")+ 
@@ -350,7 +339,6 @@ Browser.prototype.loadExternalCSS = function() {
 }
 
 Browser.prototype.loadDocumentOrImage = function(mimetype, url, responseText) {
-    console.log(`loadDocumentOrImage() ${mimetype} ${url}`);
     if(mimetype=='image/jpeg' || mimetype=='image/png' ||
                 mimetype=='image/jpg') { 
         this.showImage(url);
@@ -379,10 +367,8 @@ Browser.prototype.doFormEventListeners = function() {
         var forms = this.shadow ? 
             this.shadow.querySelectorAll("form"):
             this.content.getElementsByTagName("form");
-        console.log("forms.length="+forms.length);
 
         for(var i=0; i<forms.length; i++) {    
-            console.log("Doing form " + i);
             forms[i].addEventListener("submit", (function(form,e){
                 e.preventDefault();
                 var actionLocalUrl = form.action.substring
