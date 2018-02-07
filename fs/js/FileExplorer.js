@@ -7,7 +7,7 @@ function FileExplorer(divId, urls, dropId, callbacks)
     trash.src = "assets/images/trash.png";
     trash.alt = "Delete selected file(s)";
     trash.addEventListener("click", (e)=> {
-    this.sendAjaxDelete(); 
+    this.promptDelete(); 
     });
     toolbar.appendChild(trash);
    container.appendChild(toolbar);
@@ -71,7 +71,7 @@ function FileExplorer(divId, urls, dropId, callbacks)
                     }
                     str+=k;
                 }
-            this.sendAjaxDelete();
+            this.promptDelete();
         } });
     this.div.setAttribute("tabindex",0);
 }
@@ -122,6 +122,39 @@ FileExplorer.prototype.sendAjaxDelete = function() {
             }
         });
 }
+
+
+
+FileExplorer.prototype.promptDelete = function() {
+
+    var dialog = new Dialog ("server",
+                            { 
+                                'OK': ()=> {
+                                    dialog.hide();
+									this.sendAjaxDelete();
+                                    
+                                }, 
+                                'Cancel': ()=> {
+                                    dialog.hide();
+                                }
+                            },
+                            {
+                                top: '300px',
+                                left: '100px',
+                                width: '200px',
+                                height: '100px',
+                                position:'absolute',
+                                backgroundColor: '#ffffc0',
+                                border: '1px solid black'
+                            }
+                            );
+
+		var nSelected = Object.keys(this.selectedFiles).length;
+        dialog.setContent("Really delete " +nSelected+ " selected file"+
+			(nSelected==1 ? "?":"s?")); 
+		dialog.show();
+}
+
 
 FileExplorer.prototype.images = 
     ['unknown.png', 'folder.png', 'html.png', 'script.png'];
