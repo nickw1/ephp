@@ -13,7 +13,6 @@ class ZMQEmitter extends MultiUserEmitter {
     public function emit($data) {
 		$data1 = $this->addUserToData($data);
         $this->socket->send(json_encode($data1));
-        echo "Sending ". json_encode($data1)."\n";
     }
 
     public function emitError($msg) {

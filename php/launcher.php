@@ -32,10 +32,13 @@ if(isset($_SESSION["ephpuser"]) &&
         $i!=($stopping ?  -1: count($scripts));
         $i+=($stopping ? -1:1)) {
         
+
         $cmd1="/usr/bin/php ".SCRIPTDIR."{$scripts[$i]}.php $cmd $data ".
                 "> ".TMPDIR."{$scripts[$i]}_{$cmd}_".$t."_out.txt ".
                 "2> ".TMPDIR."{$scripts[$i]}_{$cmd}_".$t."_err.txt ".
                 "&";
+
+//        $cmd1="/usr/bin/php ".SCRIPTDIR."{$scripts[$i]}.php $cmd $data ".  "> /dev/null 2> /dev/null";
         system($cmd1);
         usleep(500000);
     }

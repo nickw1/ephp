@@ -22,15 +22,12 @@ class EPHPXDClient extends XDClient\VarWatcher  {
 		$this->httpData = [];
         $this->startTime = time();
         $this->config = json_decode(file_get_contents("../config.json"));
-        fwrite($this->log, 
-            "EPHPXDClient started: start time = {$this->startTime}\n\n");
     }
 
     public function onInit($doc) {
         parent::onInit($doc);
         $ok = false;
         $idekey = (string)$doc["idekey"];
-        fwrite($this->log,  "onInit(): IDE key=$idekey\n\n");
         if($doc["fileuri"] && $this->isUserDebugScript($doc["fileuri"])) {
             $this->lf[$idekey] = new DBLoopFinder((string)$doc["fileuri"]);
             if($this->lf[$idekey]) {
@@ -54,8 +51,6 @@ class EPHPXDClient extends XDClient\VarWatcher  {
                 }
            }
         } else {
-            fwrite($this->log, "NOTICE: Not in a user web dir: ". 
-                (string)$doc["fileuri"]. " : not debugging\n");
         }
         return $ok;
     }
@@ -65,7 +60,6 @@ class EPHPXDClient extends XDClient\VarWatcher  {
 		$n = (string)$doc->property[$i]["name"];
 		$n1 = str_replace('$','',$n);
 		if(isset($this->httpData[$this->idekey][$n1])) {
-			echo "IS SET!\n";
 			$this->vars[$this->idekey][$n]['httpvar'] =
 				$this->httpData[$this->idekey][$n1];
 		}
@@ -86,20 +80,12 @@ class EPHPXDClient extends XDClient\VarWatcher  {
                                 $this->vars[$this->idekey][$n] = 
                                     ["type"=>"query", "value"=>$sql];
                             }
-//                            fwrite($this->log,"vars index $n = \n\n");
- //                           fwrite($this->log, print_r($this->vars[$this->idekey][$n], true));
                             // get the db results for this query if it's
                             // not already been done
                             if (!isset($this->vars
                                     [$this->idekey][$n]["dbresults"])) {
-                                fwrite($this->log,  
-                                    "DBResults not set for {$this->idekey} ".
-                                    "n1...\n\n");
                                 $loop=$this->lf[$this->idekey]->getLoops([$n1]);
                                 if($loop!==false) {
-                                    fwrite($this->log, 
-                                        "Setting DBResults for {$this->idekey}".
-                                        " variable $n1\n\n");
                                     $this->loops[$this->idekey]->addLoop($loop);
                                     $results = $this->executeSQL($sql); 
                                     if($results[0]!==false) {
@@ -111,17 +97,11 @@ class EPHPXDClient extends XDClient\VarWatcher  {
                                        (["cmd"=>"dbresults","data"=>
                                        ["varName"=>$n1,"results"=>$results[0]]]);
                                     } else {
-                                        fwrite($this->log, "ERROR INFO: ");
-                                        fwrite($this->log, print_r($results[1],
-                                             true));
                                     }
                                 }
                             } else {
                                 $results = $this->vars
                                     [$this->idekey][$n]["dbresults"];
-                                fwrite($this->log, 
-                                    "Using previous results for ".
-                                    "{$this->idekey} $n1:\n\n");
                             }
                         }
                     }

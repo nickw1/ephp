@@ -12,7 +12,6 @@ class SSockEmitter extends MultiUserEmitter {
     }
 
     public function emit($data) {
-        echo "Sending ". json_encode($data)."\n";
 		fwrite($this->ssocket,json_encode($this->addUserToData($data)));
     }
 
