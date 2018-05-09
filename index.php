@@ -1,5 +1,5 @@
 <?php
-
+//die("EPHP is unavailable during the cross site scripting labs this week due to possible side effects with stealing session IDs.");
 session_start();
 
 require_once('defines.php');
@@ -13,7 +13,11 @@ class EPHPPage extends Page {
         <h1>ephp<sup>ii</sup></h1>
         <div id="login">
         <?php
-        if(isset($_SESSION["ephpuser"])) {
+		if(false) {
+			echo "<p>EPHP is temporarily unavailable. ".
+				"Please use FileZilla instead.</p>";
+		} else {	
+       if(isset($_SESSION["ephpuser"])) {
             echo "<p>Logged in as $_SESSION[ephpuser]";
             echo " <a href='ftp/logout.php'>Logout</a></p>";
         } else {
@@ -107,6 +111,7 @@ class EPHPPage extends Page {
         </body>
         <?php
     }
+	}
 }
 
 $page = new EPHPPage();
