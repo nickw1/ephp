@@ -11,19 +11,20 @@ session_start();
 //$user = $_SESSION["username"];
 //$script = $_POST["script"];
 
+$user = isset($_POST["overrideUser"])  ? $_POST["overrideUser"] :
+	(isset($_SESSION["ephpuser"]) ? $_SESSION["ephpuser"]: null);
 
-$user = null;
 
-if(isset($_SESSION["ephpuser"]) &&
-        preg_match("/^ephp\d{3}$/", $_SESSION["ephpuser"])) {
-
-    $cmd = isset($_POST["cmd"]) && ctype_alpha($_POST["cmd"]) ? $_POST["cmd"] : 
+$cmd = isset($_POST["cmd"]) && ctype_alpha($_POST["cmd"]) ? $_POST["cmd"] : 
         (isset($argv[1]) && ctype_alpha($argv[1])  ? $argv[1]: "start");
+$stopping = $cmd=="stop";
+
+if($stopping || ($user!=null && preg_match("/^ephp\d{3}$/",  $user))) {
+
     $data = isset($_POST["data"]) ? $_POST["data"] : 
         (isset($argv[2])  ? $argv[2]: "");
 
 
-    $stopping = $cmd=="stop";
     $scripts = ["wsocksrv", "xdclient"];
 
 //    $t = time() % 10000000;
@@ -50,10 +51,10 @@ if(isset($_SESSION["ephpuser"]) &&
             }
         }
     }
-    $user = $_SESSION["ephpuser"];
+    //$user = $_SESSION["ephpuser"];
     echo json_encode(["user"=>$user]);
 } else {
-    echo json_encode(["error"=>"Not logged in as an EPHP user"]);
+    echo json_encode(["error"=>"Not logged in as an EPHP user","user"=>$user]);
 }
 ?>
 

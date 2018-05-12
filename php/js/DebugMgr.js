@@ -3,12 +3,16 @@ function DebugMgr(launcher, options) {
     this.launcher = launcher;
     this.dbgMsgHandler = options.dbgMsgHandler || null;
     this.completeCallback = options.completeCallback || null;
+    this.overrideUser = options.overrideUser || null;
 }
 
 DebugMgr.prototype.runLauncher = function(method, scriptUrl, userFormData) {
     console.log("runLauncher(): scriptUrl="+scriptUrl);
     var launcherFormData=new FormData();
     launcherFormData.append('cmd', 'start');
+    if(this.overrideUser) {
+        launcherFormData.append('overrideUser', this.overrideUser);
+    }
     http.send('POST', this.launcher,launcherFormData).
         then( (xmlHTTP) => {
                     // startup the websocket stuff
@@ -26,8 +30,8 @@ DebugMgr.prototype.runLauncher = function(method, scriptUrl, userFormData) {
 DebugMgr.prototype.connect = function(method, scriptUrl, userFormData) {
     //console.log("connect(): scriptUrl="+scriptUrl);
     console.log("create new websocket...");
-    this.ws=new WebSocket('ws://ephp.solent.ac.uk:8080');
-    //this.ws=new WebSocket('ws://localhost:8080');
+    //this.ws=new WebSocket('ws://ephp.solent.ac.uk:8080');
+    this.ws=new WebSocket('ws://localhost:8080');
     console.log('readystate=' + this.ws.readyState);
 
     this.ws.onopen = (e) => {
