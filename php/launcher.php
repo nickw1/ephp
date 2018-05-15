@@ -12,7 +12,7 @@ session_start();
 //$script = $_POST["script"];
 
 $user = isset($_POST["overrideUser"])  ? $_POST["overrideUser"] :
-	(isset($_SESSION["ephpuser"]) ? $_SESSION["ephpuser"]: null);
+    (isset($_SESSION["ephpuser"]) ? $_SESSION["ephpuser"]: null);
 
 
 $cmd = isset($_POST["cmd"]) && ctype_alpha($_POST["cmd"]) ? $_POST["cmd"] : 
@@ -28,15 +28,15 @@ if($stopping || ($user!=null && preg_match("/^ephp\d{3}$/",  $user))) {
     $scripts = ["wsocksrv", "xdclient"];
 
 //    $t = time() % 10000000;
-    $t = (round(microtime(true)*1000)) % 1000000000;
+    $t = (round(microtime(true)*1000)) % 1000000;
     for($i=($stopping ? count($scripts)-1 : 0); 
         $i!=($stopping ?  -1: count($scripts));
         $i+=($stopping ? -1:1)) {
         
 
         $cmd1="/usr/bin/php ".SCRIPTDIR."{$scripts[$i]}.php $cmd $data ".
-                "> ".TMPDIR."{$scripts[$i]}_{$cmd}_".$t."_out.txt ".
-                "2> ".TMPDIR."{$scripts[$i]}_{$cmd}_".$t."_err.txt ".
+                ">> ".TMPDIR."out.txt ".
+                "2> ".TMPDIR."{$scripts[$i]}_{$cmd}_{$user}_".$t."_err.txt ".
                 "&";
 
 //        $cmd1="/usr/bin/php ".SCRIPTDIR."{$scripts[$i]}.php $cmd $data ".  "> /dev/null 2> /dev/null";

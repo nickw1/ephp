@@ -1,7 +1,8 @@
+<!DOCTYPE html>
 <html>
 <head>
-<script type='text/javascript' src='php/js/DebugMgr.js'></script>
-<script type='text/javascript' src='jslib/PromiseAjax.js'></script>
+<script type='text/javascript' src='../php/js/DebugMgr.js'></script>
+<script type='text/javascript' src='../jslib/PromiseAjax.js'></script>
 <script type='text/javascript'>
 
 function init() {
@@ -21,7 +22,7 @@ function go() {
 		if(i<limit) {
 			var user = "ephp" + ("00"+(i+1)).slice(-3);
 			handlr.handle("Launching "+ user);
-			dbgMgrs[i] = new DebugMgr('php/launcher.php',
+			dbgMgrs[i] = new DebugMgr('../php/launcher.php?XDEBUG_SESSION_STOP',
 					{dbgMsgHandler: handlr, overrideUser: user });
 			dbgMgrs[i].launchDebugSession('/epup/'+user+'/basicsearch.php?artist='+artists[i], 'GET', null, (xhr) => { handlr.handle("Launch debug return: " + xhr.responseText); } );	
 		}
