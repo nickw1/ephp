@@ -30,9 +30,10 @@ if(count($argv) > 1 && $argv[1]!="start") {
 		exit;
     }
 } else {
-    register_shutdown_function('unlink_with_test', LOCKFILE);
     try {
         if(@symlink("/proc/".getmypid(),LOCKFILE)!==false) {
+    		register_shutdown_function('unlink_with_test', LOCKFILE);
+			echo "Symlinked ". LOCKFILE . "\n";
 			$emitter = new ZMQEmitter('127.0.0.1', $xdupdateport);
             $dc=new EPHPXDClient($emitter);
             $dc->init(9000, $launchport);

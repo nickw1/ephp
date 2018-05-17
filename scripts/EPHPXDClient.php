@@ -196,7 +196,7 @@ class EPHPXDClient extends XDClient\VarWatcher  {
         $executableQuery = $query;
         foreach($this->vars[$this->idekey] as $k=>$v) {
             // $row will be an array
-            if(!is_array($v["value"])) {
+            if(isset($v["value"]) && !is_array($v["value"])) {
                 $executableQuery=str_replace($k, $v["value"], $executableQuery);
             }
         }
