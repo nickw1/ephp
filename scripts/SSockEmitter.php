@@ -18,6 +18,9 @@ class SSockEmitter extends MultiUserEmitter {
     public function emitError($msg) {
 		fwrite($this->ssocket,json_encode(["error"=>$msg]));
     }
-}
 
+	public function shutdown() {
+		stream_socket_shutdown($this->ssocket, STREAM_SHUT_RDWR);
+	}
+}
 ?>

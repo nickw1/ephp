@@ -3,11 +3,14 @@
 // see Rady Cristescu's comment on getmypid() manual page
 require('EPHPXDClient.php');
 require('ZMQEmitter.php');
+require('SSockEmitter.php');
 define('LOCKFILE', TMPDIR."xdclient.lock");
 
 
 $xdupdateport = 9001;
 $launchport = 9002;
+
+$emitter = null;
 
 if(count($argv) > 1 && $argv[1]!="start") {
     $client=stream_socket_client("tcp://127.0.0.1:$launchport",$errno,$errmsg);
@@ -30,7 +33,8 @@ if(count($argv) > 1 && $argv[1]!="start") {
     register_shutdown_function('unlink_with_test', LOCKFILE);
     try {
         if(@symlink("/proc/".getmypid(),LOCKFILE)!==false) {
-            $dc = new EPHPXDClient(new ZMQEmitter('127.0.0.1', $xdupdateport));
+			$emitter = new ZMQEmitter('127.0.0.1', $xdupdateport);
+            $dc=new EPHPXDClient($emitter);
             $dc->init(9000, $launchport);
             $dc->run();
         } else {
@@ -42,9 +46,13 @@ if(count($argv) > 1 && $argv[1]!="start") {
 }
 
 function unlink_with_test($file) {
+	global $emitter;
     if(file_exists($file)) {
         unlink($file);
     }
+	if($emitter!=null) {
+		$emitter->shutdown();
+	}
 }
 ?>
 
