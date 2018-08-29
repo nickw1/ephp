@@ -20,11 +20,13 @@ function go() {
 
 	for(var i=0; i<artists.length; i++) {
 		if(i<limit) {
-			var user = "ephp" + ("00"+(i+1)).slice(-3);
-			handlr.handle("Launching "+ user);
-			dbgMgrs[i] = new DebugMgr('../php/launcher.php?XDEBUG_SESSION_STOP',
+			setTimeout((function(i) {
+				var user = "ephp" + ("00"+(i+1)).slice(-3);
+				handlr.handle("Launching "+ user);
+				dbgMgrs[i] = new DebugMgr('../php/launcher.php?XDEBUG_SESSION_STOP',
 					{dbgMsgHandler: handlr, overrideUser: user });
-			dbgMgrs[i].launchDebugSession('/epup/'+user+'/basicsearch.php?artist='+artists[i], 'GET', null, (xhr) => { handlr.handle("Launch debug return: " + xhr.responseText); } );	
+				dbgMgrs[i].launchDebugSession('/epup/'+user+'/basicsearch.php?artist='+artists[i], 'GET', null, (xhr) => { handlr.handle("Launch debug return: " + xhr.responseText); } );	
+			}).bind(this, i), i*500);
 		}
 	}
 
