@@ -50,6 +50,8 @@ body
 
 #src_ace {
 	height: 600px;
+    justify-content: center;
+/*    background-color: #e0e0e0; */
 }
 
 #content {
@@ -90,11 +92,6 @@ body
 {
     background-color: #e0e0e0;
     color: black;
-}
-
-#src_ace {
-    justify-content: center;
-    background-color: #e0e0e0;
 }
 
 #content {
