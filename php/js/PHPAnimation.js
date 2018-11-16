@@ -13,6 +13,7 @@ function PHPAnimation(options) {
     this.dbgMsgQueue = new DbgMsgQueue(this, 500, 
             { onStart:()=> {
                 this.runBtn.setAttribute("disabled", "disabled");
+				this.outputWindow.innerHTML = "";
                 },
               onStop: ()=>{
                 this.runBtn.removeAttribute("disabled");
@@ -31,50 +32,16 @@ function PHPAnimation(options) {
     }
     this.srcDivPos = this.getSrcDivPos(this.parentDiv);
 
-    this.varWindow = document.createElement("div");
-    this.outputWindow = document.createElement("div");
+	this.varWindow = document.getElementById("varsInner");
+	this.outputWindow = document.getElementById("logInner");
 
-    var varDraggable = new Draggable(this.varWindow), 
-            consDraggable = new Draggable(this.outputWindow);
-
-    this.varWindow.innerHTML += "<strong>--Vars--</strong><br />";
-    this.varWindowInner = document.createElement("div");
-    this.varWindow.appendChild(this.varWindowInner);
-    this.varWindow.setAttribute("id", "_var_window_" + new Date().getTime());
-
-    this.outputWindow.innerHTML += "<strong>--Output--</strong><br />";
-    this.outputWindowInner = document.createElement("div");
-    this.outputWindow.appendChild(this.outputWindowInner);
-    this.outputWindow.setAttribute
-        ("id", "_cons_window_" + new Date().getTime());
-
-    varDraggable.setup();
-    consDraggable.setup();
-
-    this.dbWindow = document.createElement("div");
-    this.dbWindow.style.position = 'relative';
-    this.dbWindow.innerHTML += "<strong>DB Results:</strong><br />";
-    this.dbWindowInner = document.createElement("div");
-    this.dbWindow.appendChild(this.dbWindowInner);
-
-    this.outputWindow.setAttribute("class","srcconsole");
-    this.varWindow.setAttribute("class","srcvar");
-    this.dbWindow.setAttribute("class","srcdb");
-
-
-    // TODO this isn't currently working - not an issue with vertical as a
-    // test page works with a vertical resizable window set. Not just 
-    // missing position:relative either. Resizers appear but will not resize
-    // the window, setting element.style.height=...px does not change the height
-    ResizableWindowSet.addFullResize([this.srcDiv, this.dbWindow]);
-    var rsz = new ResizableWindowSet([this.srcDiv, this.dbWindow], true);
-    rsz.setup();
+	this.dbWindow = document.getElementById("dbInner");
 
 
     this.parentDiv.addEventListener("dragover", (e)=> {
             e.preventDefault();
     });
-    this.varsBox = new VarsBox(this.varWindowInner);
+    this.varsBox = new VarsBox(this.varWindow);
 
     this.dbResults = new DBResults(this);
     this.dbAnimation = options.dbAnimation || null;
@@ -110,7 +77,7 @@ PHPAnimation.prototype.setupGUI = function() {
     this.runBtn.setAttribute("value","Send back output from PHP");
     this.runBtn.addEventListener("click", ()=> {
         this.showing=false;
-        this.dbWindowInner.innerHTML = this.outputWindowInner.innerHTML = "";
+        this.dbWindow.innerHTML = this.outputWindow.innerHTML = "";
         this.varsBox.reset();
         this.dbResults.reset();
         this.dbgMsgQueue.clear();
@@ -139,8 +106,6 @@ PHPAnimation.prototype.setupGUI = function() {
 PHPAnimation.prototype.showSrc = function(data) {
     this.srcDiv.innerHTML = "";
     this.outputWindow.style.display = 'block';
-    this.varWindow.style.display = 'block';
-    this.dbWindow.style.display = 'block';
     var codeLines = data.src || [];
     if(true) {
         // If showing some other code from a previous request, blank out the
@@ -183,11 +148,8 @@ PHPAnimation.prototype.showSrc = function(data) {
               this.codeLines.push(line);
             }
         }
-        this.parentDiv.appendChild(this.dbWindow);
         this.parentDiv.appendChild(this.controlsDiv);
         this.parentDiv.appendChild(this.btndiv);
-        this.parentDiv.appendChild(this.outputWindow);
-        this.parentDiv.appendChild(this.varWindow);
 
         return true;
     }
@@ -229,14 +191,14 @@ PHPAnimation.prototype.handleNewRow = function(data) {
 PHPAnimation.prototype.handleStdout = function(data)  {
     // TODO handle stdout sent from the debugger
     if(this.outputWindow!==null) {
-        this.outputWindowInner.innerHTML += data.replace(/</g,"&lt;").
+        this.outputWindow.innerHTML += data.replace(/</g,"&lt;").
                 replace(/>/g,"&gt;").replace(/\\n/g,"<br />")+"<br />";
     }
 }
 
 PHPAnimation.prototype.handleDBResults = function(data) {
     console.log("handleDBResults: "+ JSON.stringify(data));
-    this.dbResults.showResults(data, this.dbWindowInner);
+    this.dbResults.showResults(data, this.dbWindow);
 }
 
 PHPAnimation.prototype.handleDBError = function(data) {

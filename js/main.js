@@ -400,6 +400,14 @@ function init() {
     rw.setOnFinishCallback(animation.calculateCanvasPos.bind(animation));
     rw.setup();
 
+    ResizableWindowSet.addFullResize([document.getElementById('vars'), 
+                                    document.getElementById('dbresults'), 
+                                    document.getElementById('log')]);
+    var rw2 = new ResizableWindowSet([document.getElementById('vars'), 
+                                    document.getElementById('dbresults'),
+                                    document.getElementById('log')]);
+	rw2.setup();
+
     window.addEventListener("resize",  () => {
             var serverWidth = document.body.offsetWidth-
                 (document.getElementById('client').offsetWidth+

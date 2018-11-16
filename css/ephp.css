@@ -6,7 +6,7 @@ html,body
 
 body
 {
-    font-family: Trebuchet MS, franklin gothic, helvetica, arial, sans-serif;
+    font-family: Trebuchet MS, DejaVu Sans Condensed, helvetica, arial, sans-serif;
     background-color: #0b99b7;
 }
 
@@ -20,12 +20,13 @@ body
       divs being contained */
     white-space: nowrap;
     overflow: hidden;
+	height:800px;
+	width: 100%;
 }
 
 #client, #networkContainer, #server {
     display: inline-block;  
     margin: 10px;
-    height: 100%; 
     vertical-align: top; 
     position: relative;
     /* white-space is inherited so get the contained elements 
@@ -44,9 +45,6 @@ body
     background-color: white;
 }
 
-#ephp_container {
-	height: 800px;
-}
 
 #src_ace {
 	height: 600px;
@@ -156,28 +154,28 @@ tr,td,th
 
 
 
-#server .selected
+#dbresults .selected
 {
     background-color: yellow;
+	color: black;
     border: 2px solid red;
 }
 
-#server tr.selected 
+#dbresults tr.selected 
 {
     background-color: white;
     font-weight: bold;
 }
 
-#server .varcell
+#dbresults .varcell
 {
     border: none;
-    color: #ffffc0;
+    color: black;
 }
 
-#server .varcell.selected
+#dbresults .varcell.selected
 {
     border: 2px solid black;
-    color: black;
 }
 #serverContent { height:100%; overflow: auto; } 
 #serverContent code, #serverContent .code
@@ -254,3 +252,32 @@ tr,td,th
     overflow: auto;
 }
 
+#dbg {
+	height: 20%;
+	bottom: 0%;
+	position: relative;
+	background-color: black;
+}
+
+#vars, #dbresults, #log {
+	border: 1px solid white;
+	height:100%;
+	float: left;
+    position: relative;
+	font-size: 80%;
+	font-family: monospace;
+	color: white;
+	overflow: auto;
+}
+
+#vars>p, #dbresults>p, #log>p {
+	color: yellow;
+}
+
+#vars {
+	width: 20%;
+}
+
+#dbresults, #log {
+	width: 39%;
+}

@@ -21,6 +21,10 @@ DBResults.prototype.highlightRow = function(id) {
 }
 
 DBResults.prototype.showResults = function(sqlquery, hostDiv) {
+	while(hostDiv.childNodes.length > 0) {
+		hostDiv.removeChild(hostDiv.firstChild);
+	}
+	
     var div = document.createElement("div");
     var table = document.createElement("table");
     var id;

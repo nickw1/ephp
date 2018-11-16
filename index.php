@@ -107,6 +107,22 @@ class EPHPPage extends Page {
 
 		</div> 
         <div id="msg" style="clear:both">msg</div>
+		<div id='dbg'>
+			<div id='vars'>
+				<p><strong>Variables</strong></p>
+				<div id='varsInner'></div>
+			</div>
+`
+	
+			<div id='dbresults'>
+				<p><strong>Database Results</strong></p>
+				<div id='dbInner'></div>
+			</div>
+			<div id='log'>
+				<p><strong>Script Output</strong></p>
+				<div id='logInner'></div>
+			</div>
+		</div>
 
         </body>
         <?php
