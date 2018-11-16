@@ -42,7 +42,7 @@ function Browser(options) {
     this.editor = ace.edit(options.sourceElement);
     this.editor.setOptions({fontSize:"10pt"});
     this.editor.getSession().setMode("ace/mode/php");
-	this.editor.setTheme('ace/theme/twilight');
+    this.editor.setTheme('ace/theme/twilight');
     this.editor.on("change", (e)=> {
         if(!this.lock) {
             this.showContent('text/html', this.editor.getValue());
@@ -64,10 +64,10 @@ function Browser(options) {
 
 Browser.prototype.sendRequest = function(method,url,formData) {
     this.setRequestingState(true);
-    var regexp=/^(http:\/\/[^\/]+)?(\/.*)$/;    
+    var regexp=/^(http:\/\/[^\/]+)?\/?(.*)$/;    
     var parts = url.match(regexp);
     if(parts==null) {
-        alert("Invalid URL: it must use HTTP");
+        alert("Invalid URL: " + url + " it must use HTTP");
     } else if(this.animation==null) {
         http.send(method, url, formData).then(
                 () =>{
@@ -75,25 +75,29 @@ Browser.prototype.sendRequest = function(method,url,formData) {
                     this.loadResponse();
                     } );
     } else {
-        var pXHR = new PendingHttpRequest
-            ( {
-                url: parts[2], 
-                method: method,
-                formData: formData,
-                callback: this.loadResponse.bind(this),
-                server: parts[1]?parts[1].replace("http://",""):
-                        window.location.hostname,
-                sourceRetriever: 'php/retriever.php'
-              }
-            );
-
-        if(this.doAnimation) {
-            this.animation.stop(); // stop any previous animations
-            this.animation.setMessage(pXHR);
-            this.animation.paused = false;
-            this.animation.animate();
+        if(parts[1] && parts[1].replace('http://','') != window.location.hostname) {
+            alert(`Cannot fetch a page from another server ${parts[1]}, only this server i.e. ${window.location.hostname}`);
         } else {
-            // kick off the php stepthrough 
+            var pXHR = new PendingHttpRequest
+                ( {
+                    url: "/"+parts[2], 
+                    method: method,
+                    formData: formData,
+                    callback: this.loadResponse.bind(this),
+                    server: parts[1]?parts[1].replace("http://",""):
+                        window.location.hostname,
+                    sourceRetriever: 'php/retriever.php'
+                  }
+                );
+
+            if(this.doAnimation) {
+                this.animation.stop(); // stop any previous animations
+                this.animation.setMessage(pXHR);
+                this.animation.paused = false;
+                this.animation.animate();
+            } else {
+                // kick off the php stepthrough 
+            }
         }
     }
 }
@@ -246,7 +250,7 @@ Browser.prototype.showContent = function(mimetype, responseText) {
         }
 
         this.doFormEventListeners();
-		this.doLinkEventListeners();
+        this.doLinkEventListeners();
 
     }
 }
@@ -327,11 +331,11 @@ Browser.prototype.loadExternalCSS = function() {
                     xmlhttp.responseText.replace("body",":host")+ 
                         '</style>';
                 this.lock = false;
-				// Adding the CSS to the innerHTML of shadow seems to screw up
-				// the event listeners we added to our form submit buttons.
-				// So add them again.
+                // Adding the CSS to the innerHTML of shadow seems to screw up
+                // the event listeners we added to our form submit buttons.
+                // So add them again.
                 this.doFormEventListeners();
-				this.doLinkEventListeners();
+                this.doLinkEventListeners();
 
         } ).catch((code)=>{ 
                         console.log("Warning - could not load external css: " +
