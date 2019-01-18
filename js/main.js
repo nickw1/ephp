@@ -408,6 +408,18 @@ function init() {
                                     document.getElementById('log')]);
 	rw2.setup();
 
+
+
+	/* note vertical currently not working
+    ResizableWindowSet.addFullResize([document.getElementById('ephp_container'),
+								document.getElementById('msg'), 
+								document.getElementById('dbg')]);
+	var rw3 = new ResizableWindowSet([document.getElementById('ephp_container'),
+									document.getElementById('msg'),
+									document.getElementById('dbg')], true);
+	rw3.setup();
+	*/
+
     window.addEventListener("resize",  () => {
             var serverWidth = document.body.offsetWidth-
                 (document.getElementById('client').offsetWidth+
@@ -466,4 +478,13 @@ function init() {
             rw.showResizer(netCont, false);
         });
     document.getElementById('network').appendChild(img);
+	// resize event code - width initially incorrectly done
+	// TODO look at this
+	var serverWidth = document.body.offsetWidth-
+                (document.getElementById('client').offsetWidth+
+                    document.getElementById('network').offsetWidth);
+	document.getElementById('server').style.width=serverWidth+'px';
+	animation.calculateCanvasPos();
+	compAnim.recalculateDimensions();
+	rw.recalculateTotalSpan();
 }

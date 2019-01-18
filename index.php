@@ -10,7 +10,9 @@ class EPHPPage extends Page {
     public function writeBody() {
         ?>
         <body onload='init()'>
-        <h1>ephp<sup>ii</sup></h1>
+		<div id='titlecontainer'>
+        <h1>ephp<sup>iia</sup></h1>
+		</div>
         <div id="login">
         <?php
 		if(false) {
@@ -46,7 +48,7 @@ class EPHPPage extends Page {
 
         <div id="client">
             <div id='client_header' class='component_header'>client<br />
-                <img src='assets/images/computer-laptop.small.png'
+                <img src='assets/images/computer-laptop.vsmall.png'
                 alt='client' id='client_img'/>
             </div>
             <div id='client_toolbar'>
@@ -73,7 +75,7 @@ class EPHPPage extends Page {
 		<div id="network">
         <div id='network_header' class='component_header'>
         network<br />
-            <img src='assets/images/rgtaylor_csc_net_wan_cloud.med.png'
+            <img src='assets/images/rgtaylor_csc_net_wan_cloud.small.png'
                 alt='network' id='network_img'/>
         </div>
 		</div>
@@ -81,7 +83,7 @@ class EPHPPage extends Page {
 
         <div id="server">
             <div id='server_header' class='component_header'>server<br />
-                <img src='assets/images/web_server.small.png'
+                <img src='assets/images/web_server.vsmall.png'
                 alt='server' id='server_img'/>
             </div>
             <div id="serverContent"> 
@@ -98,7 +100,7 @@ class EPHPPage extends Page {
 
         <div id='database'>
             <div id='database_header' class='component_header'>database<br />
-            <img src='assets/images/web_server.small.png'
+            <img src='assets/images/web_server.vsmall.png'
             alt='database' />
             </div>
             <div id='databaseContent'></div>

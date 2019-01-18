@@ -15,12 +15,26 @@ body
     margin-left: 10px;
 }
 
+#login 
+{
+	float: right;
+}
+
+#titlecontainer
+{
+	float: left;
+}
+
+#titlecontainer h1 {
+	margin-top: 0px;
+}
+
 #ephp_container {
     /* How we solve the dreaded wrap to another line problem with the
       divs being contained */
     white-space: nowrap;
     overflow: hidden;
-	height:800px;
+	height:640px;
 	width: 100%;
 }
 
@@ -47,7 +61,7 @@ body
 
 
 #src_ace {
-	height: 600px;
+	height: 500px;
     justify-content: center;
 /*    background-color: #e0e0e0; */
 }
@@ -255,6 +269,7 @@ tr,td,th
 #dbg {
 	height: 20%;
 	bottom: 0%;
+	width: 100%;
 	position: relative;
 	background-color: black;
 }
