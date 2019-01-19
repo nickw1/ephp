@@ -5,7 +5,7 @@ function PHPAnimation(options) {
     this.parentDiv = document.getElementById(options.divId);
     this.srcDiv = document.createElement("div");
     this.srcDiv.style.position = 'relative';
-    this.srcDiv.style.height = '50%';
+    this.srcDiv.style.height = '75%';
     this.srcDiv.style.overflow = 'auto';
     this.callback = options.callback || null; 
     this.browserCallback = options.browserCallback || null;
