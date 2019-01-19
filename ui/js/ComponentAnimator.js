@@ -65,6 +65,7 @@ ComponentAnimator.prototype.doAnim = function (direction, cb) {
     }
     grower.fullResizeWidth(growerWidth);
     
+	/* Remove this now we've made the client/network/server images smaller
     if(document.getElementById(shrinker.id+"_img")) {
         document.getElementById(shrinker.id+"_img").width = 
             (shrinker.offsetWidth> 75 ? 75: shrinker.offsetWidth);
@@ -78,6 +79,7 @@ ComponentAnimator.prototype.doAnim = function (direction, cb) {
             
         }
     }
+	*/
 
     if(direction==1 && this.elem[0].offsetWidth<this.minWidth) {
         this.elem[0].fullResizeWidth(this.minWidth);

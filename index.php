@@ -90,23 +90,6 @@ class EPHPPage extends Page {
             </div>
         </div>
 
-        <div id='dbconnect'>
-            <div id='network_header' class='component_header'>
-            db connect<br />
-                <img src='assets/images/rgtaylor_csc_net_wan_cloud.med.png'
-                    alt='network' />
-            </div>
-        </div>
-
-        <div id='database'>
-            <div id='database_header' class='component_header'>database<br />
-            <img src='assets/images/web_server.vsmall.png'
-            alt='database' />
-            </div>
-            <div id='databaseContent'></div>
-        </div>
-
-
 		</div> 
         <div id="msg" style="clear:both">msg</div>
 		<div id='dbg'>

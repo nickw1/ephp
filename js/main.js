@@ -6,7 +6,7 @@ function init() {
     var filenameDiv = document.getElementById("filename");
     var mode=0;
     var savedLoginHTML="", originalLoginDivContents = "";
-    var canvasHeight = 592; 
+    var canvasHeight = 500; 
     var compAnim = new ComponentAnimator(1000, 5, 200, 
                                             ['client', 'networkContainer', 'server']);
 
@@ -428,7 +428,7 @@ function init() {
     networkShowDiv.style.width='75px';
     networkShowDiv.style.border='ridge';
     var cloudImg = new Image();
-    cloudImg.src='assets/images/rgtaylor_csc_net_wan_cloud.small.png';
+    cloudImg.src='assets/images/rgtaylor_csc_net_wan_cloud.vsmall.png';
     networkShowDiv.appendChild(cloudImg);
     networkShowDiv.addEventListener('click', ()=> {
             var netCont = document.getElementById('networkContainer'),
