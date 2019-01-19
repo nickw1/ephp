@@ -189,9 +189,14 @@ tr,td,th
 }
 
 
-#content .selected
+#content .selected, #serverContent span.selected
 {
     background-color: yellow;
+}
+
+#serverContent span.selected
+{
+   border: 1px solid black;
 }
 
 .lineHighlight {
@@ -255,6 +260,7 @@ tr,td,th
 }
 
 #dbg {
+	margin-top: 10px;
 	height: 20%;
 	bottom: 0%;
 	width: 100%;

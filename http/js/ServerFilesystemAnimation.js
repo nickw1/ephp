@@ -8,6 +8,7 @@ function ServerFilesystemAnimation(options) {
 
 ServerFilesystemAnimation.prototype.animate = function() {
 	if(this.urlParts.length >= 2) {
+			this.fileExplorer.clearSelected();
 		this.urlPartCounter = this.urlParts[1][0] == "~"  ? 2:1;
 		this.counter=0;
 		this.element = this.fileExplorer.findFileSpan
@@ -18,7 +19,6 @@ ServerFilesystemAnimation.prototype.animate = function() {
 			this.callback();
 		} else {
 			this.timer=setInterval(this.doAnimate.bind(this), this.interval);
-			this.fileExplorer.clearSelected();
 		}
 	}
 }
@@ -30,9 +30,13 @@ ServerFilesystemAnimation.prototype.doAnimate = function() {
 		this.nextLevel();
 	} else {
 		if(this.counter%2) {
+			console.log("ADDING SELECTED: " + this.element.id);
 			this.element.classList.add("selected");
+			//this.element.style.backgroundColor = 'red';
 		} else {
+			console.log("REMOVING SELECTED: " + this.element.id);
 			this.element.classList.remove("selected");
+			//this.element.style.backgroundColor = 'white';
 		}
 	}
 }

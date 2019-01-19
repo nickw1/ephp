@@ -14,10 +14,12 @@ session_start();
 $user = isset($_POST["overrideUser"])  ? $_POST["overrideUser"] :
     (isset($_SESSION["ephpuser"]) ? $_SESSION["ephpuser"]: null);
 
+$user="ephp001";
 
 $cmd = isset($_POST["cmd"]) && ctype_alpha($_POST["cmd"]) ? $_POST["cmd"] : 
         (isset($argv[1]) && ctype_alpha($argv[1])  ? $argv[1]: "start");
 $stopping = $cmd=="stop";
+$dbg = [];
 
 if($stopping || ($user!=null && preg_match("/^ephp\d{3}$/",  $user))) {
 
@@ -40,7 +42,11 @@ if($stopping || ($user!=null && preg_match("/^ephp\d{3}$/",  $user))) {
                 "&";
 
 //        $cmd1="/usr/bin/php ".SCRIPTDIR."{$scripts[$i]}.php $cmd $data ".  "> /dev/null 2> /dev/null";
-        system($cmd1);
+
+	 
+	$dbg[] = "Launching: $cmd1";
+        $res=system($cmd1);
+	$dbg[] = "Res: $res";
         usleep(500000);
     }
     if($stopping) {
@@ -52,7 +58,7 @@ if($stopping || ($user!=null && preg_match("/^ephp\d{3}$/",  $user))) {
         }
     }
     //$user = $_SESSION["ephpuser"];
-    echo json_encode(["user"=>$user]);
+    echo json_encode(["user"=>$user, "dbg"=>$dbg]);
 } else {
     echo json_encode(["error"=>"Not logged in as an EPHP user","user"=>$user]);
 }

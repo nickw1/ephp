@@ -97,8 +97,6 @@ class EPHPPage extends Page {
 				<p><strong>Variables</strong></p>
 				<div id='varsInner'></div>
 			</div>
-`
-	
 			<div id='dbresults'>
 				<p><strong>Database Results</strong></p>
 				<div id='dbInner'></div>

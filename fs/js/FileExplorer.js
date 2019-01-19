@@ -277,10 +277,12 @@ FileExplorer.prototype.onAjaxFileResponseFtp = function(xmlHTTP)
 }
 
 FileExplorer.prototype.findFileSpan = function (filename) {
+	console.log(`Trying to find file span ${filename}`);
     var spans = this.div.getElementsByTagName("span");
     for(var i=0; i<spans.length; i++) {
         if(spans[i].childNodes.length>1 && 
             spans[i].childNodes[1].nodeValue == filename) {
+		console.log('FOUND!!!');
             return spans[i];
         }
     }

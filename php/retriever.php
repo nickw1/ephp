@@ -42,7 +42,9 @@ if(empty($errors)) {
         //"php" => htmlentities($target_contents), 
         "src" => $srclines,
                 ); 
+	/* 190119 WTF? this code is doing nothing !!!
         $httpCode = $script_result["status"]["code"];
+	*/
 } else { 
     $json = array ("errors" => $errors);
 }
