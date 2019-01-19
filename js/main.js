@@ -420,15 +420,7 @@ function init() {
 	rw3.setup();
 	*/
 
-    window.addEventListener("resize",  () => {
-            var serverWidth = document.body.offsetWidth-
-                (document.getElementById('client').offsetWidth+
-                    document.getElementById('network').offsetWidth);
-            document.getElementById('server').style.width=serverWidth+'px';
-            animation.calculateCanvasPos();
-            compAnim.recalculateDimensions();
-            rw.recalculateTotalSpan();
-            } );
+    window.addEventListener("resize",onResize.bind(this,animation,compAnim,rw)); 
     var origWidth, netWidth = 400;
 
     var networkShowDiv = document.createElement("div");
@@ -478,13 +470,15 @@ function init() {
             rw.showResizer(netCont, false);
         });
     document.getElementById('network').appendChild(img);
-	// resize event code - width initially incorrectly done
-	// TODO look at this
-	var serverWidth = document.body.offsetWidth-
+	onResize(animation, compAnim, rw);
+}
+
+function onResize(animation, compAnim, rw) {
+            var serverWidth = document.body.offsetWidth-
                 (document.getElementById('client').offsetWidth+
                     document.getElementById('network').offsetWidth);
-	document.getElementById('server').style.width=serverWidth+'px';
-	animation.calculateCanvasPos();
-	compAnim.recalculateDimensions();
-	rw.recalculateTotalSpan();
+            document.getElementById('server').style.width=serverWidth+'px';
+            animation.calculateCanvasPos();
+            compAnim.recalculateDimensions();
+            rw.recalculateTotalSpan();
 }
