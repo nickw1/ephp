@@ -270,7 +270,8 @@ tr,td,th
 	font-size: 90%;
 	font-family: monospace;
 	color: white;
-	overflow: auto;
+	overflow-y: auto;
+	overflow-x: hidden;
 	white-space: normal;
 }
 

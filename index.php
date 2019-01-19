@@ -91,7 +91,7 @@ class EPHPPage extends Page {
         </div>
 
 		</div> 
-        <div id="msg" style="clear:both">msg</div>
+        <div id="msg" style="clear:both"> </div>
 		<div id='dbg'>
 			<div id='vars'>
 				<p><strong>Variables</strong></p>
