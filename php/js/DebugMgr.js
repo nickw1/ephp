@@ -1,30 +1,9 @@
 
-function DebugMgr(launcher, options) {
-    this.launcher = launcher;
+function DebugMgr(options) {
     this.dbgMsgHandler = options.dbgMsgHandler || null;
     this.completeCallback = options.completeCallback || null;
     this.overrideUser = options.overrideUser || null;
-}
-
-DebugMgr.prototype.runLauncher = function(method, scriptUrl, userFormData) {
-    console.log("runLauncher(): scriptUrl="+scriptUrl);
-    var launcherFormData=new FormData();
-    launcherFormData.append('cmd', 'start');
-    if(this.overrideUser) {
-        launcherFormData.append('overrideUser', this.overrideUser);
-    }
-    http.send('POST', this.launcher,launcherFormData).
-        then( (xmlHTTP) => {
-                    // startup the websocket stuff
-                    console.log("Response text=" + xmlHTTP.responseText);
-                    var data = JSON.parse(xmlHTTP.responseText);
-                    this.user = data.user;
-                    console.log('USER: ' + this.user);
-                    console.log("Launcher returned: "+ xmlHTTP.responseText);
-                    this.connect(method, scriptUrl, userFormData);
-                } ).catch( (statusCode) => {
-                    console.log('http error: ' + statusCode);
-                    } );
+    this.user = options.user || null;
 }
 
 DebugMgr.prototype.connect = function(method, scriptUrl, userFormData) {
@@ -141,5 +120,9 @@ DebugMgr.prototype.launchDebugSession = function(scriptUrl, method, userFormData
     }
     this.setCompleteCallback (callback);
     this.dbgMsgHandler.clearQueue();
-    this.runLauncher(method, scriptUrl, userFormData);
+    if(this.user != null) {    
+        this.connect(method, scriptUrl, userFormData);
+    } else {
+        alert('Cannot launch debug session as not logged in');
+    }
 } 

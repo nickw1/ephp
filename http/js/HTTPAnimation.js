@@ -6,6 +6,7 @@ function HTTPAnimation(options) {
         this.componentAnimator = options.componentAnimator;
     } 
     this.onerror = options.onerror;
+	this.loggedin = null;
 }
 
 HTTPAnimation.prototype = Object.create(GenericAnimation.prototype);
@@ -23,8 +24,7 @@ HTTPAnimation.prototype.fireAnimation = function()  {
 
 // Overridden to do the ServerFilesystemAnimation and analyser stuff
 HTTPAnimation.prototype.finishRequest = function() {
-        var debugMgr = new DebugMgr("php/launcher.php",
-                { dbgMsgHandler: this.serverAnimation } );
+        var debugMgr = new DebugMgr( { dbgMsgHandler: this.serverAnimation, user: this.loggedin } );
 
         var urlParts = this.message.url.split("/");    
 

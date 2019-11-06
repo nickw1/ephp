@@ -219,6 +219,7 @@ function init() {
 
                         if(json.loggedin!=null) {
                             loggedin = json.loggedin;
+							animation.loggedin = json.loggedin;
                             document.getElementById("login").innerHTML = 
                                 "<p>Logged in as " + loggedin +
                                 " <a href='ftp/logout.php'>Logout</a></p>";
