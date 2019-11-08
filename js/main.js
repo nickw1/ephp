@@ -1,81 +1,77 @@
 
-function init() {
-    var fileInfo = { "file": null, "dir": null }, newFileInfo=null;
-    var loggedin = null;
-    var msgDiv = document.getElementById("msg");
-    var filenameDiv = document.getElementById("filename");
-    var mode=0;
-    var savedLoginHTML="", originalLoginDivContents = "";
-    var canvasHeight = 500; 
-    var compAnim = new ComponentAnimator(1000, 5, 200, 
-                                            ['client', 'networkContainer', 'server']);
+class App {
+    constructor() {
+        this.fileInfo = { "file": null, "dir": null }; 
+        this.newFileInfo=null;
+        this.loggedin = null;
+        this.msgDiv = document.getElementById("msg");
+        this.filenameDiv = document.getElementById("filename");
+        this.mode=0;
+        this.savedLoginHTML=""; 
+        this.origLoginDivContents = "";
+        this.canvasHeight = 500; 
 
-    var fileExplorer=new FileExplorer('serverContent', 
-                            {http: 'fs/fs.php',
-                            ftp: 'ftp/ftp.php' } ,'client',
-                            { showContentCallback: (mime,src,webdirPath,
-                                webdirUrl)=> {
-                                    saveOld(()=> {
-                                        browser.setContent(mime,src);
-                                        browser.setFreezeAlteredStatus(false);
-                                        fileInfo = newFileInfo;
-                                        // remove the . from the current dir 
-                                        var localPath = webdirPath + fileInfo.dir.substr(1);
-                                        console.log("webdirPath="+webdirPath+" webdirUrl="+webdirUrl+" fileInfo.dir="+fileInfo.dir+" fileInfo.file="+fileInfo.file + " localPath="+
-        localPath);
-                                        //var filePath='file://'+webdirPath+fileInfo.dir.substr(1);
-                                     //   var filePath='file://'+webdirPath+fileInfo.dir.substr(1);
-                                        var filePath = webdirUrl+fileInfo.dir.substr(1);
-//                                        browser.setWebDir(localPath);
-                                        browser.setWebDir(filePath);        
-                                        browser.setFile(fileInfo.file);
-                                        browser.loadExternalCSS();
-                                        browser.markUnaltered();
-                                        newFileInfo = null;
-                                        if(mode==0) {
-                                            showFilename();
-                                        }
-                                        });
-                                    }, 
-                                 fileInfoCallback: 
-                                    (fInfo)=> { 
-                                        newFileInfo = fInfo;
-                                    },
+        this.fileExplorer=new FileExplorer('serverContent', 
+            {http: 'fs/fs.php',
+            ftp: 'ftp/ftp.php' } ,
+            'client',
+            { showContentCallback: (mime,src,webdirPath, webdirUrl)=> {
+                    this.saveOld(()=> {
+                        this.browser.setContent(mime,src);
+                        this.browser.setFreezeAlteredStatus(false);
+                        this.fileInfo = this.newFileInfo;
+                        var filePath = webdirUrl+this.fileInfo.dir.substr(1);
+                        this.browser.setWebDir(filePath);       
+                        this.browser.setFile(this.fileInfo.file);
+                        this.browser.loadExternalCSS();
+                        this.browser.markUnaltered();
+                        this.newFileInfo = null;
+                        if(this.mode==0) {
+                            this.showFilename();
+                        }
+                    });
+                    }, 
+                 fileInfoCallback: fInfo=> { this.newFileInfo = fInfo; },
+                 onDragStart: () => { this.browser.setFreezeAlteredStatus(true); },
+        });
 
-                                 onDragStart: () => {
-                                        browser.setFreezeAlteredStatus(true);
-                                    
-                                 },
- 
-                             });
-
-    var phpAnimation = new PHPAnimation({divId:"serverContent",
+        this.phpAnim = new PHPAnimation({divId:"serverContent",
                                         consoleElement: "console"});
 
-    var animation = new HTTPAnimation({parentId: 'network',
-                                        height:canvasHeight,
+        this.httpAnim = new HTTPAnimation({parentId: 'network',
+                                        height:this.canvasHeight,
                                     interval: 20,
                                     step : 2,
-                                    fileExplorer: fileExplorer,
-                                    serverAnimation: phpAnimation,
-                                    componentAnimator: compAnim,
+                                    fileExplorer: this.fileExplorer,
+                                    serverAnimation: this.phpAnim,
+                                    componentAnimator: null,
                                     onerror: ()=> { }
-            });
+        });
 
-    var browser = new Browser({divId: 'content', 
-                                animation: animation,
-                                sourceElement: 'src_ace',
-                                saveOldCallback: (cb)=> {
-                                    saveOld ( ()=> {
-                                        cb();
-                                        fileInfo.file=fileInfo.dir=null;
-                                        showFilename();
-                                    } )
-                                }});
+        this.browser = new Browser({divId: 'content', 
+                                animation: this.httpAnim,
+								saveOldCallback: ()=> {
 
-    // Resize event was here
+                           			this.saveOld ( ()=> {
+                                			cb();
+                                			this.fileInfo.file=this.fileInfo.dir=null;
+                                			this.showFilename();
+                            		} )},
+                                sourceElement: 'src_ace'});
 
-    var errors = { 
+		/*
+        this.browser.on("responseloaded", cb=> {
+                           this.saveOld ( ()=> {
+                                cb();
+                                this.fileInfo.file=this.fileInfo.dir=null;
+                                this.showFilename();
+                            } )
+                        });
+		*/
+
+        // Resize event was here
+
+        this.errors = { 
                     256: 'Unable to move temporary file on server',
                     257: 'File upload security violation detected',
                     258: 'Exceeded maximum file size',
@@ -88,7 +84,7 @@ function init() {
                     1025: 'Invalid username'
                 };
 
-    var showInModes = [
+       this.showInModes = [
         { 'content': ['none'],
           'filename': [ 'block'],
           'src_ace': ['block'],
@@ -104,25 +100,25 @@ function init() {
           'file_save' : ['none'] }
         ];
 
-    var dialog = new Dialog ("client",
+       this.dialog = new Dialog ("client",
                             { 
                                 'Yes': ()=> {
-                                    dialog.hide();
-                                    uploadContent();
-                                    if(dialog.additionalCallback) {
-                                        dialog.additionalCallback();
-                                        dialog.additionalCallback = null;
+                                    this.dialog.hide();
+                                    this.uploadContent();
+                                    if(this.dialog.additionalCallback) {
+                                        this.dialog.additionalCallback();
+                                        this.dialog.additionalCallback = null;
                                     }
                                 }, 
                                 'No': ()=> {
-                                    dialog.hide();
-                                    if(dialog.additionalCallback) {
-                                        dialog.additionalCallback();
-                                        dialog.additionalCallback = null;
+                                    this.dialog.hide();
+                                    if(this.dialog.additionalCallback) {
+                                        this.dialog.additionalCallback();
+                                        this.dialog.additionalCallback = null;
                                     }
                                 },
                                 'Cancel': ()=> {
-                                    dialog.hide();
+                                    this.dialog.hide();
                                 }
                             },
                             {
@@ -135,231 +131,47 @@ function init() {
                                 border: '1px solid black'
                             }
                             );
-
-
-    var askUploadFile = (additionalCallback)=> {
-        dialog.additionalCallback = additionalCallback;
-        dialog.setContent("Unsaved file. Upload to server?");
-        dialog.show();
-    }
-
-    var uploadContent = ()=> {
-        var formData = new FormData();
-        savedLoginHTML = document.getElementById("login").innerHTML;
-
-        if(document.getElementById("ephp_username") && 
-            document.getElementById("ephp_password")) { 
-        
-            formData.append("ephp_username", 
-                    document.getElementById("ephp_username").value);
-            formData.append("ephp_password", 
-                    document.getElementById("ephp_password").value);
-        }
-        var filename=null, msg="";
-        if(fileInfo.file==null) {
-            filename = prompt("Unsaved file. Please enter a filename:");
-            if(filename!=null && fileExplorer) {
-                filename=fileExplorer.dir+"/"+filename;
-            } 
+        if(document.getElementById("ftpsubmit")) {
+            this.initFtpSubmitBtn();
         } else {
-            filename = fileInfo.file;
-        }
-
-        if(filename!=null) {
-            alert("Transferring: " + filename);
-            formData.append("filename", filename);
-            formData.append("src",browser.getCode());
-            formData.append("action", "upload");
-            msg = "Transferring file...";
-
-            http.post('ftp/ftp.php', formData).then((xmlHTTP)=> {
-                var json = JSON.parse(xmlHTTP.responseText);
-                if(json.status!=0 && (json.status>=256)) {
-                    alert('Error: ' + errors[json.status]);
-                } else {
-                    browser.markUnaltered();
-                    fileExplorer.sendAjax();
-
-                    if(fileInfo.file==null && filename!="") {
-                        fileInfo.file = filename;
-                        showFilename();
-                    } 
-                }
-            });
-        }
-    };
-
-    var login = (e)=> {
-        var formData = new FormData();
-        savedLoginHTML = document.getElementById("login").innerHTML;
-        formData.append("action", "login"); // don't try and transfer
-
-        
-        if(document.getElementById("ephp_username") &&
-            document.getElementById("ephp_password")) {
-            formData.append("ephp_username", 
-                document.getElementById("ephp_username").value);
-            formData.append("ephp_password", 
-                document.getElementById("ephp_password").value);
-        }
-        var msg = "Logging in...";
-
-        originalLoginDivContents = document.getElementById("login").
-                    innerHTML;
-        document.getElementById("login").innerHTML = msg +
-                    "<img src='assets/images/ajax-loader.gif' "+
-                    "alt='ajax loader' />";
-        http.post('ftp/ftp.php', formData).then((xmlHTTP)=> {
-                    var json = JSON.parse(xmlHTTP.responseText);
-                    if(json.status!=0 && (json.status>=1024)) {
-                        alert('Error: ' + errors[json.status]);
-                        resetLogin();
-                    } else {
-                        fileExplorer.sendAjax();
-
-                        if(json.loggedin!=null) {
-                            loggedin = json.loggedin;
-							animation.loggedin = json.loggedin;
-                            document.getElementById("login").innerHTML = 
-                                "<p>Logged in as " + loggedin +
-                                " <a href='ftp/logout.php'>Logout</a></p>";
-                            doModeDisplay();
-                            loadBackedUpFile();
-                        } 
-            }
-        });
-    };
-
-    var loadBackedUpFile = ()=> {
-            http.get('ftp/backup.php').then (
-                (xmlHTTP)=> {
-                    var json=JSON.parse(xmlHTTP.responseText);
-                                    browser.setCode(json.src);
-                                    if(json.filename!="") {
-                                        // We want to mark reloaded backup code
-                                        // as unaltered if already saved
-                                        browser.markUnaltered();
-                                        fileInfo.file=json.filename;
-                                        // TODO this is a quick and dirty
-                                        // HACK. It does not account for
-                                        // FTP vs non-FTP mode and will not
-                                        // work if the backedup file was not
-                                        // in the user's web root directory.
-                                        if(loggedin!=null) {
-                                            browser.setWebDir('/~' + loggedin);
-                                            browser.setFile(json.filename);
-                                        }
-                                        showFilename();
-                                    }
-                                });
-                setInterval(backup, 10000);
-        
-    };
-
-    var backup = ()=> {
-        var data = new FormData();
-        data.append("src", browser.getCode());
-        data.append("filename", fileInfo.file==null ? "":
-                        fileInfo.file);
-        http.post('ftp/backup.php', data).then((xmlHTTP)=> {
-            setTimeout ( showFilename, 2000);
-            });
-    };
-
-    var showFilename = (fInfo)=> {
-        fInfo = fInfo || fileInfo;
-        filenameDiv.innerHTML = (fInfo.file!=null) ?
-                 fInfo.file: "UNSAVED";
-    }
-
-
-    var doTabs = ()=> {
-        var tabs = document.getElementById('client_tabs').
-            getElementsByTagName("span");
-        for(var j=0; j<tabs.length; j++) {
-            tabs[j].classList.remove("active");
-        }
-        
-        tabs[mode].classList.add("active");
-        
-    }
-
-    var doModeDisplay = ()=> {
-        for(id in showInModes[mode] ) {
-            document.getElementById(id).style.display = 
-                (showInModes[mode][id].length==2 &&
-                showInModes[mode][id][1]==true &&
-                loggedin==null) ? 
-                'none': showInModes[mode][id][0];
-        }
-    }
-
-    var fakeEvent = (el,eventtype)=> {
-        // stackoverflow.com/questions/2705583
-        var e = document.createEvent('Events');
-        e.initEvent(eventtype, true, false);
-        document.getElementById(el).dispatchEvent(e);
-    }
-
-    var resetLogin = ()=> {
-        document.getElementById("login").innerHTML = savedLoginHTML;
-        initFtpSubmitBtn();
-    }
-
-    var initFtpSubmitBtn = ()=> {
-        document.getElementById("ftpsubmit").addEventListener
-                    ("click",login);
-    }
-
-    var saveOld = (cb)=> {
-        if(browser.isAltered()) { 
-            askUploadFile(cb);
-        } else {
-            cb();
-        }
-    }
-
-    if(document.getElementById("ftpsubmit")) {
-        initFtpSubmitBtn();
-    } else {
         // Page reload when logged in
-//        loadBackedUpFile();
-        login();
-    }
+//        this.loadBackedUpFile();
+            this.login();
+        }
 
-    document.getElementById("file_upload").addEventListener
+        document.getElementById("file_upload").addEventListener
             ("click",()=> {
-                if(loggedin==null) {
+                if(this.loggedin==null) {
                     alert("Not logged in!");
                 } else {
-                       uploadContent(); 
+                   this.uploadContent(); 
                 }
 
             });
 
-    document.getElementById("file_new").addEventListener
+        document.getElementById("file_new").addEventListener
             ("click", ()=>
                 {
-                    saveOld (()=>{
-                        fileInfo.file = null;
-                        browser.setCode("");
-                        showFilename();
+                    this.saveOld (()=>{
+                        this.fileInfo.file = null;
+                        this.browser.setCode("");
+                        this.showFilename();
                     });
                 }
             );
 
     // stackoverflow.com/questions/2897619/using-html5-javascript-to-generate-and-save-a-file
-    document.getElementById("file_save").addEventListener
-            ("click", (e)=>
+        document.getElementById("file_save").addEventListener
+            ("click", e=>
                 {
                     var a = document.createElement("a"); 
-                    fileInfo.file = (fileInfo.file==null ?
+                    this.fileInfo.file = (this.fileInfo.file==null ?
                         prompt("Please enter a filename") :
-                        fileInfo.file);    
-                    if(fileInfo.file!=null) {    
-                        showFilename();
-                        a.setAttribute("download", fileInfo.file);
-                        a.setAttribute("href", "data:text/plain;charset=utf-8,"+encodeURIComponent(browser.getCode()));
+                        this.fileInfo.file);    
+                    if(this.fileInfo.file!=null) {    
+                        this.showFilename();
+                        a.setAttribute("download", this.fileInfo.file);
+                        a.setAttribute("href", "data:text/plain;charset=utf-8,"+encodeURIComponent(this.browser.getCode()));
                     /*
                     var event = new Event('click'); // new way?
                     */
@@ -372,66 +184,56 @@ function init() {
                 }
             );
 
-    var tabs = document.getElementById('client_tabs').
-        getElementsByTagName("span");
-    for(var i=0; i<tabs.length; i++) {
-        tabs[i].addEventListener
-                ("click", ((i,e)=> {
-                    mode=i;
-                    doTabs();
-                    doModeDisplay();
+        var tabs = document.getElementById('client_tabs').getElementsByTagName("span");
+
+        for(var i=0; i<tabs.length; i++) {
+            tabs[i].addEventListener
+                ("click",  (function(j,e) {
+                    this.mode=j;
+                    this.setupTabs();
+                    this.setupModeDisplay();
                     // MUST be done after changing visibility
-                    browser.refresh(); 
+                    this.browser.refresh(); 
                 }).bind(this,i));
-        tabs[i].addEventListener
+            tabs[i].addEventListener
                 ("mouseover", (e)=> {
                     e.target.style.cursor="default";
                 } );
-    }
+        }
 
-    showFilename();
-    doTabs();
-    doModeDisplay();
-    ResizableWindowSet.addFullResize([document.getElementById('client'), 
+        this.showFilename();
+        this.setupTabs();
+        this.setupModeDisplay();
+        ResizableWindowSet.addFullResize([document.getElementById('client'), 
                                     document.getElementById('networkContainer'), 
                                     document.getElementById('server')]);
-    var rw = new ResizableWindowSet([document.getElementById('client'), 
+        var rw = new ResizableWindowSet([document.getElementById('client'), 
                                     document.getElementById('networkContainer'),
                                     document.getElementById('server')]);
-    rw.setOnFinishCallback(animation.calculateCanvasPos.bind(animation));
-    rw.setup();
+        rw.setOnFinishCallback(this.httpAnim.calculateCanvasPos.bind(this.httpAnim));
+        rw.setup();
 
-    ResizableWindowSet.addFullResize([document.getElementById('vars'), 
+        ResizableWindowSet.addFullResize([document.getElementById('vars'), 
                                     document.getElementById('dbresults'), 
                                     document.getElementById('log')]);
-    var rw2 = new ResizableWindowSet([document.getElementById('vars'), 
+        var rw2 = new ResizableWindowSet([document.getElementById('vars'), 
                                     document.getElementById('dbresults'),
                                     document.getElementById('log')]);
-	rw2.setup();
+        rw2.setup();
 
 
 
-	/* note vertical currently not working
-    ResizableWindowSet.addFullResize([document.getElementById('ephp_container'),
-								document.getElementById('msg'), 
-								document.getElementById('dbg')]);
-	var rw3 = new ResizableWindowSet([document.getElementById('ephp_container'),
-									document.getElementById('msg'),
-									document.getElementById('dbg')], true);
-	rw3.setup();
-	*/
+        window.addEventListener("resize",this.onResize.bind(this.httpAnim,rw)); 
+        var origWidth, netWidth = 400;
 
-    window.addEventListener("resize",onResize.bind(this,animation,compAnim,rw)); 
-    var origWidth, netWidth = 400;
-
-    var networkShowDiv = document.createElement("div");
-    networkShowDiv.style.backgroundColor = '#ffffe0';
-    networkShowDiv.style.width='75px';
-    networkShowDiv.style.border='ridge';
-    var cloudImg = new Image();
-    cloudImg.src='assets/images/rgtaylor_csc_net_wan_cloud.vsmall.png';
-    networkShowDiv.appendChild(cloudImg);
-    networkShowDiv.addEventListener('click', ()=> {
+        var networkShowDiv = document.createElement("div");
+        networkShowDiv.style.backgroundColor = '#ffffe0';
+        networkShowDiv.style.width='75px';
+        networkShowDiv.style.border='ridge';
+        var cloudImg = new Image();
+        cloudImg.src='assets/images/rgtaylor_csc_net_wan_cloud.vsmall.png';
+        networkShowDiv.appendChild(cloudImg);
+        networkShowDiv.addEventListener('click', ()=> {
             var netCont = document.getElementById('networkContainer'),
                 net = document.getElementById('network');
             netCont.removeChild(networkShowDiv);
@@ -442,19 +244,17 @@ function init() {
             var csWidth= ((origWidth-netWidth)/2)+'px';
             document.getElementById('server').style.width = csWidth;
             document.getElementById('client').style.width = csWidth;
-            animation.setActive(true);
-            animation.clearCanvas();
-            compAnim.setIgnored(null);
+            this.httpAnim.setActive(true);
+            this.httpAnim.clearCanvas();
             rw.showResizer(netCont, true);
-        }
-    );
+        });
 
-    var img = document.createElement('img'); 
-    img.src='assets/images/cross.png';
-    img.style.position='absolute';
-    img.style.right='0px';
-    img.style.top='0px';
-    img.addEventListener('click', ()=> {
+        var img = document.createElement('img'); 
+        img.src='assets/images/cross.png';
+        img.style.position='absolute';
+        img.style.right='0px';
+        img.style.top='0px';
+        img.addEventListener('click', ()=> {
             var netCont = document.getElementById('networkContainer'),
                 net = document.getElementById('network');
             origWidth = document.getElementById('client').offsetWidth+
@@ -466,20 +266,205 @@ function init() {
             document.getElementById('server').style.width='50%';
             net.style.display='none';
             netCont.appendChild(networkShowDiv);
-            animation.setActive(false);
-            compAnim.setIgnored(net);
+            this.httpAnim.setActive(false);
             rw.showResizer(netCont, false);
         });
-    document.getElementById('network').appendChild(img);
-	onResize(animation, compAnim, rw);
-}
+        document.getElementById('network').appendChild(img);
+        this.onResize(this.httpAnim, rw);
+    }
 
-function onResize(animation, compAnim, rw) {
-            var serverWidth = document.body.offsetWidth-
+    askUploadFile(runAfterUpload) {
+        this.dialog.additionalCallback = runAfterUpload;
+        this.dialog.setContent("Unsaved file. Upload to server?");
+        this.dialog.show();
+    }
+
+    uploadContent() {
+        var formData = new FormData();
+        this.savedLoginHTML = document.getElementById("login").innerHTML;
+
+        if(document.getElementById("ephp_username") && 
+            document.getElementById("ephp_password")) { 
+        
+            formData.append("ephp_username", 
+                    document.getElementById("ephp_username").value);
+            formData.append("ephp_password", 
+                    document.getElementById("ephp_password").value);
+        }
+        var filename=null, msg="";
+        if(this.fileInfo.file==null) {
+            filename = prompt("Unsaved file. Please enter a filename:");
+            if(filename!=null && this.fileExplorer) {
+                filename=this.fileExplorer.dir+"/"+filename;
+            } 
+        } else {
+            filename = this.fileInfo.file;
+        }
+
+        if(filename!=null) {
+            alert("Transferring: " + filename);
+            formData.append("filename", filename);
+            formData.append("src",this.browser.getCode());
+            formData.append("action", "upload");
+            msg = "Transferring file...";
+
+            http.post('ftp/ftp.php', formData).then((xmlHTTP)=> {
+                var json = JSON.parse(xmlHTTP.responseText);
+                if(json.status!=0 && (json.status>=256)) {
+                    alert('Error: ' + this.errors[json.status]);
+                } else {
+                    this.browser.markUnaltered();
+                    this.fileExplorer.sendAjax();
+
+                    if(this.fileInfo.file==null && filename!="") {
+                        this.fileInfo.file = filename;
+                        this.showFilename();
+                    } 
+                }
+            });
+        }
+    }
+
+    login(e) {
+        var formData = new FormData();
+        this.savedLoginHTML = document.getElementById("login").innerHTML;
+        formData.append("action", "login"); // don't try and transfer
+
+        
+        if(document.getElementById("ephp_username") &&
+            document.getElementById("ephp_password")) {
+            formData.append("ephp_username", 
+                document.getElementById("ephp_username").value);
+            formData.append("ephp_password", 
+                document.getElementById("ephp_password").value);
+        }
+        var msg = "Logging in...";
+
+        this.origLoginDivContents = document.getElementById("login").
+                    innerHTML;
+        document.getElementById("login").innerHTML = msg +
+                    "<img src='assets/images/ajax-loader.gif' "+
+                    "alt='ajax loader' />";
+        var xhr2 = new XMLHttpRequest();
+        xhr2.addEventListener("load",e=> { 
+            var json = JSON.parse(e.target.responseText);
+            if(json.status!=0 && (json.status>=1024)) {
+                alert('Error: ' + this.errors[json.status]);
+                this.resetLogin();
+            } else {
+                
+                for(k in this) {
+                    console.log(`${k} ${this[k]}`);
+                }
+                        
+                this.fileExplorer.sendAjax();
+
+                if(json.loggedin!=null) {
+                    this.loggedin = json.loggedin;
+                    this.httpAnim.loggedin = json.loggedin;
+                    document.getElementById("login").innerHTML = 
+                                "<p>Logged in as " + this.loggedin +
+                                " <a href='ftp/logout.php'>Logout</a></p>";
+                    this.setupModeDisplay();
+                    this.loadBackedUpFile();
+                } 
+            }
+        });
+        xhr2.open("POST", "ftp/ftp.php");
+        xhr2.send(formData);
+    }
+
+    loadBackedUpFile() {
+            http.get('ftp/backup.php').then (
+                xmlHTTP=> {
+                    var json=JSON.parse(xmlHTTP.responseText);
+                                    this.browser.setCode(json.src);
+                                    if(json.filename!="") {
+                                        // We want to mark reloaded this.backup code
+                                        // as unaltered if already saved
+                                        this.browser.markUnaltered();
+                                        this.fileInfo.file=json.filename;
+                                        // TODO this is a quick and dirty
+                                        // HACK. It does not account for
+                                        // FTP vs non-FTP this.mode and will not
+                                        // work if the backedup file was not
+                                        // in the user's web root directory.
+                                        if(this.loggedin!=null) {
+                                            this.browser.setWebDir('/~' + this.loggedin);
+                                            this.browser.setFile(json.filename);
+                                        }
+                                        this.showFilename();
+                                    }
+                                });
+                setInterval(this.backup.bind(this), 10000);
+        
+    }
+
+    backup() {
+        var data = new FormData();
+        data.append("src", this.browser.getCode());
+        data.append("filename", this.fileInfo.file==null ? "":
+                        this.fileInfo.file);
+        http.post('ftp/backup.php', data).then((xmlHTTP)=> {
+            setTimeout ( this.showFilename.bind(this), 2000);
+            });
+    }
+
+    showFilename(fInfo) {
+        fInfo = fInfo || this.fileInfo;
+        this.filenameDiv.innerHTML = (fInfo.file!=null) ?
+                 fInfo.file: "UNSAVED";
+    }
+
+
+    setupTabs() {
+        console.log('setupTabs() mode=' +this.mode);
+        var tabs = document.getElementById('client_tabs').
+            getElementsByTagName("span");
+        for(var j=0; j<tabs.length; j++) {
+            tabs[j].classList.remove("active");
+        }
+        
+        tabs[this.mode].classList.add("active");
+        
+    }
+
+    setupModeDisplay() {
+        for(var id in this.showInModes[this.mode] ) {
+            document.getElementById(id).style.display = 
+                (this.showInModes[this.mode][id].length==2 &&
+                this.showInModes[this.mode][id][1]==true &&
+                this.loggedin==null) ? 
+                'none': this.showInModes[this.mode][id][0];
+        }
+    }
+
+    resetLogin () {
+        document.getElementById("login").innerHTML = this.savedLoginHTML;
+        this.initFtpSubmitBtn();
+    }
+
+    initFtpSubmitBtn () {
+        document.getElementById("ftpsubmit").addEventListener
+                    ("click",this.login.bind(this));
+    }
+
+    saveOld (cb) {
+        if(this.browser.isAltered()) { 
+            this.askUploadFile(cb);
+        } else {
+            cb();
+        }
+    }
+
+    onResize(httpAnim, rw) {
+        var serverWidth = document.body.offsetWidth-
                 (document.getElementById('client').offsetWidth+
                     document.getElementById('network').offsetWidth);
-            document.getElementById('server').style.width=serverWidth+'px';
-            animation.calculateCanvasPos();
-            compAnim.recalculateDimensions();
-            rw.recalculateTotalSpan();
+        document.getElementById('server').style.width=serverWidth+'px';
+        httpAnim.calculateCanvasPos();
+        rw.recalculateTotalSpan();
+    }
 }
+
+new App();

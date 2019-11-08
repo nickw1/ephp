@@ -9,16 +9,16 @@ class EPHPPage extends Page {
 
     public function writeBody() {
         ?>
-        <body onload='init()'>
-		<div id='titlecontainer'>
+        <body>
+        <div id='titlecontainer'>
         <h1>ephp<sup>iia</sup></h1>
-		</div>
+        </div>
         <div id="login">
         <?php
-		if(false) {
-			echo "<p>EPHP is temporarily unavailable. ".
-				"Please use FileZilla instead.</p>";
-		} else {	
+        if(false) {
+            echo "<p>EPHP is temporarily unavailable. ".
+                "Please use FileZilla instead.</p>";
+        } else {    
        if(isset($_SESSION["ephpuser"])) {
             echo "<p>Logged in as $_SESSION[ephpuser]";
             echo " <a href='ftp/logout.php'>Logout</a></p>";
@@ -44,7 +44,7 @@ class EPHPPage extends Page {
 
 
 
-		<div id="ephp_container">
+        <div id="ephp_container">
 
         <div id="client">
             <div id='client_header' class='component_header'>client<br />
@@ -56,7 +56,7 @@ class EPHPPage extends Page {
                     alt='New file' title='New file' />
                 <img id='file_save' src='assets/images/script_save.2.png'
                     alt='Save current file (to Downloads)' 
-					title='Save current file (to Downloads)' />
+                    title='Save current file (to Downloads)' />
                 <img id='file_upload' src='assets/images/arrow_right.2.png'
                     alt='Upload current file' title='Upload current file' />
             </div>
@@ -72,13 +72,13 @@ class EPHPPage extends Page {
         </div>
 
         <div id="networkContainer">
-		<div id="network">
+        <div id="network">
         <div id='network_header' class='component_header'>
         network<br />
             <img src='assets/images/rgtaylor_csc_net_wan_cloud.small.png'
                 alt='network' id='network_img'/>
         </div>
-		</div>
+        </div>
         </div>
 
         <div id="server">
@@ -90,35 +90,36 @@ class EPHPPage extends Page {
             </div>
         </div>
 
-		</div> 
+        </div> 
         <div id="msg" style="clear:both"> </div>
-		<div id='dbg'>
-			<div id='vars'>
-				<p><strong>Variables</strong></p>
-				<div id='varsInner'></div>
-			</div>
-			<div id='dbresults'>
-				<p><strong>Database Results</strong></p>
-				<div id='dbInner'></div>
-			</div>
-			<div id='log'>
-				<p><strong>Script Output</strong></p>
-				<div id='logInner'></div>
-			</div>
-		</div>
+        <div id='dbg'>
+            <div id='vars'>
+                <p><strong>Variables</strong></p>
+                <div id='varsInner'></div>
+            </div>
+            <div id='dbresults'>
+                <p><strong>Database Results</strong></p>
+                <div id='dbInner'></div>
+            </div>
+            <div id='log'>
+                <p><strong>Script Output</strong></p>
+                <div id='logInner'></div>
+            </div>
+        </div>
 
         </body>
         <?php
     }
-	}
+    }
 }
 
 $page = new EPHPPage();
-$scripts = [ 'js/main.js',
-			'ui/js/ResizableWindowSet.js',
+$scripts = [ 
+            'ui/js/ResizableWindowSet.js',
             'ui/js/ComponentAnimator.js',
             'ui/js/Draggable.js',
              'fs/js/FileExplorer.js',
+            'js/Eventable.js',
             'http/js/Browser.js',
             'http/js/GenericAnimation.js',
             'http/js/HTTPAnimation.js',
@@ -134,7 +135,8 @@ $scripts = [ 'js/main.js',
             'ui/js/Slider.js',
             'jslib/PromiseAjax.js',
             'jslib/Dialog.js',
-            'ace-builds/src/ace.js'
+            'ace-builds/src/ace.js',
+            'js/main.js'
         ];
 
 $css = array ('css/ephp.css');
