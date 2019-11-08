@@ -50,16 +50,9 @@ class App {
 
         this.browser = new Browser({divId: 'content', 
                                 animation: this.httpAnim,
-								saveOldCallback: ()=> {
-
-                           			this.saveOld ( ()=> {
-                                			cb();
-                                			this.fileInfo.file=this.fileInfo.dir=null;
-                                			this.showFilename();
-                            		} )},
                                 sourceElement: 'src_ace'});
 
-		/*
+        
         this.browser.on("responseloaded", cb=> {
                            this.saveOld ( ()=> {
                                 cb();
@@ -67,7 +60,7 @@ class App {
                                 this.showFilename();
                             } )
                         });
-		*/
+        
 
         // Resize event was here
 
