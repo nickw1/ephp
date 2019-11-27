@@ -7,3 +7,5 @@ class Eventable {
         this.eventHandlers[evType] = handler;
     }
 }
+
+module.exports = Eventable;

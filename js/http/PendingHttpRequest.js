@@ -1,9 +1,11 @@
-class PendingHttpRequest {
+const Eventable = require('./Eventable');
+
+class PendingHttpRequest extends Eventable {
     constructor(options) {
+		super();
         this.url = options.url;
         this.method = options.method.toUpperCase();
         this.formData = options.formData;
-        this.finalCallback = options.callback;
         this.server = options.server;
         this.sourceRetriever=options.sourceRetriever;
         this.editableResponse = { headers: {}, content: null };
@@ -34,16 +36,19 @@ class PendingHttpRequest {
     // immadiateCallback() runs as soon as we have sent
     // it might for example run the http response part of an animation, to ensure
     // we have the response available
-    send(immediateCallback) {
+	// 251119 change to call on callback
+    send() {
         var actualUrl = (this.url.indexOf("?")==-1 ? this.url: 
             this.url.split("?")[0]) + "?killcache=" + new Date().getTime();
         var xhr = new XMLHttpRequest();
         xhr.addEventListener("load", e=> {
             if(e.target.status == 200) {
-                this.processResponse(e.target, false, immediateCallback);
+                this.processResponse(e.target, false);
             } else {
                 this.setErrorResponse(e.target.status);
-                immediateCallback();
+				if(this.eventHandlers["responseprocessed"]) {
+					this.eventHandlers["responseprocessed"]();
+				}	
             }
         });
         xhr.open(this.method, actualUrl);
@@ -96,14 +101,14 @@ class PendingHttpRequest {
     getResponse() {
         var response = "HTTP/1.1 " + this.editableResponse.status +" " +
                     this.editableResponse.statusText+"\n";
-        for(header in this.editableResponse.headers) {
+        for(let header in this.editableResponse.headers) {
             response+=header+": "+ this.editableResponse.headers[header]+"\n";
         }
         response += "\n"+ this.editableResponse.content ;
         return response; 
     }
 
-    processResponse( xmlHTTP, debugPHP, immediateCallback) {
+    processResponse( xmlHTTP, debugPHP) {
         console.log("response headers: " + xmlHTTP.getAllResponseHeaders());
         var responseHeaders = xmlHTTP.getAllResponseHeaders().split("\r\n");
         // getAllResponseHeaders() seems to return 1 more than there  actually is
@@ -133,8 +138,8 @@ class PendingHttpRequest {
             this.editableResponse.url = xmlHTTP.responseURL;
             this.editableResponse.status = xmlHTTP.status;
             this.editableResponse.statusText = xmlHTTP.statusText;
-            if(immediateCallback) {
-                immediateCallback(); 
+            if(this.eventHandlers["responseprocessed"]) {
+                this.eventHandlers["responseprocessed"](); 
             }
         }
         //Note:
@@ -142,7 +147,7 @@ class PendingHttpRequest {
         // -responseURL contains full server details
     }
 
-    setAlteredStatusn(code,text) {
+    setAlteredStatus(code,text) {
         this.editableResponse.status = code;
         this.editableResponse.statusText = text;
     }
@@ -162,6 +167,8 @@ class PendingHttpRequest {
     }
 
     finish() {
-        this.finalCallback(this.editableResponse);
+        this.eventHandlers["responsereceived"](this.editableResponse);
     }
 }
+
+module.exports = PendingHttpRequest;

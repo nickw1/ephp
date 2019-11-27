@@ -1,5 +1,8 @@
 // window.location.protocol http:
 
+const Eventable = require('./Eventable');
+const PendingHttpRequest = require("./PendingHttpRequest");
+
 class Browser extends Eventable {
 
     constructor(options) {
@@ -56,10 +59,8 @@ class Browser extends Eventable {
         this.addedCssRules = [];
         this.setRequestingState(false);
 
-        this.animation.addOnMessageStartListener
-            (this.setRequestingState.bind(this,true));
-        this.animation.addOnMessageEndListener
-            (this.setRequestingState.bind(this,false));
+        this.animation.on("messagestart",this.setRequestingState.bind(this,true));
+        this.animation.on("messageend", this.setRequestingState.bind(this,false));
 
         this.doAnimation = true;
     }
@@ -88,13 +89,14 @@ class Browser extends Eventable {
                         url: "/"+parts[2], 
                         method: method,
                         formData: formData,
-                        callback: this.loadResponse.bind(this),
                         server: parts[1]?parts[1].replace("http://",""):
                             window.location.hostname,
                         // TODO different retrievers for different langs
                         sourceRetriever: 'php/retriever.php'
                       }
                     );
+
+				pXHR.on("responsereceived", this.loadResponse.bind(this));
 
                 if(this.doAnimation) {
                     this.animation.stop(); // stop any previous animations
@@ -390,3 +392,5 @@ class Browser extends Eventable {
         }
     }
 }
+
+module.exports = Browser;

@@ -1,4 +1,10 @@
 
+const EPHPHttpAnimation = require('./http/EPHPHttpAnimation');
+const Browser = require('./http/Browser');
+const FileExplorer = require('./fs/FileExplorer');
+const ResizableWindowSet = require('./ui/ResizableWindowSet');
+const PHPAnimation = require('./php/PHPAnimation');
+
 class App {
     constructor() {
         this.fileInfo = { "file": null, "dir": null }; 
@@ -12,8 +18,8 @@ class App {
         this.canvasHeight = 500; 
 
         this.fileExplorer=new FileExplorer('serverContent', 
-            {http: 'fs/fs.php',
-            ftp: 'ftp/ftp.php' } ,
+            {http: 'php/fs.php',
+            ftp: 'php/ftp.php' } ,
             'client',
             { showContentCallback: (mime,src,webdirPath, webdirUrl)=> {
                     this.saveOld(()=> {
@@ -38,14 +44,13 @@ class App {
         this.phpAnim = new PHPAnimation({divId:"serverContent",
                                         consoleElement: "console"});
 
-        this.httpAnim = new HTTPAnimation({parentId: 'network',
-                                        height:this.canvasHeight,
+        this.httpAnim = new EPHPHttpAnimation({parentId: 'network',
+                                    height:this.canvasHeight,
                                     interval: 20,
                                     step : 2,
                                     fileExplorer: this.fileExplorer,
-                                    serverAnimation: this.phpAnim,
-                                    componentAnimator: null,
-                                    onerror: ()=> { }
+                                    serverAnimation: this.phpAnim
+                                    
         });
 
         this.browser = new Browser({divId: 'content', 
@@ -216,7 +221,7 @@ class App {
 
 
 
-        window.addEventListener("resize",this.onResize.bind(this.httpAnim,rw)); 
+        window.addEventListener("resize",this.onResize.bind(this,rw)); 
         var origWidth, netWidth = 400;
 
         var networkShowDiv = document.createElement("div");
@@ -263,7 +268,7 @@ class App {
             rw.showResizer(netCont, false);
         });
         document.getElementById('network').appendChild(img);
-        this.onResize(this.httpAnim, rw);
+        this.onResize(rw);
     }
 
     askUploadFile(runAfterUpload) {
@@ -301,8 +306,9 @@ class App {
             formData.append("action", "upload");
             msg = "Transferring file...";
 
-            http.post('ftp/ftp.php', formData).then((xmlHTTP)=> {
-                var json = JSON.parse(xmlHTTP.responseText);
+            const xhr = new XMLHttpRequest();
+            xhr.addEventListener("load",  e=> {
+                var json = JSON.parse(e.target.responseText);
                 if(json.status!=0 && (json.status>=256)) {
                     alert('Error: ' + this.errors[json.status]);
                 } else {
@@ -315,6 +321,8 @@ class App {
                     } 
                 }
             });
+            xhr.open("POST", "php/ftp.php");
+            xhr.send(formData);
         }
     }
 
@@ -341,6 +349,7 @@ class App {
         var xhr2 = new XMLHttpRequest();
         xhr2.addEventListener("load",e=> { 
             var json = JSON.parse(e.target.responseText);
+            console.log(json);
             if(json.status!=0 && (json.status>=1024)) {
                 alert('Error: ' + this.errors[json.status]);
                 this.resetLogin();
@@ -354,23 +363,22 @@ class App {
 
                 if(json.loggedin!=null) {
                     this.loggedin = json.loggedin;
-                    this.httpAnim.loggedin = json.loggedin;
+                    this.httpAnim.setLoggedIn(json.loggedin);
                     document.getElementById("login").innerHTML = 
                                 "<p>Logged in as " + this.loggedin +
-                                " <a href='ftp/logout.php'>Logout</a></p>";
+                                " <a href='php/logout.php'>Logout</a></p>";
                     this.setupModeDisplay();
                     this.loadBackedUpFile();
                 } 
             }
         });
-        xhr2.open("POST", "ftp/ftp.php");
+        xhr2.open("POST", "php/ftp.php");
         xhr2.send(formData);
     }
 
     loadBackedUpFile() {
-            http.get('ftp/backup.php').then (
-                xmlHTTP=> {
-                    var json=JSON.parse(xmlHTTP.responseText);
+            fetch('php/backup.php').then ( response => response.json()).
+                then ( json=> {
                                     this.browser.setCode(json.src);
                                     if(json.filename!="") {
                                         // We want to mark reloaded this.backup code
@@ -398,9 +406,12 @@ class App {
         data.append("src", this.browser.getCode());
         data.append("filename", this.fileInfo.file==null ? "":
                         this.fileInfo.file);
-        http.post('ftp/backup.php', data).then((xmlHTTP)=> {
-            setTimeout ( this.showFilename.bind(this), 2000);
-            });
+        const xhr = new XMLHttpRequest();
+        xhr.addEventListener("load", e=> {
+            setTimeout (this.showFilename.bind(this), 2000);
+        });
+        xhr.open('POST', 'php/backup.php');
+        xhr.send(data);
     }
 
     showFilename(fInfo) {
@@ -450,12 +461,12 @@ class App {
         }
     }
 
-    onResize(httpAnim, rw) {
+    onResize(rw) {
         var serverWidth = document.body.offsetWidth-
                 (document.getElementById('client').offsetWidth+
                     document.getElementById('network').offsetWidth);
         document.getElementById('server').style.width=serverWidth+'px';
-        httpAnim.calculateCanvasPos();
+        this.httpAnim.calculateCanvasPos();
         rw.recalculateTotalSpan();
     }
 }

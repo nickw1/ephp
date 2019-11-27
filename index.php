@@ -115,28 +115,9 @@ class EPHPPage extends Page {
 
 $page = new EPHPPage();
 $scripts = [ 
-            'ui/js/ResizableWindowSet.js',
-            'ui/js/ComponentAnimator.js',
-            'ui/js/Draggable.js',
-             'fs/js/FileExplorer.js',
-            'js/Eventable.js',
-            'http/js/Browser.js',
-            'http/js/GenericAnimation.js',
-            'http/js/HTTPAnimation.js',
-            'http/js/PendingHttpRequest.js',
-            'http/js/MessageBox.js',
-            'http/js/ServerFilesystemAnimation.js',
-            'php/js/PHPAnimation.js',
-            'php/js/DBResults.js',
-            'php/js/DBAnimation.js',
-            'php/js/DebugMgr.js',
-            'php/js/DbgMsgQueue.js',
-            'php/js/VarsBox.js',
-            'ui/js/Slider.js',
-            'jslib/PromiseAjax.js',
             'jslib/Dialog.js',
             'ace-builds/src/ace.js',
-            'js/main.js'
+			'js/bundle.js'
         ];
 
 $css = array ('css/ephp.css');
