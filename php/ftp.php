@@ -1,7 +1,7 @@
 <?php
 
-require_once('FileUploadFtpHandler.php');
-require_once('PostFtpHandler.php');
+require_once('../classes/FileUploadFtpHandler.php');
+require_once('../classes/PostFtpHandler.php');
 
 session_start();
 // $server = EPHP_HOSTNAME;

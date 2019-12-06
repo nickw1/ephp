@@ -3,8 +3,8 @@
 // fs.php
 // Filesystem controller
 
-require_once("FSController.php");
-require_once("WSView.php");
+require_once("../classes/FSController.php");
+require_once("../classes/WSView.php");
 
 session_start();
 $controller = new FSController(new WSView());

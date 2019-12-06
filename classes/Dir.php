@@ -18,7 +18,7 @@ class Dir
             foreach($files as $file)
                 if($file!=".")
                     $json[] = $doType ? (array("name"=>$file, 
-						"dir"=>is_dir($this->dir."/".$file)?"1":"0")) : $file;
+                        "dir"=>is_dir($this->dir."/".$file)?"1":"0")) : $file;
         }
         return $json;
     }
