@@ -47,7 +47,8 @@ class Browser extends Eventable {
         this.editor = ace.edit(options.sourceElement);
         this.editor.setOptions({fontSize:"10pt"});
         this.editor.getSession().setMode("ace/mode/php");
-        this.editor.setTheme('ace/theme/twilight');
+        //this.editor.setTheme('ace/theme/twilight');
+        this.editor.setTheme('ace/theme/monokai');
         this.editor.on("change", (e)=> {
             if(!this.lock) {
                 this.showContent('text/html', this.editor.getValue());
