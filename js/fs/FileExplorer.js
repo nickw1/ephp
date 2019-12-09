@@ -248,7 +248,7 @@ class FileExplorer {
         }
     }
 
-    onAjaxFileResponseFtp = function(e) { 
+    onAjaxFileResponseFtp (e) { 
         if(this.callbacks.showContentCallback) {
             var data = JSON.parse(e.target.responseText);
             if(data.status==0) {
