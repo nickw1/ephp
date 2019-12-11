@@ -185,7 +185,9 @@ class PHPAnimation {
     
                 case 'object':
                     // TODO handle SQL queries
-					console.log(`*** This is an object: ${JSON.stringify(data)}`);
+					if(data.classname=='PDOStatement' && data.value.queryString) {
+						// send off queryString to PHP SQL parser/processor
+					}
                     break;
             }
         }
