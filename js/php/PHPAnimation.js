@@ -59,6 +59,8 @@ class PHPAnimation {
 
         this.colourCount = 0;
 
+        this.httpVars = {};
+
         this.setupGUI();
     }
 
@@ -158,20 +160,31 @@ class PHPAnimation {
     handleLine(data) {
         this.unhighlightLastLine();
         this.highlightLine(data.lineno);
+    
+        let http = null;    
+        if((http = this.extractHttpVar(this.codeLines[data.lineno - 1].firstChild.nodeValue)) !== null) {
+            this.httpVars[http.phpVar] = { lineno: data.lineno, httpVar: http.httpVar}; 
+        }
+
         for(let varName in data.vars) {
             switch(data.vars[varName].type) {
                 case 'string':
                 case 'int':
                 case 'float':
                 case 'bool':
-                    this.varsBox.setVar(varName, data.vars[varName].value);
-                    if(data.vars[varName].httpvar) {
-                        this.addVarComment(data.vars[varName].httpvar.lineno, data.vars[varName].value, data.vars[varName].httpvar.name);
+                    if(this.httpVars[varName] && !this.httpVars[varName].done) {
+                        this.addVarComment(this.httpVars[varName].lineno, data.vars[varName].value, this.httpVars[varName].httpVar);
+                        this.httpVars[varName].done = true;
                     }
+                    this.varsBox.setVar(varName, data.vars[varName].value);
                     break;
 
                 case 'array':
                     this.varsBox.setVar(varName, JSON.stringify(data.vars[varName].value));
+                    break;
+    
+                case 'object':
+                    // TODO handle SQL queries
                     break;
             }
         }
@@ -180,8 +193,9 @@ class PHPAnimation {
         }
     }
 
+
+
     handleNewRow(data) {
-        console.log("handleNewRow(): id="+data);
         this.dbResults.highlightRow(data);
     }
 
@@ -193,12 +207,10 @@ class PHPAnimation {
     }
 
     handleDBResults(data) {
-        console.log("handleDBResults: "+ JSON.stringify(data));
         this.dbResults.showResults(data, this.dbWindow);
     }
 
     handleDBError(data) {
-        console.log('******Error with SQL statement: ' + JSON.stringify(data));
         alert(`Error with SQL statement on line ${data.lineno}: `+ `${data.msg}`);
     }
 
@@ -256,15 +268,19 @@ class PHPAnimation {
     addVarComment(lineno,value,httpvar){
         if(!this.varComments[lineno]) {
             this.audio.play();
-            console.log(`addVarComment: ${lineno} ${value} ${httpvar}`);
             var comment = document.createElement("code");
             comment.appendChild(document.createTextNode("//"+value));
-            comment.style.backgroundColor = this.colours[this.colourCount%this.colours.length];
+            comment.style.backgroundColor = PHPAnimation.colours[this.colourCount%PHPAnimation.colours.length];
             this.codeLines[lineno-1].appendChild(comment);
-            this.browserCallback(httpvar, this.colours[this.colourCount%this.colours.length]);
+            this.browserCallback(httpvar, PHPAnimation.colours[this.colourCount%PHPAnimation.colours.length]);
             this.varComments[lineno]=value;
             this.colourCount++;
         }
+    }
+
+    extractHttpVar(line) {
+        const data = /(\$\w+)\s*?=\s*?\$_(GET|POST)\s*\[\s*["'](\w+)["']\s?\]/.exec(line);
+        return data ?  { phpVar: data[1], method: data[2], httpVar: data[3] } : null;
     }
 }
 

@@ -65,7 +65,8 @@ class FtpHandler {
     public function downloadFtp($filename) {
         if($this->config->ftp==1) {
             if($this->loginstatus) {    
-                $tmpname = tempnam("/tmp", $_SESSION["ephpuser"]."_dl_");
+                $tmpname = tempnam("/tmp2", $_SESSION["ephpuser"]."_dl_");
+//				echo "session $_SESSION[ephpuser] tmpname $tmpname";
                 chmod($tmpname, 0644);
                 if(@ftp_get($this->conn, $tmpname, "public_html/$filename", 
                     FTP_BINARY)) {

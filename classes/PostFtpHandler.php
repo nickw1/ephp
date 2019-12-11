@@ -18,7 +18,7 @@ class PostFtpHandler extends ReadWriteFtpHandler {
     }
 
     public function getTmpName() {
-        $this->tmpname =  tempnam("/tmp", $_SESSION["ephpuser"]);
+        $this->tmpname =  tempnam("/tmp2", $_SESSION["ephpuser"]);
         return $this->tmpname;
     }
 

@@ -21,13 +21,11 @@ class DebugMgr {
         }    
 
         this.ws.onmessage = (e) => {
-            console.log("websocket sent: " + e.data);
             var data = JSON.parse(e.data);
             var fullDebugUrl = scriptUrl;
             // all debug commands have a user field to identify which user is
             // sending them, others will be ignored
             if(data.cmd && data.user && this.user == data.user && this.dbgMsgHandler != null) {
-                console.log("cmd from web socket server=" + data.cmd);
                 switch(data.cmd) {
                     case 'opened':
                         switch(method.toUpperCase()) {
@@ -72,7 +70,6 @@ class DebugMgr {
                     break;
 
                 default:
-                    console.log("adding command to queue: "+ data.cmd);
                     this.dbgMsgHandler.addToQueue(data);
                     break;
             }

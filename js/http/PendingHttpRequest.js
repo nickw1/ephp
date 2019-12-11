@@ -86,7 +86,7 @@ class PendingHttpRequest extends Eventable {
             req+="\n";
             var entries = this.formData.entries();
             var first=true;
-            for(entry of entries) {
+            for(let entry of entries) {
                 if(first==true) {
                     first=false;
                 } else {
