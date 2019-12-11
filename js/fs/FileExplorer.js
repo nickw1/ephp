@@ -114,7 +114,7 @@ class FileExplorer {
         fd.append("files", JSON.stringify(Object.keys(this.selectedFiles)));
         const xhr = new XMLHttpRequest();
         xhr.addEventListener("load", e=> {
-            data = JSON.parse(e.target.responseText);
+            const data = JSON.parse(e.target.responseText);
             if(data.status==0) {
                 alert('Deleted successfully');
                 this.selectedFiles={};
