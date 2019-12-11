@@ -7,7 +7,12 @@ html,body
 body
 {
     font-family: Trebuchet MS, DejaVu Sans Condensed, helvetica, arial, sans-serif;
-    background-color: #0b99b7;
+    background-color: #0b99b7; 
+	color: white;
+}
+
+#ephp_container {
+	color: black;
 }
 
 #login_main_page
@@ -299,4 +304,13 @@ tr,td,th
 
 #log { 
 	width: 33%;
+}
+
+.ephpTitle {
+	font-family: 'Press Start 2P', cursive;
+}
+
+.ephpVersion {
+	font-family: 'Monoton', cursive;
+	font-size: 150%;
 }

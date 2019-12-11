@@ -11,7 +11,7 @@ class EPHPPage extends Page {
         ?>
         <body>
         <div id='titlecontainer'>
-        <h1>ephp<sup>iia</sup></h1>
+        <h1><span class='ephpTitle'>ephp</span><span class='ephpVersion'>3</span></h1>
         </div>
         <div id="login">
         <?php
@@ -120,7 +120,9 @@ $scripts = [
 			'js/bundle.js'
         ];
 
-$css = array ('css/ephp.css');
+$css = ['https://fonts.googleapis.com/css?family=Press+Start+2P&display=swap',
+        'https://fonts.googleapis.com/css?family=Monoton&display=swap',
+		'css/ephp.css'];
 
 $page->writePage("ephp", $scripts, $css);
 
