@@ -1,0 +1,7 @@
+{
+    "require": {
+		"react/react": "1.0.0",
+		"cboden/ratchet": "^0.4.1",
+        "greenlion/php-sql-parser": "^4.3"
+    }
+}

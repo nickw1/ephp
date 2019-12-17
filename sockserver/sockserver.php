@@ -1,6 +1,6 @@
 <?php
 
-require_once('vendor/autoload.php');
+require_once('../vendor/autoload.php');
 use React\Socket\ConnectionInterface;
 
 use Ratchet\MessageComponentInterface;
