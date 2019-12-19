@@ -5,6 +5,8 @@ const DbgMsgQueue = require('./DbgMsgQueue');
 const VarsBox = require('./VarsBox');
 const DBResults = require('./DBResults');
 const Slider = require('../ui/Slider');
+const DBAnimation = require('./DBAnimation');
+const SQLMessage = require('./SQLMessage');
 
 class PHPAnimation {
     constructor(options) {
@@ -16,6 +18,7 @@ class PHPAnimation {
         this.callback = options.callback || null; 
         this.browserCallback = options.browserCallback || null;
         this.audio = new Audio('assets/sound/Game-Spawn.ogg');
+        this.doneSql = {};
         this.dbgMsgQueue = new DbgMsgQueue(this, 500, 
             { onStart:()=> {
                 this.runBtn.setAttribute("disabled", "disabled");
@@ -185,9 +188,15 @@ class PHPAnimation {
     
                 case 'object':
                     // TODO handle SQL queries
-					if(data.classname=='PDOStatement' && data.value.queryString) {
-						// send off queryString to PHP SQL parser/processor
-					}
+                    if(data.vars[varName].classname=='PDOStatement' && data.vars[varName].value.queryString) {
+                        // send off queryString to PHP SQL parser/processor
+                        if(!this.doneSql[varName]) {
+                        this.doneSql[varName] = true;
+                        fetch(`php/sql.php?sql=${data.vars[varName].value.queryString}`)
+                            .then(response => response.json())
+                            .then(this.launchSqlAnimation.bind(this));
+                        } 
+                    }
                     break;
             }
         }
@@ -284,6 +293,35 @@ class PHPAnimation {
     extractHttpVar(line) {
         const data = /(\$\w+)\s*?=\s*?\$_(GET|POST)\s*\[\s*["'](\w+)["']\s?\]/.exec(line);
         return data ?  { phpVar: data[1], method: data[2], httpVar: data[3] } : null;
+    }
+
+    launchSqlAnimation(res) {
+        const dlg = new Dialog('ephp_container', {
+            },
+            { position: 'absolute',
+            left: '25%',
+            top: 'calc(50% - 200px)',
+            border: '1px solid black',
+            width: '50%',
+            backgroundColor: 'white',
+            height: '400px' } );
+        dlg.show();
+        this.dbgMsgQueue.stop();
+        const sqlAnim = new DBAnimation({parent: dlg.div,
+                                    height:this.canvasHeight,
+                                    interval: 20,
+                                    step : 2,
+                                    requestLabel: 'SQL Query',
+                                    responseLabel: 'Database results',
+                                    msgBoxEditable: false,
+                                    msgBoxWidth: '600px',
+                                    message: new SQLMessage({ results: res.results, sql: res.sql}),
+                                    serverAnimation: null });
+        sqlAnim.on("canvasloaded", sqlAnim.animate.bind(sqlAnim));
+        sqlAnim.on("finished", msg=> {
+            dlg.hide();
+            this.dbgMsgQueue.start();
+        });
     }
 }
 

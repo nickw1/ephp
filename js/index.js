@@ -349,16 +349,11 @@ class App {
         var xhr2 = new XMLHttpRequest();
         xhr2.addEventListener("load",e=> { 
             var json = JSON.parse(e.target.responseText);
-            console.log(json);
             if(json.status!=0 && (json.status>=1024)) {
                 alert('Error: ' + this.errors[json.status]);
                 this.resetLogin();
             } else {
                 
-                for(k in this) {
-                    console.log(`${k} ${this[k]}`);
-                }
-                        
                 this.fileExplorer.sendAjax();
 
                 if(json.loggedin!=null) {
@@ -422,7 +417,6 @@ class App {
 
 
     setupTabs() {
-        console.log('setupTabs() mode=' +this.mode);
         var tabs = document.getElementById('client_tabs').
             getElementsByTagName("span");
         for(var j=0; j<tabs.length; j++) {

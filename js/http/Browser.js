@@ -97,11 +97,14 @@ class Browser extends Eventable {
                       }
                     );
 
-				pXHR.on("responsereceived", this.loadResponse.bind(this));
+                pXHR.on("responsereceived", this.loadResponse.bind(this));
 
                 if(this.doAnimation) {
                     this.animation.stop(); // stop any previous animations
                     this.animation.setMessage(pXHR);
+                    this.animation.on("finished", message=> {
+                        message.finish();
+                    });
                     this.animation.paused = false;
                     this.animation.animate();
                 } else {

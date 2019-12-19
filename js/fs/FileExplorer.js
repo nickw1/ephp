@@ -2,6 +2,7 @@
 class FileExplorer {
 
     constructor(divId, urls, dropId, callbacks) {
+		console.log(`divId=${divId}`);
         var container = document.getElementById(divId);
         var toolbar = document.createElement("div");
         var trash = document.createElement("img");

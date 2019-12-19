@@ -11,5 +11,5 @@ define('USER_DB_USER','ephp');
 define('USER_DB_PASS','ephp');
 define('HOME_DIR','/home');
 define('USER_WEB_DIR','public_html');
-define('XDCLIENT_DIR','/home/vmadmin/xdclient');
+define('XDCLIENT_DIR','/home/nick/src/xdclient');
 ?>

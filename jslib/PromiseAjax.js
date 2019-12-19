@@ -10,11 +10,9 @@ var http = {
                 var xhr2 = new XMLHttpRequest();
                 xhr2.open(method, url);
                 xhr2.addEventListener("load", function(e) {
-                        if(e.target.status>=200 && e.target.status<400) {
+                        if(e.target.status>=200 && e.target.status<300) {
                             resolve(e.target);
                         } else {
-							console.log("Rejecting promise status="+
-								e.target.status);
                             reject(e.target.status);
                         }
                     } );

@@ -2,7 +2,7 @@ const Eventable = require('./Eventable');
 
 class PendingHttpRequest extends Eventable {
     constructor(options) {
-		super();
+        super();
         this.url = options.url;
         this.method = options.method.toUpperCase();
         this.formData = options.formData;
@@ -36,7 +36,7 @@ class PendingHttpRequest extends Eventable {
     // immadiateCallback() runs as soon as we have sent
     // it might for example run the http response part of an animation, to ensure
     // we have the response available
-	// 251119 change to call on callback
+    // 251119 change to call on callback
     send() {
         var actualUrl = (this.url.indexOf("?")==-1 ? this.url: 
             this.url.split("?")[0]) + "?killcache=" + new Date().getTime();
@@ -46,9 +46,9 @@ class PendingHttpRequest extends Eventable {
                 this.processResponse(e.target, false);
             } else {
                 this.setErrorResponse(e.target.status);
-				if(this.eventHandlers["responseprocessed"]) {
-					this.eventHandlers["responseprocessed"]();
-				}	
+                if(this.eventHandlers["responseprocessed"]) {
+                    this.eventHandlers["responseprocessed"]();
+                }    
             }
         });
         xhr.open(this.method, actualUrl);

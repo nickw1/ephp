@@ -12,10 +12,8 @@ function Dialog(parentId,callbacks,style)
     this.div.id = '_dlg' + Dialog.prototype.count;
     this.div.style.zIndex = 999;
     this.div.setAttribute("class","fmap_dlg");
-    this.contentsContainer = document.createElement("div");
-    this.div.appendChild(this.contentsContainer);
-    var actionsContainer = document.createElement("div");
-    actionsContainer.style.textAlign = 'center';
+    this.actionsContainer = document.createElement("div");
+    this.actionsContainer.style.textAlign = 'center';
 	if(this.callbacks)
 	{
 		for(k in this.callbacks)
@@ -27,11 +25,10 @@ function Dialog(parentId,callbacks,style)
         		btn.type="button";
         		btn.id = this.div.id + "_"+k;
         		btn.addEventListener("click", this.callbacks[k]);
-        		actionsContainer.appendChild(btn);
+        		this.actionsContainer.appendChild(btn);
 			}
 		}
     }
-    this.div.appendChild(actionsContainer);
     if(style)
         for(var s in style)
             this.div.style[s] = style[s];
@@ -39,14 +36,16 @@ function Dialog(parentId,callbacks,style)
 
 Dialog.prototype.setContent = function(content)
 {
-    this.contentsContainer.innerHTML = content;
+    this.div.innerHTML = content;
+    this.div.appendChild(this.actionsContainer);
 }
 
 Dialog.prototype.setDOMContent = function(domElement)
 {
-    while(this.contentsContainer.childNodes.length > 0)
-        this.contentsContainer.removeChild(this.contentsContainer.firstChild);
-    this.contentsContainer.appendChild(domElement);
+    while(this.div.childNodes.length > 0)
+        this.div.removeChild(this.div.firstChild);
+    this.div.appendChild(domElement);
+    this.div.appendChild(this.actionsContainer);
 }
 
 Dialog.prototype.show = function()
