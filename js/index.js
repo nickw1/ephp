@@ -247,27 +247,6 @@ class App {
             rw.showResizer(netCont, true);
         });
 
-        var img = document.createElement('img'); 
-        img.src='assets/images/cross.png';
-        img.style.position='absolute';
-        img.style.right='0px';
-        img.style.top='0px';
-        img.addEventListener('click', ()=> {
-            var netCont = document.getElementById('networkContainer'),
-                net = document.getElementById('network');
-            origWidth = document.getElementById('client').offsetWidth+
-                    netCont.offsetWidth+
-                    document.getElementById('server').offsetWidth;
-            netCont.style.width='75px';
-            netCont.style.height='40px';
-            document.getElementById('client').style.width='50%';
-            document.getElementById('server').style.width='50%';
-            net.style.display='none';
-            netCont.appendChild(networkShowDiv);
-            this.httpAnim.setActive(false);
-            rw.showResizer(netCont, false);
-        });
-        document.getElementById('network').appendChild(img);
         this.onResize(rw);
     }
 

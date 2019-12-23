@@ -7,12 +7,18 @@ html,body
 body
 {
     font-family: Trebuchet MS, DejaVu Sans Condensed, helvetica, arial, sans-serif;
-    background-color: #0b99b7; 
-	color: white;
+/*    background-color: #0b99b7;  */
+    background-color: #404060;
+    color: white;
 }
 
 #ephp_container {
-	color: black;
+    color: black;
+    margin: 0px;
+}
+
+#titlecontainer, #titlecontainer h1 {
+    margin: 0px;
 }
 
 #login_main_page
@@ -22,16 +28,16 @@ body
 
 #login 
 {
-	float: right;
+    float: right;
 }
 
 #titlecontainer
 {
-	float: left;
+    float: left;
 }
 
 #titlecontainer h1 {
-	margin-top: 0px;
+    margin-top: 0px;
 }
 
 #ephp_container {
@@ -39,41 +45,42 @@ body
       divs being contained */
     white-space: nowrap;
     overflow: hidden;
-	height:640px;
-	width: 100%;
+    height:640px;
+    width: 100%;
 }
 
 #client, #networkContainer, #server {
     display: inline-block;  
-    margin: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
     vertical-align: top; 
     position: relative;
     /* white-space is inherited so get the contained elements 
     to treat whitespace normally */
     white-space: normal;
-	background-color: white;
-	height: 100%;
+    background-color: white;
+    height: 100%;
 }
 
 
 #networkContainer {
-	width: 20%;
+    width: 20%;
 }
 
 #network {
-	width: 100%;
+    width: 100%;
     background-color: white;
 }
 
 
 #src_ace {
-	height: 500px;
+    height: 500px;
     justify-content: center;
 /*    background-color: #e0e0e0; */
 }
 
 #content {
-	height: 512px; 
+    height: 512px; 
 }
 
 
@@ -81,7 +88,7 @@ body
 {
     text-align: center;
     background-color: #ffffe0;
-	width: 100%;
+    width: 100%;
 }
 
 #client 
@@ -164,7 +171,7 @@ tr,td,th
 #dbresults .selected
 {
     background-color: yellow;
-	color: black;
+    color: black;
     border: 2px solid red;
 }
 
@@ -189,7 +196,7 @@ tr,td,th
 {
     font-size: 10pt;
     margin: 0px;
-	padding: 0px;
+    padding: 0px;
     font-family: Courier, monospace;
 }
 
@@ -246,7 +253,7 @@ tr,td,th
     height:200px;
     top: 0px; 
     border: 2px solid yellow;
-	overflow: auto;
+    overflow: auto;
 }
 
 .srcconsole >  div {
@@ -265,52 +272,60 @@ tr,td,th
 }
 
 #dbg {
-	margin-top: 10px;
-	height: 20%;
-	bottom: 0%;
-	width: 100%;
-	position: relative;
-	background-color: black;
-	white-space: nowrap;
+    margin-top: 10px;
+    height: 20%;
+    bottom: 0%;
+    width: 100%;
+    position: relative;
+    background-color: black;
+    white-space: nowrap;
 }
 
 #vars, #dbresults, #log {
-	height:100%;
-	float: left;
+    height:100%;
+    float: left;
     position: relative;
-	font-size: 90%;
-	font-family: monospace;
-	color: white;
-	overflow-y: auto;
-	overflow-x: hidden;
-	white-space: normal;
+    font-size: 90%;
+    font-family: monospace;
+    color: white;
+    overflow-y: auto;
+    overflow-x: hidden;
+    white-space: normal;
 }
 
 #vars>p, #dbresults>p, #log>p {
-	color: yellow;
-	font-size: 80%;
+    color: yellow;
+    font-size: 80%;
 }
 
 #vars {
-	width: 15%;
-	border-right: 1px solid white;
+    width: 15%;
+    border-right: 1px solid white;
 }
 
 #dbresults {
-	width: 50%;
-	border-right: 1px solid white;
+    width: 50%;
+    border-right: 1px solid white;
 }
 
 
 #log { 
-	width: 33%;
+    width: 33%;
 }
 
 .ephpTitle {
-	font-family: 'Press Start 2P', cursive;
+    font-family: 'Press Start 2P', cursive;
 }
 
 .ephpVersion {
-	font-family: 'Monoton', cursive;
-	font-size: 150%;
+    font-family: 'Monoton', cursive;
+    font-size: 150%;
+}
+
+a {
+    color: yellow;
+}
+
+#ephp_container a {
+    color: blue;
 }
