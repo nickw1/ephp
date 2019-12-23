@@ -222,11 +222,6 @@ class PHPAnimation {
     }
 
 
-
-    handleNewRow(data) {
-        this.dbResults.highlightRow(data);
-    }
-
     handleStdout(data)  {
         // TODO handle stdout sent from the debugger
         if(this.outputWindow!==null) {

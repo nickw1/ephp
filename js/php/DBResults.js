@@ -2,25 +2,7 @@
 class DBResults {
     constructor(phpAnim) {
         this.phpAnim = phpAnim;
-        this.lastId = null;
         this.index = 0;
-    }
-
-    highlightRow(id) {
-        if(this.lastId!==null) {
-            var lastRow = document.getElementById('rec'+this.lastId);
-            lastRow.classList.remove("selected");
-            var tds = lastRow.getElementsByTagName('td');
-            for(var i=0; i<tds.length; i++) {
-                tds[i].classList.remove('selected');
-            }
-        }
-        var thisRow = document.getElementById('rec'+id);
-        var tds = thisRow.getElementsByTagName('td');
-        for(var i=0; i<tds.length; i++) {
-            tds[i].classList.add('selected');
-        }
-        this.lastId = id;
     }
 
     highlightNextRow() {
@@ -103,8 +85,7 @@ class DBResults {
     }
 
     reset() {
-        this.lastId = null;
-        this.index = -1;
+        this.index = 0;
     }
 }
 

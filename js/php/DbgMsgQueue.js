@@ -56,10 +56,6 @@ class DbgMsgQueue {
                     this.dbgMsgHandler.handleLine(msg.data);
                     break;
 
-                case 'newrow':
-                    this.dbgMsgHandler.handleNewRow(msg.data);
-                    break;
-
                 case 'stdout':
                     this.dbgMsgHandler.handleStdout(msg.data);
                     break;
