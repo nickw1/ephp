@@ -179,14 +179,13 @@ class GenericAnimation extends Eventable {
             this.ctx.stroke();
             this.ctx.fillStyle='lightgray';
             var boxX = this.x - GenericAnimation.boxProps.relativePos*direction - (direction==1 ? GenericAnimation.boxProps.width:0);
-            if(boxX > this.marginLeft && boxX + GenericAnimation.boxProps.width < this.canvas.width - this.marginRight) {
             this.ctx.fillRect(boxX,y-GenericAnimation.boxProps.height/2, GenericAnimation.boxProps.width,GenericAnimation.boxProps.height);
             this.ctx.fillStyle='blue'; 
             this.ctx.font=GenericAnimation.boxProps.fontSize+'pt Helvetica';
             this.ctx.fillText(direction == -1 ? this.responseLabel: this.requestLabel, boxX+10, y+5);
             this.ctx.strokeStyle='black';
             this.ctx.strokeRect(boxX-1,y-GenericAnimation.boxProps.height/2-1, GenericAnimation.boxProps.width+2, GenericAnimation.boxProps.height+2);
-            }
+            
            
             this.x += this.step*direction;
 
