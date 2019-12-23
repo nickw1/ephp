@@ -11,7 +11,7 @@ use Ratchet\WebSocket\WsServer;
 
 
 require_once('../defines.php');
-require_once('EPHPXD.php');
+require_once('../classes/EPHPXD.php');
 require_once(XDCLIENT_DIR.'/WebSockEmitter.php');
 require_once(XDCLIENT_DIR.'/MultiUserEmitter.php');
 

@@ -6,6 +6,7 @@ class DbgMsgQueue {
         this.handle = null;
         this.interval = interval;
         this.callbacks = callbacks || {};
+        this.fileuri = '';
     }
 
     add(msg) {
@@ -47,6 +48,10 @@ class DbgMsgQueue {
         if(this.activeQueue.length > 0) {
             var msg = this.activeQueue.shift();
             switch(msg.cmd)    {
+                case 'init':
+                    this.fileuri = msg.data;
+                    break;
+
                 case 'line':
                     this.dbgMsgHandler.handleLine(msg.data);
                     break;

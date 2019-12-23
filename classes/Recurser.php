@@ -74,4 +74,3 @@ class LoopsRecurser extends Recurser {
     }
 }
 ?>
-

@@ -63,6 +63,7 @@ class PHPAnimation {
         this.colourCount = 0;
 
         this.httpVars = {};
+        this.loops = {};
 
         this.setupGUI();
     }
@@ -192,9 +193,16 @@ class PHPAnimation {
                         // send off queryString to PHP SQL parser/processor
                         if(!this.doneSql[varName]) {
                         this.doneSql[varName] = true;
-                        fetch(`php/sql.php?sql=${data.vars[varName].value.queryString}`)
+                        fetch(`php/sql.php?sql=${data.vars[varName].value.queryString}&fileuri=${this.dbgMsgQueue.fileuri}&resultvar=${varName.replace('$','')}`)
                             .then(response => response.json())
-                            .then(this.launchSqlAnimation.bind(this));
+                            .then(data => {
+                                if(data.loopBounds && 
+                                   data.loopBounds.start && 
+                                   data.loopBounds.end) {
+                                    this.loops[varName] = { lines: data.loopBounds, lastLineNo: Number.MAX_VALUE };
+                                }
+                                this.launchSqlAnimation(data);
+                            });
                         } 
                     }
                     break;
@@ -202,6 +210,14 @@ class PHPAnimation {
         }
         if(this.varsBox) {
             this.varsBox.setMultipleVars(data.vars);
+        }
+        for(let vname in this.loops) {
+            if(data.lineno >= this.loops[vname].lines.start && data.lineno <= this.loops[vname].lines.end) {
+                if(data.lineno < this.loops[vname].lastLineNo) {
+                    this.dbResults.highlightNextRow();
+                }            
+                this.loops[vname].lastLineNo = data.lineno;
+            }
         }
     }
 
@@ -320,6 +336,7 @@ class PHPAnimation {
         sqlAnim.on("canvasloaded", sqlAnim.animate.bind(sqlAnim));
         sqlAnim.on("finished", msg=> {
             dlg.hide();
+            this.handleDBResults(msg);
             this.dbgMsgQueue.start();
         });
     }

@@ -3,6 +3,7 @@ class DBResults {
     constructor(phpAnim) {
         this.phpAnim = phpAnim;
         this.lastId = null;
+        this.index = 0;
     }
 
     highlightRow(id) {
@@ -22,6 +23,26 @@ class DBResults {
         this.lastId = id;
     }
 
+    highlightNextRow() {
+        const rows = this.table.getElementsByTagName("tr");
+
+        if(this.index > 0) {
+            var lastRow = rows[this.index]; 
+            lastRow.classList.remove("selected");
+            var tds = lastRow.getElementsByTagName('td');
+            for(var i=0; i<tds.length; i++) {
+                tds[i].classList.remove('selected');
+            }
+        }
+
+        if(++this.index <= rows.length) {
+            var thisRow = rows[this.index]; 
+            var tds = thisRow.getElementsByTagName('td');
+            for(var i=0; i<tds.length; i++) {
+                tds[i].classList.add('selected');
+            }
+        }
+    }
 
     showResults(sqlquery, hostDiv) {
         while(hostDiv.childNodes.length > 0) {
@@ -29,7 +50,7 @@ class DBResults {
         }
     
         var div = document.createElement("div");
-        var table = document.createElement("table");
+        this.table = document.createElement("table");
         var id;
 
         for(var row=0; row<sqlquery.results.length; row++) {
@@ -41,9 +62,10 @@ class DBResults {
                     th.appendChild (document.createTextNode(col));
                     tr.appendChild(th);
                 }
-                table.appendChild(tr);
+                this.table.appendChild(tr);
                 tr=document.createElement("tr");
             }
+            
             id = sqlquery.results[row].id ? sqlquery.results[row].id : 
             (sqlquery.results[row].ID ? sqlquery.results[row].ID :-(row+1));
             tr.setAttribute('id','rec'+id);
@@ -59,7 +81,7 @@ class DBResults {
             td.appendChild(document.createTextNode("< $row"));
             td.setAttribute("class","varcell");
             tr.appendChild(td);
-            table.appendChild(tr);
+            this.table.appendChild(tr);
         }
         var close = document.createElement("img");
         close.setAttribute("alt", "Close");
@@ -75,13 +97,14 @@ class DBResults {
         titlebar.appendChild(close);
 
         div.appendChild(titlebar);
-        div.appendChild(table);
+        div.appendChild(this.table);
 
         hostDiv.appendChild(div);
     }
 
     reset() {
         this.lastId = null;
+        this.index = -1;
     }
 }
 

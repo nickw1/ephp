@@ -74,7 +74,7 @@ class DebugMgr {
                     break;
             }
         }
-	}
+    }
         this.ws.onerror = (e) => {
             alert('ERROR: ' + e.data);
         }
@@ -107,9 +107,9 @@ class DebugMgr {
         }
     } 
 
-	toString() {
-		return `DebugMgr object: user=${this.user}`;
-	}
+    toString() {
+        return `DebugMgr object: user=${this.user}`;
+    }
 }
 
 module.exports = DebugMgr;

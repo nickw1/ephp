@@ -12,7 +12,15 @@ class EPHPXD extends XDClient\VarWatcher {
     }
 
     public function onInit($doc) {
-        return ($doc["fileuri"] && $this->isUserDebugScript($doc["fileuri"])) ? parent::onInit($doc) : false;
+        if($doc["fileuri"] && $this->isUserDebugScript($doc["fileuri"])) {
+            $user = parent::onInit($doc);
+            if($user) {
+                $this->emitter->setUser($user);
+                $this->emitter->emit(["cmd"=>"init","data"=>(string)$doc['fileuri']]);
+                return $user;
+            }
+        }
+        return false;
     }
 
     protected function isUserDebugScript($fileuri) {
