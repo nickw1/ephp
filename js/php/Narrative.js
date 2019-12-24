@@ -16,7 +16,7 @@ class Narrative extends Eventable {
 
         this.mainDiv = document.createElement('div');
         this.mainDiv.style.width = this.mainDiv.style.height = '100%';
-        this.mainDiv.style.backgroundColor = this.options.backgroundColor || '#ffffe0';
+        this.mainDiv.style.backgroundColor = this.options.backgroundColor || '#ffffc0';
         this.mainDiv.style.color = this.options.color || 'black';
         const narrativeDiv = document.createElement('div');
         narrativeDiv.style.overflow = 'auto';

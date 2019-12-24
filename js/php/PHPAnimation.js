@@ -309,7 +309,7 @@ class PHPAnimation {
 
     launchSqlAnimation(res) {
         this.dbgMsgQueue.stop();
-        const narrative = new Narrative({elemId: 'server',
+        const narrative = new Narrative({elemId: 'serverContent',
                         narrative: `<h2>SQL Query found!</h2><p>Your PHP script is going to send an SQL query to the MySQL server.</p><p>Query is: <strong>${res.sql}</strong>.</p><p>Click below to send it.</p>`
         });
         narrative.on("dismissed", () => {

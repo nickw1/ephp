@@ -191,7 +191,7 @@ tr,td,th
 {
     border: 2px solid black;
 }
-#serverContent { height:100%; overflow: auto; } 
+#serverContent { height:calc(100% - 60px); overflow: auto; position: relative; } 
 #serverContent code, #serverContent .code
 {
     font-size: 10pt;

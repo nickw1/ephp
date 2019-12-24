@@ -5,6 +5,7 @@
 const GenericAnimation = require('./GenericAnimation');
 const DebugMgr = require('../php/DebugMgr');
 const ServerFilesystemAnimation = require('./ServerFilesystemAnimation');
+const Narrative = require('../php/Narrative');
 
 class EPHPHttpAnimation extends GenericAnimation  {
    constructor(options) {
@@ -42,23 +43,29 @@ class EPHPHttpAnimation extends GenericAnimation  {
                 repeat:2, 
                 interval:500, 
                 callback: ()=> {
-                    if(this.message.isPHPScript()) {
-                        this.message.retrieveSrc ( { 
-                            onSuccess: data => {
-                                if(data.errors) {
-                                    alert("error(s):\n" + data.errors.join("\n"));
-                                } else {
+                    const isPHP = this.message.isPHPScript();
+                    const narrative = new Narrative({elemId: 'serverContent', 
+                        narrative:`<h2>Web server has received request!</h2><p>The web server software has received a request for ${this.message.url}.</p>` + (isPHP ? "<p>This is a PHP script, so it will be run by the web server software's PHP module.</p>" : "<p>This is a static file, so it will be sent straight back to the client.</p>")});
+                    narrative.on("dismissed", ()=> {
+                        if(isPHP) {
+                            this.message.retrieveSrc ( { 
+                                onSuccess: data => {
+                                    if(data.errors) {
+                                        alert("error(s):\n" + data.errors.join("\n"));
+                                    } else {
                                     this.showSrcAndLaunchDebug(data, debugMgr);
+                                    }
+                                },
+                                onError: code => {
+                                    this.message.setErrorResponse(code);
+                                    this.animation.startResponse();
                                 }
-                            },
-                            onError: code => {
-                                this.message.setErrorResponse(code);
-                                this.animation.startResponse();
-                            }
-                        });
-                    } else {
-                         this.message.send();
-                    }
+                            });
+                        } else {
+                             this.message.send();
+                        }
+                    });
+                    narrative.show();
                 }
             });
         sa.animate();
