@@ -10,8 +10,9 @@ class EPHPPage extends Page {
     public function writeBody() {
         ?>
         <body>
+        <div id='header' style='position: relative; width: 100%'>
         <div id='titlecontainer'>
-        <h1><span class='ephpTitle'>ephp</span><span class='ephpVersion'>3</span></h1>
+        <span class='ephpTitle'>ephp</span><span class='ephpVersion'>3</span>
         </div>
         <div id="login">
         <?php
@@ -20,8 +21,8 @@ class EPHPPage extends Page {
                 "Please use FileZilla instead.</p>";
         } else {    
        if(isset($_SESSION["ephpuser"])) {
-            echo "<p>Logged in as $_SESSION[ephpuser]";
-            echo " <a href='ftp/logout.php'>Logout</a></p>";
+            echo "Logged in as $_SESSION[ephpuser]";
+            echo " <a href='ftp/logout.php'>Logout</a>";
         } else {
         ?>
         <form method="post" action="ftp.php">
@@ -35,11 +36,7 @@ class EPHPPage extends Page {
         }
         ?>
 
-        <div style="display: none">
-        <input id="dbshow" value="dbshow" type="button"/>
-        <input id="dbhide" value="dbhide" type="button"/>
         </div>
-
         </div>
 
 
@@ -117,12 +114,12 @@ $page = new EPHPPage();
 $scripts = [ 
             'jslib/Dialog.js',
             'ace-builds/src/ace.js',
-			'js/bundle.js'
+            'js/bundle.js'
         ];
 
 $css = ['https://fonts.googleapis.com/css?family=Press+Start+2P&display=swap',
         'https://fonts.googleapis.com/css?family=Monoton&display=swap',
-		'css/ephp.css'];
+        'css/ephp.css'];
 
 $page->writePage("ephp", $scripts, $css);
 

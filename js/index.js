@@ -339,8 +339,8 @@ class App {
                     this.loggedin = json.loggedin;
                     this.httpAnim.setLoggedIn(json.loggedin);
                     document.getElementById("login").innerHTML = 
-                                "<p>Logged in as " + this.loggedin +
-                                " <a href='php/logout.php'>Logout</a></p>";
+                                "Logged in as " + this.loggedin +
+                                " <a href='php/logout.php'>Logout</a>";
                     this.setupModeDisplay();
                     this.loadBackedUpFile();
                 } 
