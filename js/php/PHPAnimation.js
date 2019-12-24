@@ -7,6 +7,7 @@ const DBResults = require('./DBResults');
 const Slider = require('../ui/Slider');
 const DBAnimation = require('./DBAnimation');
 const SQLMessage = require('./SQLMessage');
+const Narrative = require('./Narrative');
 
 class PHPAnimation {
     constructor(options) {
@@ -307,18 +308,22 @@ class PHPAnimation {
     }
 
     launchSqlAnimation(res) {
-        const dlg = new Dialog('ephp_container', {
-            },
-            { position: 'absolute',
-            left: '25%',
-            top: 'calc(50% - 200px)',
-            border: '1px solid black',
-            width: '50%',
-            backgroundColor: 'white',
-            height: '400px' } );
-        dlg.show();
         this.dbgMsgQueue.stop();
-        const sqlAnim = new DBAnimation({parent: dlg.div,
+        const narrative = new Narrative({elemId: 'server',
+                        narrative: `<h2>SQL Query found!</h2><p>Your PHP script is going to send an SQL query to the MySQL server.</p><p>Query is: <strong>${res.sql}</strong>.</p><p>Click below to send it.</p>`
+        });
+        narrative.on("dismissed", () => {
+            const dlg = new Dialog('ephp_container', {
+                },
+                { position: 'absolute',
+                left: '25%',
+                top: 'calc(50% - 200px)',
+                border: '1px solid black',
+                width: '50%',
+                backgroundColor: 'white',
+                height: '400px' } );
+            dlg.show();
+            const sqlAnim = new DBAnimation({parent: dlg.div,
                                     height:this.canvasHeight,
                                     interval: 20,
                                     step : 2,
@@ -328,12 +333,14 @@ class PHPAnimation {
                                     msgBoxWidth: '600px',
                                     message: new SQLMessage({ results: res.results, sql: res.sql}),
                                     serverAnimation: null });
-        sqlAnim.on("canvasloaded", sqlAnim.animate.bind(sqlAnim));
-        sqlAnim.on("finished", msg=> {
-            dlg.hide();
-            this.handleDBResults(msg);
-            this.dbgMsgQueue.start();
+            sqlAnim.on("canvasloaded", sqlAnim.animate.bind(sqlAnim));
+            sqlAnim.on("finished", msg=> {
+                dlg.hide();
+                this.handleDBResults(msg);
+                this.dbgMsgQueue.start();
+            });
         });
+        narrative.show();
     }
 }
 
