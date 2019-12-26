@@ -41,6 +41,7 @@ class EPHPPage extends Page {
 
 
 
+		<div id='ephp_overall_container'>
         <div id="ephp_container">
 
         <div id="client">
@@ -103,6 +104,7 @@ class EPHPPage extends Page {
                 <div id='logInner'></div>
             </div>
         </div>
+		</div>
 
         </body>
         <?php

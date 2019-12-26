@@ -7,20 +7,17 @@ html,body
 body
 {
     font-family: Trebuchet MS, DejaVu Sans Condensed, helvetica, arial, sans-serif;
-/*    background-color: #0b99b7;  */
-    background-color: #404060;
+    background-color: #0b99b7;  
     color: white;
     margin-top: 5px;
 }
 
 #ephp_container {
+    display: flex;
     color: black;
     margin: 0px;
 }
 
-#titlecontainer, #titlecontainer span {
-    margin: 0px;
-}
 
 #login_main_page
 {
@@ -28,24 +25,28 @@ body
 }
 
 #header {
-    position: relative;
     width: 100%;
-    overflow: hidden;    
+    display: flex;
+    justify-content: space-between;
 }
 
-#login 
-{
-    float: right;
+#titlecontainer, #login {
+    margin-top: auto;
+    margin-bottom: auto;
 }
 
-#titlecontainer
-{
-    float: left;
-}
-
+/*
 #titlecontainer span {
     margin: 0px;
     padding: 0px;
+}
+*/
+
+#ephp_overall_container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: calc(100% - 40px);
 }
 
 #ephp_container {
@@ -53,12 +54,12 @@ body
       divs being contained */
     white-space: nowrap;
     overflow: hidden;
-    height:640px;
+    height:calc(100% - 160px);
     width: 100%;
 }
 
 #client, #networkContainer, #server {
-    display: inline-block;  
+/*    display: inline-block;  */
     margin-left: 10px;
     margin-right: 10px;
     vertical-align: top; 
@@ -77,18 +78,16 @@ body
 
 #network {
     width: 100%;
+    height: calc(100% - 64px);
     background-color: white;
 }
 
 
 #src_ace {
-    height: 500px;
+    /*height: 500px;*/
+    height:calc(100% - 128px);
     justify-content: center;
 /*    background-color: #e0e0e0; */
-}
-
-#content {
-    height: 512px; 
 }
 
 
@@ -128,9 +127,10 @@ body
 }
 
 #content {
-       background-color:#f0f0f0;
-       border: 2px solid black;
-       overflow: auto;
+    height: calc(100% - 120px);
+    background-color:#f0f0f0;
+    border: 2px solid black;
+    overflow: auto;
 }
 
 #server
@@ -281,7 +281,7 @@ tr,td,th
 
 #dbg {
     margin-top: 10px;
-    height: 20%;
+    height: 160px;
     bottom: 0%;
     width: 100%;
     position: relative;

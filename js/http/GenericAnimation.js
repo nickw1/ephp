@@ -113,6 +113,7 @@ class GenericAnimation extends Eventable {
             this.canvasY+=elem.offsetTop;
             elem=elem.offsetParent;
         }    
+        this.canvas.height = this.parentElement.clientHeight - 32;
     }
 
     setMessage (message) {

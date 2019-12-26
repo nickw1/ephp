@@ -15,7 +15,7 @@ class App {
         this.mode=0;
         this.savedLoginHTML=""; 
         this.origLoginDivContents = "";
-        this.canvasHeight = 500; 
+        this.canvasHeight = document.getElementById('network').clientHeight - 32;
 
         this.fileExplorer=new FileExplorer('serverContent', 
             {http: 'php/fs.php',
@@ -219,7 +219,16 @@ class App {
                                     document.getElementById('log')]);
         rw2.setup();
 
+        ResizableWindowSet.addFullResize([document.getElementById('ephp_container'), 
+                                    document.getElementById('dbg')]);
 
+        /* TODO this is partly working but the resizer widget isn't being
+           placed at the correct location.
+        var rw3 = new ResizableWindowSet([document.getElementById('ephp_container'), 
+                                    document.getElementById('dbg')],
+                                        true);
+        rw3.setup();
+        */
 
         window.addEventListener("resize",this.onResize.bind(this,rw)); 
         var origWidth, netWidth = 400;
