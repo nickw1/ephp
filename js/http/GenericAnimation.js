@@ -20,13 +20,14 @@ class GenericAnimation extends Eventable {
         this.marginRight = options.marginRight || 0;
         this.timer = null;
    // this.canvas = document.getElementById(options.canvasId);
+        console.log(`****Creating a canvas element`);
         this.canvas = document.createElement("canvas");
         this.parentElement = options.parent || (options.parentId ? document.getElementById(options.parentId) : null);
-        console.log(`MessageBox : options.msgBoxEditable=${options.msgBoxEditable}`);
         this.box = new MessageBox(null, { parent: this.parentElement, editable: options.msgBoxEditable!==false, width: options.msgBoxWidth||'400px', height: options.msgBoxHeight||'400px' });
         this.setMessage(options.message);
         this.canvas.setAttribute("height", options.height || this.parentElement.clientHeight - 40); // -40 for control panel
         this.canvas.setAttribute("width", this.parentElement.clientWidth); 
+        console.log(`width and height; ${this.canvas.width} ${this.canvas.height}`);
 
         this.parentElement.appendChild(this.canvas);
 
@@ -105,16 +106,6 @@ class GenericAnimation extends Eventable {
         }
     }
 
-    calculateCanvasPos () {
-        this.canvasX = this.canvasY = 0; 
-        var elem=this.canvas;
-        while(elem!=null) {
-            this.canvasX+=elem.offsetLeft;
-            this.canvasY+=elem.offsetTop;
-            elem=elem.offsetParent;
-        }    
-        this.canvas.height = this.parentElement.clientHeight - 32;
-    }
 
     setMessage (message) {
         if(message) {
@@ -319,6 +310,16 @@ class GenericAnimation extends Eventable {
     }
 
     drawBackground() {
+    }
+    
+    calculateCanvasPos() {
+        this.canvasX = this.canvasY = 0; 
+        var elem=this.canvas;
+        while(elem!=null) {
+            this.canvasX+=elem.offsetLeft;
+            this.canvasY+=elem.offsetTop;
+            elem=elem.offsetParent;
+        }    
     }
 }
 

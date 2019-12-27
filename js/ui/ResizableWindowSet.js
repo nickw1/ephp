@@ -19,7 +19,6 @@ class ResizableWindowSet extends Eventable {
         var setupTime = new Date().getTime();
         for(var i=0; i<this.elems.length; i++) {
             this.totalSpan += this.vert? this.elems[i].offsetHeight: this.elems[i].offsetWidth;
-            if(this.vert) console.log(`totalSpan=${this.totalSpan}`);
             if(i<this.elems.length - 1) {
                 var resizer = document.createElement("div");
                 resizer.style.backgroundColor = 'lightgray';
@@ -35,7 +34,6 @@ class ResizableWindowSet extends Eventable {
                     resizer.style.top = '50%';
                 }
                 resizer.id = "r_"+(setupTime+i);
-                console.log(`Appending resizer to element with ID ${this.elems[i].id}`);
                 this.elems[i].appendChild(resizer);
                 resizer.addEventListener("mouseover", e =>  { document.body.style.cursor=this.vert? 'ns-resize':'ew-resize';} );
                 resizer.addEventListener("mouseout", e =>  { document.body.style.cursor = 'auto'; } );

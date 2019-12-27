@@ -34,7 +34,6 @@ class EPHPHttpAnimation extends GenericAnimation  {
     finishRequest() {
         var debugMgr = new DebugMgr( { dbgMsgHandler: this.serverAnimation, user: this.loggedInUser } );
 
-//        var urlParts = this.message.url.split("/");    
         const urlParts = this.message.url.split('/');
 
         var sa = new ServerFilesystemAnimation(
@@ -81,6 +80,14 @@ class EPHPHttpAnimation extends GenericAnimation  {
                                      this.message.formData,
                                     xmlHTTP => { this.message.processResponse(xmlHTTP, true); }
                                     );
+    }
+
+    calculateCanvasPos () {
+        super.calculateCanvasPos();
+
+        // Only makes sense if the canvas is embedded within the page layout
+        // Will not make sense if the canvas is being drawn on a dialog
+        this.canvas.height = this.parentElement.clientHeight - 32;
     }
 }
 
