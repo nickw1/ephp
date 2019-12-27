@@ -1,6 +1,6 @@
 // window.location.protocol http:
 
-const Eventable = require('./Eventable');
+const Eventable = require('../gen/Eventable');
 const PendingHttpRequest = require("./PendingHttpRequest");
 
 class Browser extends Eventable {

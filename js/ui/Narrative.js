@@ -1,5 +1,5 @@
 
-const Eventable = require('../http/Eventable');
+const Eventable = require('../gen/Eventable');
 
 class Narrative extends Eventable {
 

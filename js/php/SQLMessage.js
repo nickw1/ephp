@@ -1,4 +1,4 @@
-const Eventable = require('../http/Eventable');
+const Eventable = require('../gen/Eventable');
 
 class SQLMessage  extends Eventable {
     constructor(options) {

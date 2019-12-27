@@ -7,7 +7,6 @@ const DBResults = require('./DBResults');
 const Slider = require('../ui/Slider');
 const DBAnimation = require('./DBAnimation');
 const SQLMessage = require('./SQLMessage');
-//const Narrative = require('./Narrative');
 const NarrativeDialog = require('../ui/NarrativeDialog');
 
 class PHPAnimation {

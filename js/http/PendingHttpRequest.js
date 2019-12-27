@@ -1,4 +1,4 @@
-const Eventable = require('./Eventable');
+const Eventable = require('../gen/Eventable');
 
 class PendingHttpRequest extends Eventable {
     constructor(options) {

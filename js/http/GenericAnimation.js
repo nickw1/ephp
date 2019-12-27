@@ -6,7 +6,7 @@
 // - changed names of onrequeststart/end to messagestart/end as this is
 // more accurate
 
-const Eventable = require('./Eventable');
+const Eventable = require('../gen/Eventable');
 const MessageBox = require('./MessageBox');
 const Slider = require('../ui/Slider');
 

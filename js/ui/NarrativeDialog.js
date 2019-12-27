@@ -1,6 +1,6 @@
 
-const Narrative = require('../php/Narrative');
-const Eventable = require('../http/Eventable');
+const Narrative = require('./Narrative');
+const Eventable = require('../gen/Eventable');
 
 class NarrativeDialog extends Eventable {
 

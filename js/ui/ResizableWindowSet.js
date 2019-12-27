@@ -1,4 +1,4 @@
-const Eventable = require('../http/Eventable');
+const Eventable = require('../gen/Eventable');
 
 class ResizableWindowSet extends Eventable {
     constructor(windows, vert=false) {
