@@ -244,6 +244,13 @@ class App {
         });
 
         this.onResize(rw);
+
+        this.config = { sockserver: 'localhost' };
+
+        fetch('config.json')
+            .then(response => response.json())
+            .then(json => this.config=json);
+            
     }
 
     askUploadFile(runAfterUpload) {
@@ -440,4 +447,4 @@ class App {
     }
 }
 
-new App();
+window.app = new App();

@@ -1,0 +1,5 @@
+{
+    "ephproot": "ephp",
+    "ftp" : 1,
+    "sockserver" : "localhost"
+}
