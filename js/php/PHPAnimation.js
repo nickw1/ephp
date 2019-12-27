@@ -7,7 +7,8 @@ const DBResults = require('./DBResults');
 const Slider = require('../ui/Slider');
 const DBAnimation = require('./DBAnimation');
 const SQLMessage = require('./SQLMessage');
-const Narrative = require('./Narrative');
+//const Narrative = require('./Narrative');
+const NarrativeDialog = require('../ui/NarrativeDialog');
 
 class PHPAnimation {
     constructor(options) {
@@ -309,8 +310,8 @@ class PHPAnimation {
 
     launchSqlAnimation(res) {
         this.dbgMsgQueue.stop();
-        const narrative = new Narrative({elemId: 'serverContent',
-                        narrative: `<h2>SQL Query found!</h2><p>Your PHP script is going to send an SQL query to the MySQL server.</p><p>Query is: <strong>${res.sql}</strong>.</p><p>Click below to send it.</p>`
+        const narrative = new NarrativeDialog({ elemId: 'ephp_container',
+                        narrative:`<h2>SQL Query found!</h2><p>Your PHP script is going to send an SQL query to the MySQL server.</p><p>Query is: <strong>${res.sql}</strong>.</p><p>Click below to send it.</p>`
         });
         narrative.on("dismissed", () => {
             const dlg = new Dialog('ephp_container', {

@@ -7,14 +7,15 @@ class Narrative extends Eventable {
         super();
         this.origContents = [];
         this.options = options;
-        this.elem = document.getElementById(options.elemId);
+        this.elem = options.elem || document.getElementById(options.elemId);
+        this.mainDiv = document.createElement('div');
     }
 
     show() {
         this.saveOriginalContents();    
         this.removeContents();
 
-        this.mainDiv = document.createElement('div');
+        this.mainDiv.setAttribute("class", "ephp_narrative");
         this.mainDiv.style.width = this.mainDiv.style.height = '100%';
         this.mainDiv.style.backgroundColor = this.options.backgroundColor || '#ffffc0';
         this.mainDiv.style.color = this.options.color || 'black';

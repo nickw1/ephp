@@ -5,7 +5,7 @@
 const GenericAnimation = require('./GenericAnimation');
 const DebugMgr = require('../php/DebugMgr');
 const ServerFilesystemAnimation = require('./ServerFilesystemAnimation');
-const Narrative = require('../php/Narrative');
+const NarrativeDialog = require('../ui/NarrativeDialog');
 
 class EPHPHttpAnimation extends GenericAnimation  {
    constructor(options) {
@@ -44,7 +44,7 @@ class EPHPHttpAnimation extends GenericAnimation  {
                 interval:500, 
                 callback: ()=> {
                     const isPHP = this.message.isPHPScript();
-                    const narrative = new Narrative({elemId: 'serverContent', 
+                    const narrative = new NarrativeDialog({elemId: 'serverContent', 
                         narrative:`<h2>Web server has received request!</h2><p>The web server software has received a request for ${this.message.url}.</p>` + (isPHP ? "<p>This is a PHP script, so it will be run by the web server software's PHP module.</p>" : "<p>This is a static file, so it will be sent straight back to the client.</p>")});
                     narrative.on("dismissed", ()=> {
                         if(isPHP) {

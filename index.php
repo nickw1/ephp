@@ -10,6 +10,7 @@ class EPHPPage extends Page {
     public function writeBody() {
         ?>
         <body>
+		<div id="greyOutOverlay"></div>
         <div id='header' style='position: relative; width: 100%'>
         <div id='titlecontainer'>
         <span class='ephpTitle'>ephp</span><span class='ephpVersion'>3</span>

@@ -324,3 +324,15 @@ a {
 #ephp_container a {
     color: blue;
 }
+
+#greyOutOverlay {
+    background-color: lightgray;
+    opacity: 0.8;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    display: none;
+}
