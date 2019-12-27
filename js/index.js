@@ -194,7 +194,7 @@ class App {
                     this.browser.refresh(); 
                 }).bind(this,i));
             tabs[i].addEventListener
-                ("mouseover", (e)=> {
+                ("mouseover", e=> {
                     e.target.style.cursor="default";
                 } );
         }
@@ -202,31 +202,18 @@ class App {
         this.showFilename();
         this.setupTabs();
         this.setupModeDisplay();
-        ResizableWindowSet.addFullResize([document.getElementById('client'), 
-                                    document.getElementById('networkContainer'), 
-                                    document.getElementById('server')]);
-        var rw = new ResizableWindowSet([document.getElementById('client'), 
+        const rw = new ResizableWindowSet([document.getElementById('client'), 
                                     document.getElementById('networkContainer'),
                                     document.getElementById('server')]);
-        rw.setOnFinishCallback(this.httpAnim.calculateCanvasPos.bind(this.httpAnim));
+        rw.on("finish", this.httpAnim.calculateCanvasPos.bind(this.httpAnim));
         rw.setup();
 
-        ResizableWindowSet.addFullResize([document.getElementById('vars'), 
-                                    document.getElementById('dbresults'), 
-                                    document.getElementById('log')]);
-        var rw2 = new ResizableWindowSet([document.getElementById('vars'), 
+        const rw2 = new ResizableWindowSet([document.getElementById('vars'), 
                                     document.getElementById('dbresults'),
                                     document.getElementById('log')]);
         rw2.setup();
 
-        ResizableWindowSet.addFullResize([document.getElementById('ephp_container'), 
-                                    document.getElementById('dbg')]);
-
-        /* TODO this is partly working but the resizer widget isn't being
-           placed at the correct location. */
-        var rw3 = new ResizableWindowSet([document.getElementById('ephp_container'), 
-                                    document.getElementById('dbg')],
-                                        true);
+        const rw3 = new ResizableWindowSet([document.getElementById('ephp_container'), document.getElementById('dbg')], true);
         rw3.setup();
         
 

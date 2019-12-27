@@ -1,16 +1,15 @@
-class ResizableWindowSet {
+const Eventable = require('../http/Eventable');
+
+class ResizableWindowSet extends Eventable {
     constructor(windows, vert=false) {
-        this.elem = [];
+        super();
+        this.elems = [];
         var i=0;
         for(let w of windows) {
-            this.elem[i++] = w; 
+            this.elems[i++] = w; 
         }
         this.vert = vert;
-        this.onFinishCallback = null;
-    }
-
-    setOnFinishCallback(cb) {
-        this.onFinishCallback = cb;
+        this.setupResizeChanges();
     }
 
     // used this to help out here..
@@ -18,10 +17,10 @@ class ResizableWindowSet {
     setup() {
         this.totalSpan = 0;
         var setupTime = new Date().getTime();
-        for(var i=0; i<this.elem.length; i++) {
-            this.totalSpan += this.vert? this.elem[i].offsetHeight: this.elem[i].offsetWidth;
+        for(var i=0; i<this.elems.length; i++) {
+            this.totalSpan += this.vert? this.elems[i].offsetHeight: this.elems[i].offsetWidth;
             if(this.vert) console.log(`totalSpan=${this.totalSpan}`);
-            if(i<this.elem.length - 1) {
+            if(i<this.elems.length - 1) {
                 var resizer = document.createElement("div");
                 resizer.style.backgroundColor = 'lightgray';
                 resizer.style.border = '1px solid darkgray';
@@ -36,15 +35,15 @@ class ResizableWindowSet {
                     resizer.style.top = '50%';
                 }
                 resizer.id = "r_"+(setupTime+i);
-                console.log(`Appending resizer to element with ID ${this.elem[i].id}`);
-                this.elem[i].appendChild(resizer);
+                console.log(`Appending resizer to element with ID ${this.elems[i].id}`);
+                this.elems[i].appendChild(resizer);
                 resizer.addEventListener("mouseover", e =>  { document.body.style.cursor=this.vert? 'ns-resize':'ew-resize';} );
                 resizer.addEventListener("mouseout", e =>  { document.body.style.cursor = 'auto'; } );
                 resizer.addEventListener("mousedown", e => {
                     var index = parseInt(e.target.id.substring(2)) - setupTime;
-                    this.elem[index].dragStartPos =     
-                            this.vert? this.elem[index].offsetHeight:
-                            this.elem[index].offsetWidth;
+                    this.elems[index].dragStartPos =     
+                            this.vert? this.elems[index].offsetHeight:
+                            this.elems[index].offsetWidth;
                     this.realDrag = this.drag.bind(this,index,
                                 this.vert ? e.clientY: e.clientX);
                     document.body.style.cursor= this.vert? 'ns-resize' : 'ew-resize';
@@ -57,33 +56,33 @@ class ResizableWindowSet {
 
     drag(index, origClientPos, e) {
         if(this.vert) {
-            var newHeight = (this.elem[index].dragStartPos + (e.clientY - origClientPos));
-            this.elem[index].calcFullResizeHeight(newHeight);
+            var newHeight = (this.elems[index].dragStartPos + (e.clientY - origClientPos));
+            this.elems[index].applyResizeHeight(newHeight);
         } else {
-            var newWidth = (this.elem[index].dragStartPos + 
+            var newWidth = (this.elems[index].dragStartPos + 
                     (e.clientX - origClientPos));
-            this.elem[index].calcFullResizeWidth(newWidth);
+            this.elems[index].applyResizeWidth(newWidth);
         }
 
         // calculate width of all elements after the resize
         var actualTotalSpan  = 0;
-        for(var j=0; j<this.elem.length; j++) { 
-            actualTotalSpan += this.vert ? this.elem[j].offsetHeight:
-                    this.elem[j].offsetWidth;
+        for(var j=0; j<this.elems.length; j++) { 
+            actualTotalSpan += this.vert ? this.elems[j].offsetHeight:
+                    this.elems[j].offsetWidth;
         }
         
         // resize remaining elements to fit into available space
-        for(var j=index+1; j<this.elem.length; j++) { 
+        for(var j=index+1; j<this.elems.length; j++) { 
             if(this.vert) {
-                var newHeight = this.elem[j].offsetHeight - 
+                var newHeight = this.elems[j].offsetHeight - 
                         ((actualTotalSpan-this.totalSpan)/
-                            (this.elem.length-(index+1)));
-                this.elem[j].calcFullResizeHeight(newHeight);
+                            (this.elems.length-(index+1)));
+                this.elems[j].applyResizeHeight(newHeight);
             } else {
-                var newWidth = this.elem[j].offsetWidth - 
+                var newWidth = this.elems[j].offsetWidth - 
                         ((actualTotalSpan-this.totalSpan)/
-                            (this.elem.length-(index+1)));
-                this.elem[j].calcFullResizeWidth(newWidth);
+                            (this.elems.length-(index+1)));
+                this.elems[j].applyResizeWidth(newWidth);
             }
         }
     }
@@ -92,13 +91,13 @@ class ResizableWindowSet {
         document.documentElement.removeEventListener("mousemove", this.realDrag);
         document.documentElement.removeEventListener("mouseup", this.dragend);
         document.body.style.cursor='auto';
-        if(this.onFinishCallback) {
-            this.onFinishCallback();
+        if(this.eventHandlers.finish) {
+            this.eventHandlers.finish();
         }
     }
 
     showResizer(elem, doShow) {
-        for(curElem of this.elem) {
+        for(let curElem of this.elems) {
             if(elem == curElem) {
                 var resizer = elem.querySelector('.resizer');
                 if(resizer) {
@@ -111,32 +110,33 @@ class ResizableWindowSet {
 
     recalculateTotalSpan() {
         this.totalSpan = 0;
-        for(var i=0; i<this.elem.length; i++) {
-            this.totalSpan += this.vert? this.elem[i].offsetHeight: this.elem[i].offsetWidth;
+        for(var i=0; i<this.elems.length; i++) {
+            this.totalSpan += this.vert? this.elems[i].offsetHeight: this.elems[i].offsetWidth;
+        }
+    }
+
+    setupResizeChanges () {
+        for(let elem of this.elems) {
+            if(elem.querySelector("canvas")) {
+                elem.applyResizeWidth = function(sz) {
+                    this.style.width = sz + "px";
+                    this.querySelector("canvas").width = sz;
+                }
+                elem.applyResizeHeight = function(sz) {
+                    this.style.height = sz + "px";
+                    this.querySelector("canvas").height = sz;
+                }
+            } else {
+                elem.applyResizeWidth = function(sz) {
+                    this.style.width = sz + "px";
+                }
+                elem.applyResizeHeight = function(sz) {
+                    this.style.height = sz + "px";
+                }
+            }
         }
     }
 }
 
-ResizableWindowSet.addFullResize = function(elems) {
-    for(elem of elems) {
-        if(elem.querySelector("canvas")) {
-            elem.calcFullResizeWidth = function(sz) {
-                this.style.width = sz + "px";
-                this.querySelector("canvas").width = sz;
-            }
-            elem.calcFullResizeHeight = function(sz) {
-                this.style.height = sz + "px";
-                this.querySelector("canvas").height = sz;
-            }
-        } else {
-            elem.calcFullResizeWidth = function(sz) {
-                this.style.width = sz + "px";
-            }
-            elem.calcFullResizeHeight = function(sz) {
-                this.style.height = sz + "px";
-            }
-        }
-    }
-}
 
 module.exports = ResizableWindowSet;
