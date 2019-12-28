@@ -132,8 +132,6 @@ class App {
         if(document.getElementById("ftpsubmit")) {
             this.initFtpSubmitBtn();
         } else {
-        // Page reload when logged in
-//        this.loadBackedUpFile();
             this.login();
         }
 
@@ -245,12 +243,13 @@ class App {
 
         this.onResize(rw);
 
-        this.config = { sockserver: 'localhost' };
+        this.settings = { narrative: true, server_anim: true, http_anim: true };
 
+        this.config = { sockserver: 'localhost' };
         fetch('config.json')
             .then(response => response.json())
             .then(json => this.config=json);
-            
+
     }
 
     askUploadFile(runAfterUpload) {
@@ -331,7 +330,7 @@ class App {
         var xhr2 = new XMLHttpRequest();
         xhr2.addEventListener("load",e=> { 
             var json = JSON.parse(e.target.responseText);
-            if(json.status!=0 && (json.status>=1024)) {
+            if( json.status>=1024) {
                 alert('Error: ' + this.errors[json.status]);
                 this.resetLogin();
             } else {
@@ -343,9 +342,11 @@ class App {
                     this.httpAnim.setLoggedIn(json.loggedin);
                     document.getElementById("login").innerHTML = 
                                 "Logged in as " + this.loggedin +
-                                " <a href='php/logout.php'>Logout</a>";
+                                " <a href='php/logout.php'>Logout</a>"+
+                                "<div id='settings'><img id='settingsImg' src='assets/images/settings.png' alt='Settings' /><div id='settingsControl'></div></div>";
                     this.setupModeDisplay();
                     this.loadBackedUpFile();
+                    this.getSettings();
                 } 
             }
         });
@@ -444,6 +445,31 @@ class App {
         document.getElementById('server').style.width=serverWidth+'px';
         this.httpAnim.calculateCanvasPos();
         rw.recalculateTotalSpan();
+    }
+
+    getSettings() {
+        fetch('php/settings.php')
+            .then(response => response.json())
+            .then(json => {
+                this.settings = json;
+                this.setupSettingsDialog();
+            });
+    }
+
+    setupSettingsDialog() {
+        const settingsControl = document.getElementById("settingsControl");
+        for(let setting in this.settings) {
+            const cb = document.createElement("input");
+            cb.type = "checkbox";
+            cb.checked = this.settings[setting];
+            cb.id = setting;
+            cb.addEventListener("click", e=>{
+                this.settings[e.target.id] = e.target.checked;
+            });
+            settingsControl.appendChild(cb);
+            settingsControl.appendChild(document.createTextNode(setting));
+            settingsControl.appendChild(document.createElement("br"));
+        }
     }
 }
 

@@ -189,18 +189,17 @@ class PHPAnimation {
                     break;
     
                 case 'object':
-                    // TODO handle SQL queries
-                    if(data.vars[varName].classname=='PDOStatement' && data.vars[varName].value.queryString) {
+                    if(window.app.settings.db_anim && data.vars[varName].classname=='PDOStatement' && data.vars[varName].value.queryString) {
                         // send off queryString to PHP SQL parser/processor
                         if(!this.doneSql[varName]) {
-                        this.doneSql[varName] = true;
-                        fetch(`php/sql.php?sql=${data.vars[varName].value.queryString}&fileuri=${this.dbgMsgQueue.fileuri}&resultvar=${varName.replace('$','')}`)
-                            .then(response => response.json())
-                            .then(data => {
-                                if(data.loopBounds && 
-                                   data.loopBounds.start && 
-                                   data.loopBounds.end) {
-                                    this.loops[varName] = { lines: data.loopBounds, lastLineNo: Number.MAX_VALUE };
+                            this.doneSql[varName] = true;
+                            fetch(`php/sql.php?sql=${data.vars[varName].value.queryString}&fileuri=${this.dbgMsgQueue.fileuri}&resultvar=${varName.replace('$','')}`)
+                                .then(response => response.json())
+                                .then(data => {
+                                    if(data.loopBounds && 
+                                       data.loopBounds.start && 
+                                       data.loopBounds.end) {
+                                        this.loops[varName] = { lines: data.loopBounds, lastLineNo: Number.MAX_VALUE };
                                 }
                                 this.launchSqlAnimation(data);
                             });
@@ -309,11 +308,19 @@ class PHPAnimation {
 
     launchSqlAnimation(res) {
         this.dbgMsgQueue.stop();
-        const narrative = new NarrativeDialog({ elemId: 'ephp_container',
+        if(window.app.settings.narrative) {
+            const narrative = new NarrativeDialog({ elemId: 'ephp_container',
                         narrative:`<h2>SQL Query found!</h2><p>Your PHP script is going to send an SQL query to the MySQL server.</p><p>Query is: <strong>${res.sql}</strong>.</p><p>Click below to send it.</p>`
-        });
-        narrative.on("dismissed", () => {
-            const dlg = new Dialog('ephp_container', {
+            });
+            narrative.on("dismissed", this.doLaunchSqlAnimation.bind(this, res));
+            narrative.show();
+        } else {
+            this.doLaunchSqlAnimation(res);
+        }
+    }
+
+    doLaunchSqlAnimation(res) {
+        const dlg = new Dialog('ephp_container', {
                 },
                 { position: 'absolute',
                 left: '25%',
@@ -322,8 +329,8 @@ class PHPAnimation {
                 width: '50%',
                 backgroundColor: 'white',
                 height: '400px' } );
-            dlg.show();
-            const sqlAnim = new DBAnimation({parent: dlg.div,
+        dlg.show();
+        const sqlAnim = new DBAnimation({parent: dlg.div,
                                     height:this.canvasHeight,
                                     interval: 20,
                                     step : 2,
@@ -333,14 +340,12 @@ class PHPAnimation {
                                     msgBoxWidth: '600px',
                                     message: new SQLMessage({ results: res.results, sql: res.sql}),
                                     serverAnimation: null });
-            sqlAnim.on("canvasloaded", sqlAnim.animate.bind(sqlAnim));
-            sqlAnim.on("finished", msg=> {
+        sqlAnim.on("canvasloaded", sqlAnim.animate.bind(sqlAnim));
+        sqlAnim.on("finished", msg=> {
                 dlg.hide();
                 this.handleDBResults(msg);
                 this.dbgMsgQueue.start();
-            });
         });
-        narrative.show();
     }
 }
 

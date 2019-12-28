@@ -32,9 +32,9 @@ class EPHPHttpAnimation extends GenericAnimation  {
     // to run when a request has been completed
     // starts up the ServerFilesystemAnimation and debugging 
     finishRequest() {
-        var debugMgr = new DebugMgr( { dbgMsgHandler: this.serverAnimation, user: this.loggedInUser } );
 
         const urlParts = this.message.url.split('/');
+        const isPHP = this.message.isPHPScript();
 
         var sa = new ServerFilesystemAnimation(
                 {fileExplorer: this.fileExplorer,
@@ -42,32 +42,38 @@ class EPHPHttpAnimation extends GenericAnimation  {
                 repeat:2, 
                 interval:500, 
                 callback: ()=> {
-                    const isPHP = this.message.isPHPScript();
-                    const narrative = new NarrativeDialog({elemId: 'serverContent', 
-                        narrative:`<h2>Web server has received request!</h2><p>The web server software has received a request for ${this.message.url}.</p>` + (isPHP ? "<p>This is a PHP script, so it will be run by the web server software's PHP module.</p>" : "<p>This is a static file, so it will be sent straight back to the client.</p>")});
-                    narrative.on("dismissed", ()=> {
-                        if(isPHP) {
-                            this.message.retrieveSrc ( { 
-                                onSuccess: data => {
-                                    if(data.errors) {
-                                        alert("error(s):\n" + data.errors.join("\n"));
-                                    } else {
-                                    this.showSrcAndLaunchDebug(data, debugMgr);
-                                    }
-                                },
-                                onError: code => {
-                                    this.message.setErrorResponse(code);
-                                    this.animation.startResponse();
-                                }
-                            });
-                        } else {
-                             this.message.send();
-                        }
-                    });
-                    narrative.show();
+                    if(window.app.settings.narrative) {
+                        const narrative = new NarrativeDialog({elemId: 'serverContent', 
+                            narrative:`<h2>Web server has received request!</h2><p>The web server software has received a request for ${this.message.url}.</p>` + (isPHP ? "<p>This is a PHP script, so it will be run by the web server software's PHP module.</p>" : "<p>This is a static file, so it will be sent straight back to the client.</p>")});
+                        narrative.on("dismissed", this.finishRequestPostNarrative.bind(this, isPHP));
+                        narrative.show();
+                    } else {
+                        this.finishRequestPostNarrative(isPHP);
+                    }
                 }
             });
         sa.animate();
+    }
+
+    finishRequestPostNarrative(isPHP) {
+        if(isPHP) {
+            var debugMgr = new DebugMgr( { dbgMsgHandler: this.serverAnimation, user: this.loggedInUser } );
+            this.message.retrieveSrc ( { 
+                onSuccess: data => {
+                    if(data.errors) {
+                        alert("error(s):\n" + data.errors.join("\n"));
+                    } else {
+                    this.showSrcAndLaunchDebug(data, debugMgr);
+                    }
+                },
+                onError: code => {
+                    this.message.setErrorResponse(code);
+                    this.animation.startResponse();
+                }
+            });
+        } else {
+             this.message.send();
+        }
     }
 
     // componsnetAnimator has been taken out. So remove this

@@ -336,3 +336,24 @@ a {
     left: 0px;
     display: none;
 }
+
+#settings {
+    display: inline;
+    position: relative;
+}
+
+#settingsControl {
+    display: none;
+    position: absolute;
+    top: 0px;
+    width: 200px;
+    height: 200px;
+    right: 0px;
+    z-index: 1;
+    background-color: #ffffc0;
+    color: black;
+}
+
+#settings:hover #settingsControl {
+    display: block;
+}
