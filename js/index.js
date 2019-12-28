@@ -465,6 +465,13 @@ class App {
             cb.id = setting;
             cb.addEventListener("click", e=>{
                 this.settings[e.target.id] = e.target.checked;
+                fetch('php/settings.php',
+                    { method: "POST",
+                        body: JSON.stringify(this.settings),
+                        headers: { 'Content-Type': 'application/json' }
+                    })
+                .then(response => response.text())
+                .then(console.log);                    
             });
             settingsControl.appendChild(cb);
             settingsControl.appendChild(document.createTextNode(setting));
