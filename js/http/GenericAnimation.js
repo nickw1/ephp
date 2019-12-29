@@ -87,7 +87,6 @@ class GenericAnimation extends Eventable {
 
             var slider = new Slider(50, 10, {
                 onchange: value=> { this.interval = value; } ,
-
                 parent: controlsDiv 
             } );
             slider.setValue(this.interval);

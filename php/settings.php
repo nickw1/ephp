@@ -7,7 +7,7 @@ if(isset($_SESSION["ephpuser"])) {
     $conn = new PDO("mysql:host=localhost;dbname=".USER_DB, USER_DB_USER, USER_DB_PASS);
     switch($_SERVER["REQUEST_METHOD"]) {
         case "GET":
-            $stmt = $conn->prepare("SELECT narrative, server_anim, http_anim, db_anim FROM ephpusers WHERE username=?");
+            $stmt = $conn->prepare("SELECT narrative, server_anim, db_anim FROM ephpusers WHERE username=?");
             $stmt->execute([$_SESSION["ephpuser"]]);
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
             if($row === false) {

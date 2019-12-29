@@ -346,11 +346,10 @@ a {
     display: none;
     position: absolute;
     top: 0px;
-    width: 200px;
-    height: 200px;
+    width: 320px;
     right: 0px;
     z-index: 1;
-    background-color: #ffffc0;
+    background-color: #85ccdb;
     color: black;
 }
 

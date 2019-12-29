@@ -98,6 +98,12 @@ class App {
           'file_save' : ['none'] }
         ];
 
+        this.settingsLabels = {
+            'narrative': 'Show narrative',
+            'server_anim' : 'Show PHP script step-through',
+            'db_anim' : 'Show PHP / Database animation'
+        };
+            
        this.dialog = new Dialog ("client",
                             { 
                                 'Yes': ()=> {
@@ -474,7 +480,7 @@ class App {
                 .then(console.log);                    
             });
             settingsControl.appendChild(cb);
-            settingsControl.appendChild(document.createTextNode(setting));
+            settingsControl.appendChild(document.createTextNode(this.settingsLabels[setting]));
             settingsControl.appendChild(document.createElement("br"));
         }
     }

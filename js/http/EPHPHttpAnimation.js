@@ -58,33 +58,35 @@ class EPHPHttpAnimation extends GenericAnimation  {
     finishRequestPostNarrative(isPHP) {
         if(isPHP) {
             var debugMgr = new DebugMgr( { dbgMsgHandler: this.serverAnimation, user: this.loggedInUser } );
-            this.message.retrieveSrc ( { 
-                onSuccess: data => {
-                    if(data.errors) {
-                        alert("error(s):\n" + data.errors.join("\n"));
-                    } else {
-                    this.showSrcAndLaunchDebug(data, debugMgr);
+            if(window.app.settings.server_anim) {
+                this.message.retrieveSrc ( { 
+                    onSuccess: data => {
+                            if(data.errors) {
+                            alert("error(s):\n" + data.errors.join("\n"));
+                        } else {
+                            this.serverAnimation.showSrc(data);
+                            this.launchDebug(debugMgr);
+                        }
+                    },
+                    onError: code => {
+                        this.message.setErrorResponse(code);
+                        this.animation.startResponse();
                     }
-                },
-                onError: code => {
-                    this.message.setErrorResponse(code);
-                    this.animation.startResponse();
-                }
-            });
+                });
+            } else {
+                debugMgr.setCompleteCallback (this.message.processResponse.bind(this.message));
+                debugMgr.requestScriptAjax(this.message.method, this.message.url, this.message.formData, false);
+            }
         } else {
              this.message.send();
         }
     }
 
-    // componsnetAnimator has been taken out. So remove this
-    //startResponse() {
-
-    showSrcAndLaunchDebug(data, debugMgr) {
-        this.serverAnimation.showSrc(data);
+    launchDebug(debugMgr) {
         debugMgr.launchDebugSession (this.message.url, 
                                      this.message.method,
                                      this.message.formData,
-                                    xmlHTTP => { this.message.processResponse(xmlHTTP, true); }
+                                     this.message.processResponse.bind(this.message)
                                     );
     }
 

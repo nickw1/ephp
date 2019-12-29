@@ -21,62 +21,72 @@ class DebugMgr {
 
         this.ws.onmessage = (e) => {
             var data = JSON.parse(e.data);
-            var fullDebugUrl = scriptUrl;
             // all debug commands have a user field to identify which user is
             // sending them, others will be ignored
             if(data.cmd && data.user && this.user == data.user && this.dbgMsgHandler != null) {
                 switch(data.cmd) {
                     case 'opened':
-                        switch(method.toUpperCase()) {
-                            case 'GET':
-                                fullDebugUrl+='&XDEBUG_SESSION_START=' + this.user;
-                                break;
-
-                            case 'POST':
-                                var debugFormData = new FormData();
-                                debugFormData.append ('XDEBUG_SESSION_START', this.user);
-                                if(userFormData) {
-                                    var entries = userFormData.entries();
-                                    for (var entry of entries) {
-                                        debugFormData.append(entry[0], entry[1]);
-                                    }
-                                }
-                                break;
-                        }
-
-                        console.log("Debugging script: " + fullDebugUrl);
-                        const xhr = new XMLHttpRequest();
-                        xhr.addEventListener("load", e=> {    
-                            if(e.target.status != 200) {
-                                alert(`HTTP error ${e.target.status}`);
-                            } else if(this.completeCallback != null) {
-                               console.log("debug session finished: "+
-                                "Sending completeCallback with response: " + 
-                                e.target.responseText);
-
-                                if(e.target.responseText.indexOf("Parse error") >=0) {
-                                     alert("Syntax error in your PHP script.  Details: " + e.target.responseText.substr (e.target.responseText.  indexOf(":")+1).  replace(/<[^>]+>/g, ""));
-                                }
-                                this.completeCallback(e.target);
-                            }
-                        });
-                        xhr.open(method, fullDebugUrl);
-                        xhr.send(debugFormData);
+                        this.requestScriptAjax(method, scriptUrl, userFormData);
                         break;
 "body"
-                case 'stop':
-                    this.dbgMsgHandler.handleStop();
-                    break;
+                    case 'stop':
+                        this.dbgMsgHandler.handleStop();
+                        break;
 
-                default:
-                    this.dbgMsgHandler.addToQueue(data);
-                    break;
+                    default:
+                        this.dbgMsgHandler.addToQueue(data);
+                        break;
+                }
             }
         }
-    }
+
         this.ws.onerror = (e) => {
             alert('ERROR: ' + e.data);
         }
+    }
+
+    requestScriptAjax(method, scriptUrl, userFormData, doDebug=true) {
+        let fullUrl = scriptUrl;
+        let fullFormData = null;
+        if(doDebug) {
+            switch(method.toUpperCase()) {
+                case 'GET':
+                    fullUrl+='&XDEBUG_SESSION_START=' + this.user;
+                    break;
+
+                case 'POST':
+                    fullFormData = new FormData();
+                    fullFormData.append ('XDEBUG_SESSION_START', this.user);
+                    if(userFormData) {
+                        var entries = userFormData.entries();
+                        for (var entry of entries) {
+                            fullFormData.append(entry[0], entry[1]);
+                        }
+                    }
+                    break;
+            }
+        } else {
+            fullFormData = userFormData;
+        }
+
+        console.log("Debugging script: " + fullUrl);
+        const xhr = new XMLHttpRequest();
+        xhr.addEventListener("load", e=> {    
+            if(e.target.status != 200) {
+                alert(`HTTP error ${e.target.status}`);
+            } else if(this.completeCallback != null) {
+               console.log("debug session finished: "+
+                "Sending completeCallback with response: " + 
+                e.target.responseText);
+
+                if(e.target.responseText.indexOf("Parse error") >=0) {
+                     alert("Syntax error in your PHP script.  Details: " + e.target.responseText.substr (e.target.responseText.  indexOf(":")+1).  replace(/<[^>]+>/g, ""));
+                }
+                this.completeCallback(e.target);
+            }
+        });
+        xhr.open(method, fullUrl);
+        xhr.send(fullFormData);
     }
 
     initiateDebugSession() {

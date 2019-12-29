@@ -108,7 +108,7 @@ class PendingHttpRequest extends Eventable {
         return response; 
     }
 
-    processResponse( xmlHTTP, debugPHP) {
+    processResponse( xmlHTTP, debugPHP=true) {
         console.log("response headers: " + xmlHTTP.getAllResponseHeaders());
         var responseHeaders = xmlHTTP.getAllResponseHeaders().split("\r\n");
         // getAllResponseHeaders() seems to return 1 more than there  actually is
@@ -138,10 +138,14 @@ class PendingHttpRequest extends Eventable {
             this.editableResponse.url = xmlHTTP.responseURL;
             this.editableResponse.status = xmlHTTP.status;
             this.editableResponse.statusText = xmlHTTP.statusText;
+        }
+
+        if(!debugPHP || !window.app.settings.server_anim) {
             if(this.eventHandlers["responseprocessed"]) {
                 this.eventHandlers["responseprocessed"](); 
             }
         }
+
         //Note:
         // -url is always relative (to root, no server) e.g. /~ephp001/..
         // -responseURL contains full server details
