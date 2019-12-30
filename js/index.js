@@ -206,22 +206,25 @@ class App {
         this.showFilename();
         this.setupTabs();
         this.setupModeDisplay();
-        const rw = new ResizableWindowSet([document.getElementById('client'), 
+        this.clientServerResizable = new ResizableWindowSet([document.getElementById('client'), 
                                     document.getElementById('networkContainer'),
                                     document.getElementById('server')]);
-        rw.on("finish", this.httpAnim.calculateCanvasPos.bind(this.httpAnim));
-        rw.setup();
+        this.clientServerResizable.on("finish", this.httpAnim.calculateCanvasPos.bind(this.httpAnim));
+        this.clientServerResizable.setup();
 
-        const rw2 = new ResizableWindowSet([document.getElementById('vars'), 
+        this.logResizable = new ResizableWindowSet([document.getElementById('vars'), 
                                     document.getElementById('dbresults'),
                                     document.getElementById('log')]);
-        rw2.setup();
+        this.logResizable.setup();
 
-        const rw3 = new ResizableWindowSet([document.getElementById('ephp_container'), document.getElementById('dbg')], true);
-        rw3.setup();
+        this.verticalResizable = new ResizableWindowSet([document.getElementById('ephp_container'), document.getElementById('dbg')], true);
+        this.verticalResizable.setup();
+        this.verticalResizable.on("drag", this.httpAnim.calculateCanvasPos.bind(this.httpAnim));
+        this.verticalResizable.on("finish", this.httpAnim.calculateCanvasPos.bind(this.httpAnim));
+
         
 
-        window.addEventListener("resize",this.onResize.bind(this,rw)); 
+        window.addEventListener("resize",this.onResize.bind(this)); 
         var origWidth, netWidth = 400;
 
         var networkShowDiv = document.createElement("div");
@@ -247,7 +250,7 @@ class App {
             rw.showResizer(netCont, true);
         });
 
-        this.onResize(rw);
+        this.onResize();
 
         this.settings = { narrative: true, server_anim: true, http_anim: true };
 
@@ -444,13 +447,15 @@ class App {
         }
     }
 
-    onResize(rw) {
+    onResize() {
         var serverWidth = document.body.offsetWidth-
                 (document.getElementById('client').offsetWidth+
                     document.getElementById('network').offsetWidth);
         document.getElementById('server').style.width=serverWidth+'px';
         this.httpAnim.calculateCanvasPos();
-        rw.recalculateTotalSpan();
+        this.clientServerResizable.recalculateTotalSpan();
+        this.logResizable.recalculateTotalSpan();
+        this.verticalResizable.recalculateTotalSpan();
     }
 
     getSettings() {

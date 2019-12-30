@@ -41,7 +41,7 @@ class DebugMgr {
         }
 
         this.ws.onerror = (e) => {
-            alert('ERROR: ' + e.data);
+            alert('Could not connect to web socket server. Please start sockserver.php or ask your tutor to start it.');
         }
     }
 

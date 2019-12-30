@@ -83,6 +83,9 @@ class ResizableWindowSet extends Eventable {
                 this.elems[j].applyResizeWidth(newWidth);
             }
         }
+        if(this.eventHandlers.drag) {
+            this.eventHandlers.drag();
+        }
     }
 
     dragend(e) {
