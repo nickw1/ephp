@@ -224,30 +224,6 @@ class App {
 
         window.addEventListener("resize",this.onResize.bind(this)); 
         var origWidth, netWidth = 400;
-
-        var networkShowDiv = document.createElement("div");
-        networkShowDiv.style.backgroundColor = '#ffffe0';
-        networkShowDiv.style.width='75px';
-        networkShowDiv.style.border='ridge';
-        var cloudImg = new Image();
-        cloudImg.src='assets/images/rgtaylor_csc_net_wan_cloud.vsmall.png';
-        networkShowDiv.appendChild(cloudImg);
-        networkShowDiv.addEventListener('click', ()=> {
-            var netCont = document.getElementById('networkContainer'),
-                net = document.getElementById('network');
-            netCont.removeChild(networkShowDiv);
-            net.style.display='block';
-            netCont.style.width=netWidth+'px';
-            netCont.style.height='100%';
-            netCont.fullResizeWidth(netWidth);
-            var csWidth= ((origWidth-netWidth)/2)+'px';
-            document.getElementById('server').style.width = csWidth;
-            document.getElementById('client').style.width = csWidth;
-            this.httpAnim.setActive(true);
-            this.httpAnim.clearCanvas();
-            rw.showResizer(netCont, true);
-        });
-
         this.onResize();
 
         this.settings = { narrative: true, server_anim: true, http_anim: true };
