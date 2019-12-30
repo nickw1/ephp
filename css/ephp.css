@@ -31,8 +31,13 @@ body
 }
 
 #titlecontainer, #login {
-    margin-top: auto;
-    margin-bottom: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#login a {
+    margin: 5px;
 }
 
 #ephp_overall_container {

@@ -349,7 +349,7 @@ class App {
                     this.httpAnim.setLoggedIn(json.loggedin);
                     document.getElementById("login").innerHTML = 
                                 "Logged in as " + this.loggedin +
-                                " <a href='php/logout.php'>Logout</a>"+
+                                "<a href='php/logout.php'>Logout</a>"+
                                 "<div id='settings'><img id='settingsImg' src='assets/images/settings.png' alt='Settings' /><div id='settingsControl'></div></div>";
                     this.setupModeDisplay();
                     this.loadBackedUpFile();

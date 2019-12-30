@@ -16,10 +16,7 @@ class EPHPPage extends Page {
         </div>
         <div id="login">
         <?php
-       if(isset($_SESSION["ephpuser"])) {
-            echo "Logged in as $_SESSION[ephpuser]";
-            echo " <a href='ftp/logout.php'>Logout</a>";
-        } else {
+       if(!isset($_SESSION["ephpuser"])) {
         ?>
         <form method="post" action="ftp.php">
         <label for="ephp_username">Username:</label>
