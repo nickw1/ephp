@@ -96,6 +96,7 @@ class EPHPHttpAnimation extends GenericAnimation  {
         // Only makes sense if the canvas is embedded within the page layout
         // Will not make sense if the canvas is being drawn on a dialog
         this.canvas.height = this.parentElement.clientHeight - 40;
+        this.canvas.width = this.parentElement.clientWidth;
     }
 }
 
