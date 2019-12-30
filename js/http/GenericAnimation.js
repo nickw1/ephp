@@ -25,7 +25,7 @@ class GenericAnimation extends Eventable {
         this.parentElement = options.parent || (options.parentId ? document.getElementById(options.parentId) : null);
         this.box = new MessageBox(null, { parent: this.parentElement, editable: options.msgBoxEditable!==false, width: options.msgBoxWidth||'400px', height: options.msgBoxHeight||'400px' });
         this.setMessage(options.message);
-        this.canvas.setAttribute("height", options.height || this.parentElement.clientHeight - 40); // -40 for control panel
+        this.canvas.setAttribute("height", options.height || this.parentElement.clientHeight - 32); // -32 for control panel
         this.canvas.setAttribute("width", this.parentElement.clientWidth); 
         console.log(`width and height; ${this.canvas.width} ${this.canvas.height}`);
 

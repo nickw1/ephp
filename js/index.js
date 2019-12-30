@@ -15,7 +15,6 @@ class App {
         this.mode=0;
         this.savedLoginHTML=""; 
         this.origLoginDivContents = "";
-        this.canvasHeight = document.getElementById('network').clientHeight - 32;
 
         this.fileExplorer=new FileExplorer('serverContent', 
             {http: 'php/fs.php',
@@ -45,7 +44,6 @@ class App {
                                         consoleElement: "console"});
 
         this.httpAnim = new EPHPHttpAnimation({parentId: 'network',
-                                    height:this.canvasHeight,
                                     interval: 20,
                                     step : 2,
                                     fileExplorer: this.fileExplorer,
