@@ -5,7 +5,7 @@ class PendingHttpRequest extends Eventable {
         super();
         this.url = options.url;
         this.method = options.method.toUpperCase();
-        this.formData = options.formData;
+        this.formData = options.formData || new FormData();
         this.server = options.server;
         this.sourceRetriever=options.sourceRetriever;
         this.editableResponse = { headers: {}, content: null };
@@ -172,6 +172,26 @@ class PendingHttpRequest extends Eventable {
 
     finish() {
         this.eventHandlers["responsereceived"](this.editableResponse);
+    }
+
+    getData() {
+        const get = {};
+        const qs = this.url.split("?");
+        if(qs[1]) {
+            qs[1].split('&').forEach( kv => {
+                const kvarr = kv.split('=');
+                get[kvarr[0]] = kvarr[1];
+            });
+        }
+        return get;
+    }
+
+    postData() {
+        const post = {};
+        for(let data of this.formData.entries()) {
+            post[data[0]] = data[1];
+        }
+        return post;
     }
 }
 

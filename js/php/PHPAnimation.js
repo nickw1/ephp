@@ -67,6 +67,20 @@ class PHPAnimation {
         this.loops = {};
 
         this.setupGUI();
+
+        this.dlg = new Dialog('serverContent', {
+                    'OK' : ()=> { 
+                        this.dbgMsgQueue.start(); 
+                        this.dlg.hide();
+                    }
+                },
+                { position: 'absolute',
+                left: '25%',
+                top: '100px',
+                border: '1px solid black',
+                width: '50%',
+                backgroundColor: '#ffffc0' } 
+        );
     }
 
 
@@ -168,10 +182,21 @@ class PHPAnimation {
     
         let http = null;    
         if((http = this.extractHttpVar(this.codeLines[data.lineno - 1].firstChild.nodeValue)) !== null) {
-            this.httpVars[http.phpVar] = { lineno: data.lineno, httpVar: http.httpVar}; 
+            if(http.method != this.httpRequest.method) {
+                this.dbgMsgQueue.stop();
+                this.dlg.setContent(`This script was requested with a method of ${this.httpRequest.method}, but this line is trying to use $_${http.method} to read in the data sent to it. Try changing it to $_${this.httpRequest.method}.`);
+                this.dlg.show();
+            } else if (this.httpRequest[http.method][http.httpVar]) {
+                this.httpVars[http.phpVar] = { lineno: data.lineno, httpVar: http.httpVar}; 
+            } else {
+                this.dbgMsgQueue.stop();
+                this.dlg.setContent(`You are trying to read in an item of ${http.method} data named '${http.httpVar}', however this does not exist. If using a form, make sure there's a field called '${http.httpVar}' or change your $_${http.method} statement to use the correct form field. If using a query string, ensure there is a variable called '${http.httpVar}' in your query string.`);
+                this.dlg.show();
+            }
         }
 
         for(let varName in data.vars) {
+            console.log(`${varName} is a ${data.vars[varName].type}`);
             switch(data.vars[varName].type) {
                 case 'string':
                 case 'int':
@@ -295,9 +320,12 @@ class PHPAnimation {
             comment.appendChild(document.createTextNode("//"+value));
             comment.style.backgroundColor = PHPAnimation.colours[this.colourCount%PHPAnimation.colours.length];
             this.codeLines[lineno-1].appendChild(comment);
-            this.browserCallback(httpvar, PHPAnimation.colours[this.colourCount%PHPAnimation.colours.length]);
-            this.varComments[lineno]=value;
-            this.colourCount++;
+            const retval = this.browserCallback(httpvar, PHPAnimation.colours[this.colourCount%PHPAnimation.colours.length]);
+            console.log(`browserCallback returned ${retval} for ${httpvar}`);
+            if(retval) {
+                this.varComments[lineno]=value;
+                this.colourCount++;
+            } 
         }
     }
 

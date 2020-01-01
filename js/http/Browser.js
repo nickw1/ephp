@@ -251,9 +251,11 @@ class Browser extends Eventable {
                 if(forms[i].elements[j].name==fieldName) {
                     forms[i].elements[j].style.backgroundColor = colour;
                     this.selectedField = forms[i].elements[j];
+                    return true;
                 }
             }
         }
+        return false;
     }
 
     setCode (code) {
