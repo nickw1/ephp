@@ -14,9 +14,9 @@ class NarrativeDialog extends Eventable {
                 top: 'calc(50% - 200px)',
                 border: '1px solid black',
                 width: '50%',
-                backgroundColor: '#ffffc0',
-                filter: 'grayscale(0%)',
-                height: '400px' } );
+                backgroundColor: '#ffffc0'//,
+                //height: '400px' 
+				} );
 
         const narrativeOptions = {elem : this.dlg.div, narrative: options.narrative};
         this.narrative = new Narrative(narrativeOptions);

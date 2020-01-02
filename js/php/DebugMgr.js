@@ -73,14 +73,14 @@ class DebugMgr {
         const xhr = new XMLHttpRequest();
         xhr.addEventListener("load", e=> {    
             if(e.target.status != 200) {
-                alert(`HTTP error ${e.target.status}`);
+                this.dbgMsgHandler.showError(`HTTP error ${e.target.status}`);
             } else if(this.completeCallback != null) {
                console.log("debug session finished: "+
                 "Sending completeCallback with response: " + 
                 e.target.responseText);
 
                 if(e.target.responseText.indexOf("Parse error") >=0) {
-                     alert("Syntax error in your PHP script.  Details: " + e.target.responseText.substr (e.target.responseText.  indexOf(":")+1).  replace(/<[^>]+>/g, ""));
+                     this.dbgMsgHandler.displayError("<p><strong>Syntax error in your PHP script.</strong><?p><p>Details: " + e.target.responseText.substr (e.target.responseText.  indexOf(":")+1).replace(/<[^>]+>/g, "")+"</p><p><em>If you do not see an error in that line, try looking at the line above.</em</p>");
                 }
                 this.completeCallback(e.target);
             }

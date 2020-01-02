@@ -36,9 +36,6 @@ class EPHPHttpAnimation extends GenericAnimation  {
         const urlParts = this.message.url.split('/');
         const isPHP = this.message.isPHPScript();
 
-        console.log(`GET data: ${JSON.stringify(this.message.getData())}`);
-        console.log(`POST data: ${JSON.stringify(this.message.postData())}`);
-
         this.serverAnimation.httpRequest = { method: this.message.method, 'GET': this.message.getData(), 'POST': this.message.postData() }; 
 
         var sa = new ServerFilesystemAnimation(
@@ -75,7 +72,7 @@ class EPHPHttpAnimation extends GenericAnimation  {
                     },
                     onError: code => {
                         this.message.setErrorResponse(code);
-                        this.animation.startResponse();
+                        this.startResponse();
                     }
                 });
             } else {
