@@ -187,7 +187,7 @@ class PHPAnimation {
             } else if (this.httpRequest[http.method][http.httpVar]) {
                 this.httpVars[http.phpVar] = { lineno: data.lineno, httpVar: http.httpVar}; 
             } else {
-                this.displayError(`You are trying to read in an item of ${http.method} data named '${http.httpVar}', however this does not exist. If using a form, make sure there's a field called '${http.httpVar}' or change your $_${http.method} statement to use the correct form field. If using a query string, ensure there is a variable called '${http.httpVar}' in your query string.`);
+                this.displayError(`<p>You are trying to read in an item of ${http.method} data named '${http.httpVar}', however this does not exist.</p><p>` + (http.method=='POST' ? 'M': 'If using a form, m') + `ake sure there's a form field called '${http.httpVar}' or change your $_${http.method} statement to use the correct form field.</p>` + (http.method=='POST' ? '' :`<p>If using a query string, ensure there is a variable called '${http.httpVar}' in your query string.</p>`));
             }
         }
 
