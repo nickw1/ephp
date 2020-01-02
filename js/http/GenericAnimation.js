@@ -109,7 +109,7 @@ class GenericAnimation extends Eventable {
     setMessage (message) {
         if(message) {
             this.message=message;
-            this.message.on("responseprocessed", this.startResponse.bind(this));
+//            this.message.on("responseprocessed", this.startResponse.bind(this));
             this.box.message=message;
         }
     }
@@ -197,9 +197,6 @@ class GenericAnimation extends Eventable {
             }
             
             if(this.animationState==GenericAnimation.messageTypes.REQUEST) {
-                // NEW onrequestend is an event handler which runs when the
-                // request has reached its destination. This would for example
-                // run the PHPAnimation (or whatever)
                 this.finishRequest();
                 
             } else if (this.animationState==GenericAnimation.messageTypes.RESPONSE) {

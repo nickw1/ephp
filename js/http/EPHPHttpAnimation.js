@@ -33,11 +33,16 @@ class EPHPHttpAnimation extends GenericAnimation  {
     // starts up the ServerFilesystemAnimation and debugging 
     finishRequest() {
 
-        const urlParts = this.message.url.split('/');
-        const isPHP = this.message.isPHPScript();
 
         this.serverAnimation.httpRequest = { method: this.message.method, 'GET': this.message.getData(), 'POST': this.message.postData() }; 
 
+        this.message.on("responseprocessed", this.actualRequestDone.bind(this));
+        this.message.send();
+    }
+
+    actualRequestDone() {
+        const isServerSideScript = this.message.isServerSideScript();
+        const urlParts = this.message.url.split('/');
         var sa = new ServerFilesystemAnimation(
                 {fileExplorer: this.fileExplorer,
                 urlParts: urlParts,
@@ -46,29 +51,29 @@ class EPHPHttpAnimation extends GenericAnimation  {
                 callback: ()=> {
                     if(window.app.settings.narrative) {
                         const narrative = new NarrativeDialog({elemId: 'serverContent', 
-                            narrative:`<h2>Web server has received request!</h2><p>The web server software has received a request for ${this.message.url}.</p>` + (isPHP ? "<p>This is a PHP script, so it will be run by the web server software's PHP module.</p>" : "<p>This is a static file, so it will be sent straight back to the client.</p>")});
-                        narrative.on("dismissed", this.finishRequestPostNarrative.bind(this, isPHP));
+                            narrative:`<h2>Web server has received request!</h2><p>${this.message.httpServer} has received a request for ${this.message.url}.</p>` + (isServerSideScript ? `<p>This is a ${window.app.config.language} script, so it will be run by ${this.message.httpServer}'s ${window.app.config.language} module.</p>` : "<p>This is a static file, so it will be sent straight back to the client.</p>")});
+                        narrative.on("dismissed", this.finishRequestPostNarrative.bind(this, isServerSideScript));
                         narrative.show();
                     } else {
-                        this.finishRequestPostNarrative(isPHP);
+                        this.finishRequestPostNarrative(isServerSideScript);
                     }
                 }
             });
         sa.animate();
     }
 
-    finishRequestPostNarrative(isPHP) {
-        if(isPHP) {
+    finishRequestPostNarrative(isServerSideScript) {
+        if(isServerSideScript) {
             var debugMgr = new DebugMgr( { dbgMsgHandler: this.serverAnimation, user: this.loggedInUser } );
             if(window.app.settings.server_anim) {
                 this.message.retrieveSrc ( { 
                     onSuccess: data => {
                             if(data.errors) {
-                            alert("error(s):\n" + data.errors.join("\n"));
-                        } else {
-                            this.serverAnimation.showSrc(data);
-                            this.launchDebug(debugMgr);
-                        }
+                                alert("error(s):\n" + data.errors.join("\n"));
+                            } else {
+                                this.serverAnimation.showSrc(data);
+                                this.launchDebug(debugMgr);
+                            }
                     },
                     onError: code => {
                         this.message.setErrorResponse(code);
@@ -76,11 +81,11 @@ class EPHPHttpAnimation extends GenericAnimation  {
                     }
                 });
             } else {
-                debugMgr.setCompleteCallback (this.message.processResponse.bind(this.message));
+                debugMgr.setCompleteCallback (this.startResponse.bind(this));
                 debugMgr.requestScriptAjax(this.message.method, this.message.url, this.message.formData, false);
             }
         } else {
-             this.message.send();
+            this.startResponse();
         }
     }
 

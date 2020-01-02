@@ -27,8 +27,6 @@ class DBAnimation extends GenericAnimation  {
         this.ctx.fillStyle = 'white';
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         this.ctx.drawImage(this.phpScriptImg, 0, (this.canvas.height - this.phpScriptImg.height) / 2);    
-        this.ctx.drawImage(this.phpScriptImg, this.marginLeft, (this.canvas.height - this.phpScriptImg.height) / 2);    
-        this.ctx.drawImage(this.dbImg, this.canvas.width - this.dbImg.width*2, (this.canvas.height - this.dbImg.height) / 2);    
         this.ctx.drawImage(this.dbImg, this.canvas.width - this.dbImg.width, (this.canvas.height - this.dbImg.height) / 2);    
         this.ctx.rect(this.marginLeft, 0, this.canvas.width-this.marginLeft-this.marginRight,this.canvas.height);
         this.ctx.clip();

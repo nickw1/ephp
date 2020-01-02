@@ -28,12 +28,12 @@ class PendingHttpRequest extends Eventable {
         }
     }
 
-    isPHPScript() {
+    isServerSideScript() {
         var noQsUrl = this.url.indexOf("?")==-1 ? this.url: this.url.split("?")[0];
-        return noQsUrl.substring(noQsUrl.length-4)==".php";
+        return noQsUrl.substring(noQsUrl.length-4)==`.${window.app.config.extension}`;
     }
 
-    // immadiateCallback() runs as soon as we have sent
+    // immediateCallback() runs as soon as we have sent
     // it might for example run the http response part of an animation, to ensure
     // we have the response available
     // 251119 change to call on callback
@@ -116,6 +116,8 @@ class PendingHttpRequest extends Eventable {
             var curHeader = responseHeaders[i].split(": ");
             if(curHeader[0].toLowerCase()!="server") {
                 this.editableResponse.headers[curHeader[0].toLowerCase()] = curHeader[1];
+            } else {
+                this.httpServer = curHeader[1].split("/")[0];
             }
         }
 

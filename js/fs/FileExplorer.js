@@ -178,8 +178,7 @@ class FileExplorer {
                     var ext = json.content[i].name.substr
                     (json.content[i].name.lastIndexOf(".")+1);
                     type = ext=="html" ? FileExplorer.filetypes.HTML :
-                    (ext=="php" ? FileExplorer.filetypes.PHP :    
-                        FileExplorer.filetypes.UNKNOWN);    
+                    (ext==window.app.config.extension ? FileExplorer.filetypes.SCRIPT :    FileExplorer.filetypes.UNKNOWN);    
                     name=json.content[i].name;
                 }
             
@@ -294,7 +293,7 @@ class FileExplorer {
     }
 }
 
-FileExplorer.filetypes = { UNKNOWN: 0, DIR: 1, HTML: 2, PHP: 3};
+FileExplorer.filetypes = { UNKNOWN: 0, DIR: 1, HTML: 2, SCRIPT: 3};
 FileExplorer.images = ['unknown.png', 'folder.png', 'html.png', 'script.png'];
 
 module.exports = FileExplorer;

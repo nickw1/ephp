@@ -1,5 +1,7 @@
 {
     "ephproot": "ephp",
     "ftp" : 1,
-    "sockserver" : "localhost"
+    "sockserver" : "localhost",
+    "language": "PHP",
+    "extension" : "php"
 }

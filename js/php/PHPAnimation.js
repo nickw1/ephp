@@ -99,7 +99,7 @@ class PHPAnimation {
         this.btndiv = document.createElement("div");
         this.runBtn = document.createElement("input");
         this.runBtn.setAttribute("type","button");
-        this.runBtn.setAttribute("value","Send back output from PHP");
+        this.runBtn.setAttribute("value",`Send back output to client`);
         this.runBtn.addEventListener("click", ()=> {
             this.showing=false;
             this.dbWindow.innerHTML = this.outputWindow.innerHTML = "";
@@ -334,7 +334,7 @@ class PHPAnimation {
         this.dbgMsgQueue.stop();
         if(window.app.settings.narrative) {
             const narrative = new NarrativeDialog({ elemId: 'ephp_container',
-                        narrative:`<h2>SQL Query found!</h2><p>Your PHP script is going to send an SQL query to the MySQL server.</p><p>Query is: <strong>${res.sql}</strong>.</p><p>Click below to send it.</p>`
+                        narrative:`<h2>SQL Query found!</h2><p>Your ${window.app.config.language} script is going to send an SQL query to the MySQL server.</p><p>Query is: <strong>${res.sql}</strong>.</p><p>Click below to send it.</p>`
             });
             narrative.on("dismissed", this.doLaunchSqlAnimation.bind(this, res));
             narrative.show();
