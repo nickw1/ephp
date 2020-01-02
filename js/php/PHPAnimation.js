@@ -210,34 +210,42 @@ class PHPAnimation {
                     break;
     
                 case 'object':
-                    if(window.app.settings.db_anim && data.vars[varName].classname=='PDOStatement' && data.vars[varName].value.queryString) {
-                        // send off queryString to PHP SQL parser/processor
-                        if(!this.doneSql[varName]) {
-                            this.doneSql[varName] = true;
-                            fetch(`php/sql.php?sql=${data.vars[varName].value.queryString}&fileuri=${this.dbgMsgQueue.fileuri}&resultvar=${varName.replace('$','')}`)
-                                .then(response => response.json())
-                                .then(data => {
-                                    if(data.loopBounds && 
-                                       data.loopBounds.start && 
-                                       data.loopBounds.end) {
-                                        this.loops[varName] = { lines: data.loopBounds, lastLineNo: Number.MAX_VALUE };
-                                }
-                                this.launchSqlAnimation(data);
-                            });
-                        } 
+                    switch(data.vars[varName].classname) {
+                        case "PDOStatement":
+                            if(window.app.settings.db_anim && data.vars[varName].value.queryString) {
+                                // send off queryString to PHP SQL parser/processor
+                                if(!this.doneSql[varName]) {
+                                    this.doneSql[varName] = true;
+                                    fetch(`php/sql.php?sql=${data.vars[varName].value.queryString}&fileuri=${this.dbgMsgQueue.fileuri}&resultvar=${varName.replace('$','')}`)
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            if(data.loopBounds && 
+                                               data.loopBounds.start && 
+                                               data.loopBounds.end) {
+                                                this.loops[varName] = { lines: data.loopBounds, lastLineNo: Number.MAX_VALUE };
+                                        }
+                                        this.launchSqlAnimation(data);
+                                    });
+                                } 
+                            }
+                            break;
+    
+                        case "PDOException":
+                            this.displayError(`<strong>MySQL Error</strong><p>${data.vars[varName].value.message}</p>`);
+                            break;
                     }
                     break;
+                } 
+            if(this.varsBox) {
+                this.varsBox.setMultipleVars(data.vars);
             }
-        }
-        if(this.varsBox) {
-            this.varsBox.setMultipleVars(data.vars);
-        }
-        for(let vname in this.loops) {
-            if(data.lineno >= this.loops[vname].lines.start && data.lineno <= this.loops[vname].lines.end) {
-                if(data.lineno < this.loops[vname].lastLineNo) {
-                    this.dbResults.highlightNextRow();
-                }            
-                this.loops[vname].lastLineNo = data.lineno;
+            for(let vname in this.loops) {
+                if(data.lineno >= this.loops[vname].lines.start && data.lineno <= this.loops[vname].lines.end) {
+                    if(data.lineno < this.loops[vname].lastLineNo) {
+                        this.dbResults.highlightNextRow();
+                    }            
+                    this.loops[vname].lastLineNo = data.lineno;
+                }
             }
         }
     }
