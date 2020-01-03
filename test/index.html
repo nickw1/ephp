@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script type='text/javascript' src='bundle.js' defer></script>
+</head>
+<body>
+<h1>EPHP Tester</h1>
+<p>This will test the EPHP websocket server by firing a certain number of
+simultaneous requests at it. It assumes a table called 'songs' containing
+music data, and a 'basicsearch.php' script in each home 
+directory to search for a given artist (provided here). The chosen artists are 
+the artists with the most UK number ones (so that many results appear). Feel 
+free to create your own database and modify the artist list, or even use 
+something unrelated to music.</p>
+<div>
+Limit:
+<input id="limit" type="number" min="1" max="20"value="10" />
+<input type='button' id='go' value='go' />
+</div>
+
+<div id='output' style='width: 1024px; height:768px; overflow:auto; font-family: monospace'></div>
+
+</body>
+</html>
