@@ -28,7 +28,7 @@ class DebugMgr {
                     case 'opened':
                         this.requestScriptAjax(method, scriptUrl, userFormData);
                         break;
-"body"
+
                     case 'stop':
                         this.dbgMsgHandler.handleStop();
                         break;
