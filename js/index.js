@@ -22,13 +22,13 @@ class App {
             'client',
             { showContentCallback: (mime,src,webdirPath, webdirUrl)=> {
                     this.saveOld(()=> {
-                        this.browser.setContent(mime,src);
-                        this.browser.setFreezeAlteredStatus(false);
                         this.fileInfo = this.newFileInfo;
                         var filePath = webdirUrl+this.fileInfo.dir.substr(1);
+                        console.log(`Calling setWebDir with ${filePath}`);
                         this.browser.setWebDir(filePath);       
+                        this.browser.setContent(mime,src);
+                        this.browser.setFreezeAlteredStatus(false);
                         this.browser.setFile(this.fileInfo.file);
-                        this.browser.loadExternalCSS();
                         this.browser.markUnaltered();
                         this.newFileInfo = null;
                         if(this.mode==0) {
@@ -352,6 +352,7 @@ class App {
                                         // work if the backedup file was not
                                         // in the user's web root directory.
                                         if(this.loggedin!=null) {
+                                        console.log(`Calling setWebDir with /~${this.loggedin}`);
                                             this.browser.setWebDir('/~' + this.loggedin);
                                             this.browser.setFile(json.filename);
                                         }

@@ -2,7 +2,7 @@
 class FileExplorer {
 
     constructor(divId, urls, dropId, callbacks) {
-		console.log(`divId=${divId}`);
+        console.log(`divId=${divId}`);
         var container = document.getElementById(divId);
         var toolbar = document.createElement("div");
         var trash = document.createElement("img");
@@ -38,6 +38,7 @@ class FileExplorer {
                 var dataTextPlain = e.dataTransfer.getData("text/plain");
                 this.curFile = dataTextPlain;
                 if(this.callbacks.fileInfoCallback) {
+                    console.log(`calling fileInfoCallback with : ${JSON.stringify(this.getFileInfo())}`);
                     this.callbacks.fileInfoCallback(this.getFileInfo());
                 }
                 this.sendAjax({name: dataTextPlain});
@@ -85,7 +86,7 @@ class FileExplorer {
     sendAjax(options) {
         options = options || {};
         var url;
-		let callback = null;
+        let callback = null;
         if(options.name) {
             url = (this.ftpUrl ? this.ftpUrl:this.serverUrl) + 
             "?dir="+this.dir+"&file="+options.name;

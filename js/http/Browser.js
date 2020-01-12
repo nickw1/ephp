@@ -2,6 +2,7 @@
 
 const Eventable = require('../gen/Eventable');
 const PendingHttpRequest = require("./PendingHttpRequest");
+const BrowserRendererComponent = require('./BrowserRendererComponent');
 
 class Browser extends Eventable {
 
@@ -30,10 +31,9 @@ class Browser extends Eventable {
                         });
         this.addressDiv.appendChild(this.addressButton);
         this.div.appendChild(this.addressDiv);
-        this.nonHTMLContainer = document.createElement("div");
-        this.content = document.createElement("div");
-        this.div.appendChild(this.nonHTMLContainer);
-        this.div.appendChild(this.content);
+        this.browserRenderer = document.createElement("browser-renderer");
+        this.browserRenderer.onSendRequest = this.sendRequest.bind(this);
+        this.div.appendChild(this.browserRenderer);
         if(this.animation!=null) {
             if(this.animation.serverAnimation != null) {
                 this.animation.serverAnimation.browserCallback =
@@ -51,18 +51,17 @@ class Browser extends Eventable {
         this.editor.setTheme('ace/theme/monokai');
         this.editor.on("change", (e)=> {
             if(!this.lock) {
-                this.showContent('text/html', this.editor.getValue());
+                this.browserRenderer.showContent('text/html', this.editor.getValue());
             } 
             if(!this.alteredStatusFrozen) {
                 this.altered=true;
             }
-                });
+        });
         this.addedCssRules = [];
         this.setRequestingState(false);
 
         this.animation.on("messagestart",this.setRequestingState.bind(this,true));
         this.animation.on("messageend", this.setRequestingState.bind(this,false));
-
         this.doAnimation = true;
     }
 
@@ -148,8 +147,8 @@ class Browser extends Eventable {
         if(status==200) {
 
             // Use either supplied parameters (e.g. changed in the animation)
-            // or oriignal parameters from original ajax request
-            this.webDir = url.substr (0,url.lastIndexOf("/"));
+            // or original parameters from original ajax request
+            this.setWebDir(url.substr (0,url.lastIndexOf("/")));
             var urlComponents = url.indexOf('?')==-1 ? [url]:
                 url.split('?');
             if(urlComponents.length>1) {
@@ -170,82 +169,13 @@ class Browser extends Eventable {
             }
                 
         } else {
-            this.showHTMLMsg('HTTP error: ' + status + ' ' + statusText);
+            this.browserRenderer.showHTMLMsg('HTTP error: ' + status + ' ' + statusText);
         } 
-    }
-
-    showHTMLMsg (msg) {
-        this.nonHTMLContainer.innerHTML = "";
-        if(this.shadow) {
-            this.shadow.innerHTML = msg;
-        } else {
-            this.content.innerHTML = msg;
-        }
-    }
-
-        
-    showContent (mimetype, responseText) {
-        this.nonHTMLContainer.innerHTML = "";
-        if (mimetype=='text/plain') {
-            if(this.shadow) {
-                this.shadow.innerHTML = "";
-            } else {
-                this.content.innerHTML = "";
-            }
-            
-            var pre = document.createElement("pre");
-            pre.appendChild
-                    (document.createTextNode(responseText));
-            this.nonHTMLContainer.appendChild(pre);
-        } else {
-            // remove any old added css rules
-            // we added them to the beginning of styleshset 0, so this should work
-            for(var i=0; i<this.addedCssRules.length; i++) {
-                document.styleSheets[0].deleteRule(0);
-            }
-            this.addedCssRules = [];
-
-            // To get at the CSS rules of the document returned, we need to 
-            // create a temporary HTML DOM document and read the rules from that.
-            // developer.mozilla.org/en-US/Add-ons/Code_snippets/
-            // HTML_to_DOM#Parsing_Complete_HTML_to_DOM
-
-            this.div.style.position="relative";
-            this.content.innerHTML = "";
-            if(this.content.attachShadow) { // shadow DOM in Chrome dnd now Firefox
-                if(!this.shadow) {
-                    this.shadow = this.content.attachShadow({mode:'open'});
-                }
-                this.shadow.innerHTML = responseText;
-            } else { // no shadow - below works in Firefox
-                // Shadow DOM now works in Firefox so remove this stuff
-            }
-
-            this.doFormEventListeners();
-            this.doLinkEventListeners();
-
-        }
-    }
-
-    showImage (url) {
-        var img = new Image();
-        img.onerror = ()=> {
-            this.showHTMLMsg( url + 
-                " could not be loaded as it is an invalid image.");
-            };
-        img.src = url; 
-        img.onload = ()=> {
-            this.showHTMLMsg("");
-            this.nonHTMLContainer.innerHTML = "";
-            this.nonHTMLContainer.appendChild(img);
-        };
     }
 
     highlightFormField (fieldName, colour) {
         console.log(`****highlightFormField() : ${fieldName} ${colour}`);
-        var forms = this.shadow ? 
-                this.shadow.querySelectorAll("form"):
-                this.content.getElementsByTagName("form");
+        var forms = this.browserRenderer.shadow.querySelectorAll("form");
         for(var i=0; i<forms.length; i++) {
             for(var j=0; j<forms[i].elements.length; j++) {
                 if(forms[i].elements[j].name==fieldName) {
@@ -265,7 +195,7 @@ class Browser extends Eventable {
     setContent (mime,code) {
         this.editor.setValue(code);
 //    this.refresh();
-        this.showContent(mime, code);
+        this.browserRenderer.showContent(mime, code);
         this.markUnaltered();
     }
         
@@ -274,7 +204,7 @@ class Browser extends Eventable {
     }
 
     getContentArea() {
-        return this.content;
+        return this.browserRenderer.innerHTML;
     }
 
     markUnaltered() {
@@ -287,47 +217,22 @@ class Browser extends Eventable {
 
     setWebDir(dir){
         this.webDir = dir; 
+        this.browserRenderer.setWebDir(this.webDir);
+        console.log(`Setting webDir: dir ${dir} webDir ${this.webDir}`);
     }
 
     setFile(file) {
         this.addressBox.value = this.webDir + "/" +file;
     }
 
-    loadExternalCSS() {
-        var match =this.shadow.innerHTML.match
-            (/<link[^>]+href="([A-Za-z0-9_\-]+.css)"[^>]*>/);
-        if(match)  {
-            var xhr = new XMLHttpRequest();
-            xhr.addEventListener("load", e=> {    
-                if(e.target.status != 200) {
-                    console.log(`WARNING: Could not load external CSS: ${e.target.status}`);
-                } else {
-                    this.lock = true;
-                    this.shadow.innerHTML += '<style>'+ 
-                        xmlhttp.responseText.replace("body",":host")+ 
-                            '</style>';
-                    this.lock = false;
-                    // Adding the CSS to the innerHTML of shadow seems to screw up
-                    // the event listeners we added to our form submit buttons.
-                    // So add them again.
-                    this.doFormEventListeners();
-                    this.doLinkEventListeners();
-
-                } 
-            });
-            xhr.open("GET", `${this.webDir}/${match[1]}`);
-            xhr.send();
-        }
-    }
 
     loadDocumentOrImage(mimetype, url, responseText) {
         if(mimetype=='image/jpeg' || mimetype=='image/png' ||
                     mimetype=='image/jpg') { 
-            this.showImage(url);
+            this.browserRenderer.showImage(url);
             this.markUnaltered();
         } else if (mimetype=='text/html' || mimetype=='text/plain') {
             this.setContent(mimetype, responseText);
-            this.loadExternalCSS();
         } else {
             this.setContent('text/html', 
                 'This browser does not recognise the content type '+ mimetype);
@@ -344,58 +249,6 @@ class Browser extends Eventable {
 
     setAnimation(doAnimation) {
         this.doAnimation = doAnimation;
-    }
-
-    doFormEventListeners() {
-        var forms = this.shadow ? 
-                this.shadow.querySelectorAll("form"):
-                this.content.getElementsByTagName("form");
-
-        for(var i=0; i<forms.length; i++) {    
-            forms[i].addEventListener("submit", (function(form,e){
-                e.preventDefault();
-                var actionLocalUrl = form.action.substring
-                            (form.action.lastIndexOf("/")+1);
-                var formData = new FormData();
-                var qs="";
-                switch(form.method.toUpperCase()) {
-                    case 'POST':
-                        for(var j=0; j<form.elements.length; j++) {
-                            if(form.elements[j].type!="submit") {
-                                formData.append(form.elements[j].name, 
-                                    form.elements[j].value);    
-                            }
-                        }
-                        break;
-
-                    case 'GET':
-                        for(var j=0; j<form.elements.length; j++) {
-                            var el = form.elements[j];
-                            if(form.elements[j].type!="submit") {
-                                qs+= (qs=="" ? "?":"&");
-                                qs += form.elements[j].name+ "="+form.elements[j].value;
-                            }
-                        }
-                        break;
-                    }
-                actionLocalUrl+=qs;
-                this.sendRequest(form.method,
-                            this.webDir+"/"+actionLocalUrl,formData);
-            }).bind(this,forms[i]));    
-        }
-    }
-
-    doLinkEventListeners() {
-        var links = this.shadow ?
-                    this.shadow.querySelectorAll("a"):
-                    this.content.getElementsByTagName("a"); 
-        for(var i=0; i<links.length; i++) {
-            links[i].addEventListener("click", (e)=> {
-                e.preventDefault();
-                var href=e.target.getAttribute("href");
-                this.sendRequest('GET', href.substr(0,7)=="http://" ? href: this.webDir+"/"+href);
-            });
-        }
     }
 }
 

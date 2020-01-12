@@ -1,0 +1,12 @@
+{
+  "name": "ephp",
+  "version": "0.3.0",
+  "description": "EPHP - JavaScript",
+  "main": "index.js",
+  "dependencies": {
+    "css": "^2.2.4"
+  },
+  "devDependencies": {},
+  "author": "Nick Whitelegg",
+  "license": "GPL-3.0-or-later"
+}
