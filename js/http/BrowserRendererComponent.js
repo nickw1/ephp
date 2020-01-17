@@ -24,6 +24,7 @@ class BrowserRendererComponent extends HTMLElement {
         } else {
             this.shadow.innerHTML = `<div>${responseText}</div>`;
             this.loadExternalCSS().then( result => {
+                this.fixImages();
                 this.doFormEventListeners();
                 this.doLinkEventListeners();
             });
@@ -85,6 +86,16 @@ class BrowserRendererComponent extends HTMLElement {
                 this.onSendRequest('GET', href.substr(0,7)=="http://" ? href: this.webDir+"/"+href);
             });
         }
+    }
+
+    fixImages() {
+        const images = this.shadow.querySelectorAll("img");
+        const regexp=/^https?:\/\//;
+        images.forEach(img=> {
+            const srcAttr = img.getAttribute("src");
+            img.src = (srcAttr.match(regexp) || srcAttr.substr(0, this.webDir.length) == this.webDir) ? img.src: `${this.webDir}/${srcAttr}`;
+            console.log(`Img src now ${img.src}`)
+        });
     }
 
     setWebDir(dir) {
