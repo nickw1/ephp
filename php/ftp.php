@@ -38,7 +38,7 @@ if (($output["status"] = $ftp->connect()) == 0) {
                     $output["content"] = $dlresult["content"];
                     $output["webdirUrl"] = $dlresult["webdirUrl"];
                     $output["webdirPath"] = $dlresult["webdirPath"];
-                    $output["contentType"] = "text/html";
+                    $output["contentType"] = $dlresult["contentType"]; 
                 }
                 break;
             case 'POST':

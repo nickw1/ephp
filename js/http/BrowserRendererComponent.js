@@ -14,6 +14,7 @@ class BrowserRendererComponent extends HTMLElement {
     }
 
     showContent (mimetype, responseText) {
+		console.log(`showContent(): ${mimetype} ${responseText}`);
         this.shadow.innerHTML = "";
         if (mimetype=='text/plain') {
  
@@ -21,7 +22,13 @@ class BrowserRendererComponent extends HTMLElement {
             pre.appendChild
                     (document.createTextNode(responseText));
             this.shadow.appendChild(pre);
-        } else {
+        } else if (mimetype.substr(0,5)=='image') {
+			const img = new Image();
+			img.src = `data:${mimetype};base64,${responseText}`;
+        	img.onload = ()=> {
+				this.shadow.appendChild(img);
+			};
+		} else  {
             this.shadow.innerHTML = `<div>${responseText}</div>`;
             this.loadExternalCSS().then( result => {
                 this.fixImages();
@@ -36,8 +43,9 @@ class BrowserRendererComponent extends HTMLElement {
         const img = new Image();
         img.onerror = this.showHTMLMsg.bind(this, `${url} could not be loaded as it is an invalid image.`);
         img.src = url;
-        image.onload = this.shadow.appendChild.bind(this.shadow, img);
-        
+        img.onload = ()=> {
+			this.shadow.appendChild(img);
+		};
     }
 
     loadExternalCSS() {

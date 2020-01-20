@@ -193,8 +193,8 @@ class Browser extends Eventable {
     }
 
     setContent (mime,code) {
+		console.log(`SETTING CONTENT WITH MIME ${mime}`);
         this.editor.setValue(code);
-//    this.refresh();
         this.browserRenderer.showContent(mime, code);
         this.markUnaltered();
     }

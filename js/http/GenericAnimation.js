@@ -23,7 +23,7 @@ class GenericAnimation extends Eventable {
         console.log(`****Creating a canvas element`);
         this.canvas = document.createElement("canvas");
         this.parentElement = options.parent || (options.parentId ? document.getElementById(options.parentId) : null);
-        this.box = new MessageBox(null, { parent: this.parentElement, editable: options.msgBoxEditable!==false, width: options.msgBoxWidth||'400px', height: options.msgBoxHeight||'400px' });
+        this.box = this.createMessageBox(options);
         this.setMessage(options.message);
         this.canvas.setAttribute("height", options.height || this.parentElement.clientHeight - 32); // -32 for control panel
         this.canvas.setAttribute("width", this.parentElement.clientWidth); 
@@ -316,6 +316,10 @@ class GenericAnimation extends Eventable {
             this.canvasY+=elem.offsetTop;
             elem=elem.offsetParent;
         }    
+    }
+
+    createMessageBox(options) {
+        return new MessageBox(null, { parent: this.parentElement, editable: options.msgBoxEditable!==false, width: options.msgBoxWidth||'400px', height: options.msgBoxHeight||'400px' });
     }
 }
 

@@ -6,6 +6,7 @@ const GenericAnimation = require('./GenericAnimation');
 const DebugMgr = require('../php/DebugMgr');
 const ServerFilesystemAnimation = require('./ServerFilesystemAnimation');
 const NarrativeDialog = require('../ui/NarrativeDialog');
+const HTTPMessageBox = require('./HTTPMessageBox');
 
 class EPHPHttpAnimation extends GenericAnimation  {
    constructor(options) {
@@ -104,6 +105,10 @@ class EPHPHttpAnimation extends GenericAnimation  {
         // Will not make sense if the canvas is being drawn on a dialog
         this.canvas.height = this.parentElement.clientHeight - 40;
         this.canvas.width = this.parentElement.clientWidth;
+    }
+
+    createMessageBox(options) {
+        return new HTTPMessageBox(null, { parent: this.parentElement, editable: options.msgBoxEditable!==false, width: options.msgBoxWidth||'400px', height: options.msgBoxHeight||'400px' });
     }
 }
 

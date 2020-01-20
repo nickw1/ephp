@@ -66,16 +66,18 @@ class FtpHandler {
         if($this->config->ftp==1) {
             if($this->loginstatus) {    
                 $tmpname = tempnam("/tmp2", $_SESSION["ephpuser"]."_dl_");
-//				echo "session $_SESSION[ephpuser] tmpname $tmpname";
+//                echo "session $_SESSION[ephpuser] tmpname $tmpname";
                 chmod($tmpname, 0644);
                 if(@ftp_get($this->conn, $tmpname, "public_html/$filename", 
                     FTP_BINARY)) {
                     $contents =  file_get_contents($tmpname);
+                    $size = getimagesize($tmpname);
                     unlink($tmpname);
-                    return (["content"=>$contents,"webdirUrl"=>
-                        "/~".$_SESSION["ephpuser"],
-                        "webdirPath"=> HOME_DIR."/".$_SESSION["ephpuser"].
-                        "/".USER_WEB_DIR]);
+                    return (["content"=> $size===false ? $contents : base64_encode($contents),
+                        "contentType" => $size && $size["mime"] ? $size["mime"] : "text/html",
+                        "webdirUrl"=> "/~".$_SESSION["ephpuser"],
+                        "webdirPath"=> HOME_DIR."/".$_SESSION["ephpuser"].  "/".USER_WEB_DIR]
+                        );
                 } else {
                     return FtpHandler::CANT_TRANSFER_FILE;
                 }
@@ -84,7 +86,10 @@ class FtpHandler {
             }
         } else {
             $webdirPath=WEBROOT."/".NOFTP_USER_ROOT."/".$_SESSION["ephpuser"];
-            return (["content"=>file_get_contents("$webdirPath/$filename"),
+            $size = getimagesize("$webdirPath/$filename");
+            $contents = file_get_contents("$webdirPath/$filename");
+            return (["content"=>$size===false ? $contents: base64_encode($contents),
+                        "contentType" => $size && $size["mime"] ? $size["mime"] : "text/html",
                         "webdirUrl"=>
                         "/".NOFTP_USER_ROOT."/".$_SESSION["ephpuser"],
                     "webdirPath"=>$webdirPath]);
