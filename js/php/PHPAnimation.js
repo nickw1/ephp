@@ -175,6 +175,9 @@ class PHPAnimation {
         return true;
     }
 
+    handleInit(data) {
+        this.doneSql = {};
+    }
 
     handleLine(data) {
         this.unhighlightLastLine();

@@ -50,6 +50,7 @@ class DbgMsgQueue {
             switch(msg.cmd)    {
                 case 'init':
                     this.fileuri = msg.data;
+                    this.dbgMsgHandler.handleInit(msg.data);
                     break;
 
                 case 'line':
