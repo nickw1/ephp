@@ -127,6 +127,7 @@ class PHPAnimation {
     }
 
     showSrc(data) {
+        this.dbgMsgQueue.clear();
         this.srcDiv.innerHTML = "";
         this.outputWindow.style.display = 'block';
         var codeLines = data.src || [];
@@ -143,8 +144,8 @@ class PHPAnimation {
                 this.parentDiv.removeChild(this.parentDiv.firstChild);
             }
             this.parentDiv.classList.add("serverCode");
-            this.parentDiv.appendChild(this.srcDiv);
         }
+        this.parentDiv.appendChild(this.srcDiv);
 
         this.codeLines = [];
         this.varComments = [];
@@ -171,6 +172,7 @@ class PHPAnimation {
         }
         this.parentDiv.appendChild(this.controlsDiv);
         this.parentDiv.appendChild(this.btndiv);
+        
 
         return true;
     }
@@ -195,7 +197,6 @@ class PHPAnimation {
         }
 
         for(let varName in data.vars) {
-            console.log(`${varName} is a ${data.vars[varName].type}`);
             switch(data.vars[varName].type) {
                 case 'string':
                 case 'int':
@@ -328,7 +329,6 @@ class PHPAnimation {
             comment.style.backgroundColor = PHPAnimation.colours[this.colourCount%PHPAnimation.colours.length];
             this.codeLines[lineno-1].appendChild(comment);
             const retval = this.browserCallback(httpvar, PHPAnimation.colours[this.colourCount%PHPAnimation.colours.length]);
-            console.log(`browserCallback returned ${retval} for ${httpvar}`);
             if(retval) {
                 this.varComments[lineno]=value;
                 this.colourCount++;

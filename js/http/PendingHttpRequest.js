@@ -64,7 +64,6 @@ class PendingHttpRequest extends Eventable {
             var parts = this.url.split('?');
             sourceRetrieverUrl += (parts.length==2) ? parts[0]+'&'+parts[1]: this.url;
         } else if (this.method=='POST') {
-            console.log('PendingHttpRequest.retrieveSrc ' + this.url);
             this.formData.append('target', this.url);
         }
         var xhr = new XMLHttpRequest();
