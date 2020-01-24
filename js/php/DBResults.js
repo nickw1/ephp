@@ -17,7 +17,7 @@ class DBResults {
             }
         }
 
-        if(++this.index <= rows.length) {
+        if(++this.index < rows.length) {
             var thisRow = rows[this.index]; 
             var tds = thisRow.getElementsByTagName('td');
             for(var i=0; i<tds.length; i++) {
