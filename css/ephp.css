@@ -223,13 +223,6 @@ tr,td,th
     margin-right: 5px;
 }
 
-.serverCode {
-    /*
-    line-height: 8px;
-    */
-}
-
-
 .srcconsole {
     background-color: black;
     color: white;
@@ -284,7 +277,6 @@ tr,td,th
     height:100%;
     float: left;
     position: relative;
-    font-size: 90%;
     font-family: monospace;
     color: white;
     overflow-y: auto;
@@ -294,7 +286,6 @@ tr,td,th
 
 #vars>p, #dbresults>p, #log>p {
     color: yellow;
-    font-size: 80%;
 }
 
 #vars {

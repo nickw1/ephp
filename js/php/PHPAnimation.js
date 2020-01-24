@@ -202,17 +202,14 @@ class PHPAnimation {
                 case 'int':
                 case 'float':
                 case 'bool':
+                case 'array':
                     if(this.httpVars[varName] && !this.httpVars[varName].done) {
                         this.addVarComment(this.httpVars[varName].lineno, data.vars[varName].value, this.httpVars[varName].httpVar);
                         this.httpVars[varName].done = true;
                     }
-                    this.varsBox.setVar(varName, data.vars[varName].value);
+                    this.varsBox.setVar(varName, data.vars[varName].type, data.vars[varName].value);
                     break;
 
-                case 'array':
-                    this.varsBox.setVar(varName, JSON.stringify(data.vars[varName].value));
-                    break;
-    
                 case 'object':
                     switch(data.vars[varName].classname) {
                         case "PDOStatement":
