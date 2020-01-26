@@ -14,6 +14,7 @@ class NarrativeDialog extends Eventable {
                 top: 'calc(50% - 200px)',
                 border: '1px solid black',
                 width: '50%',
+                overflow: 'auto',
                 backgroundColor: '#ffffc0'//,
                 //height: '400px' 
 				} );

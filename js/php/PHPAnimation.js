@@ -79,6 +79,7 @@ class PHPAnimation {
                 top: '100px',
                 border: '1px solid black',
                 width: '50%',
+                overflow: 'auto',
                 backgroundColor: '#ffffc0' } 
         );
     }

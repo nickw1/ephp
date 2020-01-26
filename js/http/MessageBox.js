@@ -56,22 +56,22 @@ class MessageBox {
     }
 
     showRequest() {
+        this.div.style.display="block";
         if(this.textarea) {
             this.textarea.value = this.message.getRequest();
         } else {
             this.innerDiv.innerHTML = this.message.getRequest();
         }
-        this.div.style.display="block";
         this.messageType = MessageBox.messageTypes.REQUEST;
     }
 
     showResponse() {
+        this.div.style.display="block";
         if(this.textarea) {
             this.textarea.value = this.message.getResponse();
         } else {
             this.innerDiv.innerHTML = this.message.getResponse();
         }
-        this.div.style.display="block";
         this.messageType = MessageBox.messageTypes.RESPONSE;
     }
 

@@ -227,8 +227,7 @@ class Browser extends Eventable {
 
 
     loadDocumentOrImage(mimetype, url, responseText) {
-        if(mimetype=='image/jpeg' || mimetype=='image/png' ||
-                    mimetype=='image/jpg') { 
+        if(mimetype=='image/jpeg' || mimetype=='image/png' || mimetype=='image/jpg') { 
             this.browserRenderer.showImage(url);
             this.markUnaltered();
         } else if (mimetype=='text/html' || mimetype=='text/plain') {
