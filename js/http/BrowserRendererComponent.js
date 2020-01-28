@@ -128,7 +128,7 @@ class BrowserRendererComponent extends HTMLElement {
             case 'GET':
                 for(var j=0; j<e.target.elements.length; j++) {
                     var el = e.target.elements[j];
-                    if(e.target.elements[j].type!="submit") {
+                    if(e.target.elements[j].type!="submit" && e.target.elements[j].type!="fieldset") {
                         qs+= (qs=="" ? "?":"&");
                         qs += e.target.elements[j].name+ "="+e.target.elements[j].value;
                     }
