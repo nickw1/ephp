@@ -148,41 +148,12 @@ class GenericAnimation extends Eventable {
         var direction = (this.animationState==GenericAnimation.messageTypes.RESPONSE) ? -1 : 1;
         if((direction==1 && this.x < this.canvas.width-this.marginRight) || 
             (direction==-1 && this.x>this.marginLeft)) {
-            var y = (this.animationState==GenericAnimation.messageTypes.RESPONSE) ?
-                (this.canvas.height/4)*3: this.canvas.height/4;
-            this.ctx.fillStyle = 'white';
-            this.ctx.fillRect(this.marginLeft,0,this.canvas.width-this.marginLeft-this.marginRight,this.canvas.height);
-            this.ctx.strokeStyle=
-                this.animationState==GenericAnimation.messageTypes.RESPONSE ? 'green':'red';
-            this.ctx.lineWidth = GenericAnimation.arrow.outlineWidth;
-            this.ctx.fillStyle = 'yellow';
-            this.ctx.beginPath();
-            this.ctx.moveTo(this.x-direction*GenericAnimation.arrow.size,y-GenericAnimation.arrow.size);
-            this.ctx.lineTo(this.x, y);
-            this.ctx.lineTo(this.x-direction*GenericAnimation.arrow.size, y+GenericAnimation.arrow.size);    
-            this.ctx.lineTo(this.x-direction*GenericAnimation.arrow.size, y+GenericAnimation.arrow.size/2);
-            var origin = direction == -1 ? this.canvas.width - this.marginRight: this.marginLeft;
-            this.ctx.lineTo(origin,y+GenericAnimation.arrow.size/2);
-            this.ctx.lineTo(origin,y-GenericAnimation.arrow.size/2);
-            this.ctx.lineTo(this.x-direction*GenericAnimation.arrow.size,y-GenericAnimation.arrow.size/2);
-            this.ctx.lineTo(this.x-direction*GenericAnimation.arrow.size,y-GenericAnimation.arrow.size);
-            this.ctx.fill();
-            this.ctx.stroke();
-            this.ctx.fillStyle='lightgray';
-            var boxX = this.x - GenericAnimation.boxProps.relativePos*direction - (direction==1 ? GenericAnimation.boxProps.width:0);
-            this.ctx.fillRect(boxX,y-GenericAnimation.boxProps.height/2, GenericAnimation.boxProps.width,GenericAnimation.boxProps.height);
-            this.ctx.fillStyle='blue'; 
-            this.ctx.font=GenericAnimation.boxProps.fontSize+'pt Helvetica';
-            this.ctx.fillText(direction == -1 ? this.responseLabel: this.requestLabel, boxX+10, y+5);
-            this.ctx.strokeStyle='black';
-            this.ctx.strokeRect(boxX-1,y-GenericAnimation.boxProps.height/2-1, GenericAnimation.boxProps.width+2, GenericAnimation.boxProps.height+2);
-            
+            this.drawAnimation(direction);
            
             this.x += this.step*direction;
 
             // use same animation state for next timeout, hence no parameter to
             // this.doAnimate()
-
             if(!this.paused) {
                 this.timer = setTimeout
                     (this.doAnimate.bind(this), this.interval);
@@ -204,6 +175,38 @@ class GenericAnimation extends Eventable {
                 this.responseFinished();
             }
         }
+    }
+
+    drawAnimation(direction) {
+        direction = direction || (this.animationState==GenericAnimation.messageTypes.RESPONSE ? -1 : 1);
+        var y = (this.animationState==GenericAnimation.messageTypes.RESPONSE) ?
+                (this.canvas.height/4)*3: this.canvas.height/4;
+        this.ctx.fillStyle = 'white';
+        this.ctx.fillRect(this.marginLeft,0,this.canvas.width-this.marginLeft-this.marginRight,this.canvas.height);
+        this.ctx.strokeStyle=
+                this.animationState==GenericAnimation.messageTypes.RESPONSE ? 'green':'red';
+        this.ctx.lineWidth = GenericAnimation.arrow.outlineWidth;
+        this.ctx.fillStyle = 'yellow';
+        this.ctx.beginPath();
+        this.ctx.moveTo(this.x-direction*GenericAnimation.arrow.size,y-GenericAnimation.arrow.size);
+        this.ctx.lineTo(this.x, y);
+        this.ctx.lineTo(this.x-direction*GenericAnimation.arrow.size, y+GenericAnimation.arrow.size);    
+        this.ctx.lineTo(this.x-direction*GenericAnimation.arrow.size, y+GenericAnimation.arrow.size/2);
+        var origin = direction == -1 ? this.canvas.width - this.marginRight: this.marginLeft;
+        this.ctx.lineTo(origin,y+GenericAnimation.arrow.size/2);
+        this.ctx.lineTo(origin,y-GenericAnimation.arrow.size/2);
+        this.ctx.lineTo(this.x-direction*GenericAnimation.arrow.size,y-GenericAnimation.arrow.size/2);
+        this.ctx.lineTo(this.x-direction*GenericAnimation.arrow.size,y-GenericAnimation.arrow.size);
+        this.ctx.fill();
+        this.ctx.stroke();
+        this.ctx.fillStyle='lightgray';
+        var boxX = this.x - GenericAnimation.boxProps.relativePos*direction - (direction==1 ? GenericAnimation.boxProps.width:0);
+        this.ctx.fillRect(boxX,y-GenericAnimation.boxProps.height/2, GenericAnimation.boxProps.width,GenericAnimation.boxProps.height);
+        this.ctx.fillStyle='blue'; 
+        this.ctx.font=GenericAnimation.boxProps.fontSize+'pt Helvetica';
+        this.ctx.fillText(direction == -1 ? this.responseLabel: this.requestLabel, boxX+10, y+5);
+        this.ctx.strokeStyle='black';
+        this.ctx.strokeRect(boxX-1,y-GenericAnimation.boxProps.height/2-1, GenericAnimation.boxProps.width+2, GenericAnimation.boxProps.height+2);
     }
 
     finishRequest() {
@@ -250,6 +253,7 @@ class GenericAnimation extends Eventable {
         if(this.timer!=null) {
             clearTimeout(this.timer);
             this.timer = null;
+            this.drawAnimation();
         }
     }
 
