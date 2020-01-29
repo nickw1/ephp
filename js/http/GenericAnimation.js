@@ -323,7 +323,7 @@ class GenericAnimation extends Eventable {
     }
 
     createMessageBox(options) {
-        return new MessageBox(null, { parent: this.parentElement, editable: options.msgBoxEditable!==false, width: options.msgBoxWidth||'400px', height: options.msgBoxHeight||'400px' });
+        return new MessageBox(null, { parent: this.parentElement, editable: options.msgBoxEditable!==false, width: options.msgBoxWidth, height: options.msgBoxHeight });
     }
 }
 

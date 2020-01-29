@@ -3,8 +3,8 @@ class MessageBox {
         this.message = msg;
         this.div = document.createElement("div");
         this.div.style.position="absolute";
-        this.div.style.width=options.width || "400px";
-        this.div.style.height=options.height || "400px";
+        if(options.width) this.div.style.width=options.width;
+        if(options.height) this.div.style.height=options.height;
         this.div.style.overflow = 'auto';
         this.div.style.left="50%";
         this.div.style.top="25%";
