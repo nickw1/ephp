@@ -67,21 +67,6 @@ class PHPAnimation {
         this.loops = {};
 
         this.setupGUI();
-
-        this.errorDlg = new Dialog('serverContent', {
-                    'OK' : ()=> { 
-                        this.dbgMsgQueue.start(); 
-                        this.errorDlg.hide();
-                    }
-                },
-                { position: 'absolute',
-                left: '25%',
-                top: '100px',
-                border: '1px solid black',
-                width: '50%',
-                overflow: 'auto',
-                backgroundColor: '#ffffc0' } 
-        );
     }
 
 
@@ -383,8 +368,12 @@ class PHPAnimation {
 
     displayError(msg) {
         this.dbgMsgQueue.stop();
-        this.errorDlg.setContent(msg);
-        this.errorDlg.show();
+        const errorDlg = new NarrativeDialog({ elemId: 'ephp_container',
+                        narrative:msg,
+                        greyOutOverlay: null
+            });
+        errorDlg.on("dismissed", this.dbgMsgQueue.start.bind(this.dbgMsgQueue));
+        errorDlg.show();
     }
 }
 

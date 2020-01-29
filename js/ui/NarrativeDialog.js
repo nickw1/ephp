@@ -17,11 +17,11 @@ class NarrativeDialog extends Eventable {
                 overflow: 'auto',
                 backgroundColor: '#ffffc0'//,
                 //height: '400px' 
-				} );
+                } );
 
         const narrativeOptions = {elem : this.dlg.div, narrative: options.narrative};
         this.narrative = new Narrative(narrativeOptions);
-        this.greyOutOverlay = document.getElementById(options.greyOutOverlay||'greyOutOverlay');
+        this.greyOutOverlay = options.greyOutOverlay===null ? null: document.getElementById(options.greyOutOverlay||'greyOutOverlay');
     }
 
     on(eventType, eventHandler) {
