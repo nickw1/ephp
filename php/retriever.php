@@ -22,29 +22,29 @@ if(!isset($_SESSION["ephpuser"])) {
     $errors[] = "Not logged in.";
 }
 elseif(($fileinfo=get_php_filename($target,$config["ephproot"],$config["ftp"]))
-		==null) {
+        ==null) {
     $errors[] = "Can only read from ephp-designated directories.";
 } else {
     list($expectedUsername, $targetfile) = $fileinfo;
     if($expectedUsername != $_SESSION["ephpuser"]) {
         $errors[] = "Cannot read another user's files.";
     } else {
-		if(($target_contents = @file_get_contents($targetfile))===false) {
-			$errors[] = "Cannot open specified PHP file on server $targetfile.";
-			$httpCode = 404;
-		}
+        if(($target_contents = @file_get_contents($targetfile))===false) {
+            $errors[] = "Cannot open specified PHP file on server $targetfile.";
+            $httpCode = 404;
+        }
     } 
 } 
 
 if(empty($errors)) {
-	$srclines = explode("\r\n", $target_contents);
+    $srclines = explode("\n", $target_contents);
     $json = array (
         //"php" => htmlentities($target_contents), 
         "src" => $srclines,
                 ); 
-	/* 190119 WTF? this code is doing nothing !!!
+    /* 190119 WTF? this code is doing nothing !!!
         $httpCode = $script_result["status"]["code"];
-	*/
+    */
 } else { 
     $json = array ("errors" => $errors);
 }
@@ -58,15 +58,15 @@ echo json_encode($json);
 function get_php_filename($target, $ephproot, $ftp)
 {
     $matches=array();
-	$regexp = $ftp==1 ?
-    	"/^\/~(${ephproot}\d{3})\/([a-zA-Z0-9_\/\-]+\.php)$/":
-    	"/^\/".NOFTP_USER_ROOT.
-			"\/(${ephproot}\d{3})\/([a-zA-Z0-9_\/\-]+\.php)$/";
+    $regexp = $ftp==1 ?
+        "/^\/~(${ephproot}\d{3})\/([a-zA-Z0-9_\/\-]+\.php)$/":
+        "/^\/".NOFTP_USER_ROOT.
+            "\/(${ephproot}\d{3})\/([a-zA-Z0-9_\/\-]+\.php)$/";
     // can only get php files from specific ephp directories (sandbox)
     if(preg_match($regexp,$target,$matches)) {
         return array ($matches[1],$ftp==1?
-			HOME_DIR."/$matches[1]/".USER_WEB_DIR."/$matches[2]":
-			WEBROOT."/".NOFTP_USER_ROOT."/$matches[1]/$matches[2]");
+            HOME_DIR."/$matches[1]/".USER_WEB_DIR."/$matches[2]":
+            WEBROOT."/".NOFTP_USER_ROOT."/$matches[1]/$matches[2]");
     }
     return null;
 }

@@ -108,7 +108,7 @@ $page = new EPHPPage();
 $scripts = [ 
             'jslib/Dialog.js',
             'ace-builds/src/ace.js',
-            'js/bundle.js'
+            'js/bundle.js?v=0129'
         ];
 
 $css = ['https://fonts.googleapis.com/css?family=Press+Start+2P&display=swap',
