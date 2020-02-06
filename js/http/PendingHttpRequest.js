@@ -52,7 +52,8 @@ class PendingHttpRequest extends Eventable {
             }
         });
         xhr.open(this.method, actualUrl);
-        xhr.send(this.formData);
+        //xhr.send(this.formData);
+        xhr.send();
     }
 
 // to be called in debug mode as the first step: 
