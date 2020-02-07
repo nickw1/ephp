@@ -15,6 +15,7 @@ class Recurser {
                 case 'Stmt_While':
                 case 'Stmt_Do':
                 case 'Stmt_For':
+                case 'Stmt_TryCatch':
                     $result =$this->loopHandler($node, $additional);
                     break;
 
@@ -22,7 +23,8 @@ class Recurser {
                     $result = $this->ifHandler($node, $additional);
                     break;
 
-               } 
+              } 
+//        }
         
         return $result;    
     }

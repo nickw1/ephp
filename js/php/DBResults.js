@@ -27,6 +27,7 @@ class DBResults {
     }
 
     showResults(sqlquery, hostDiv) {
+		this.index = 0;
         while(hostDiv.childNodes.length > 0) {
             hostDiv.removeChild(hostDiv.firstChild);
         }

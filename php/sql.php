@@ -17,7 +17,7 @@ if(!isset($_SESSION["ephpuser"])) {
 else
 {
     $loopBounds = [];
-	$varName = null;
+    $varName = null;
     if(isset($_GET["resultvar"]) && isset($_GET["fileuri"]) && preg_match("/^[\w\d]+$/", $_GET['resultvar'])) {
         $varName = $_GET["resultvar"];
         $loopFinder = new DBLoopFinder($_GET["fileuri"]);
